@@ -1,0 +1,270 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>LittleJohn</title>
+
+	<!-- Third Party references -->
+	<script src="/js/jquery-2.2.4.js"></script>
+	<link href="/css/bootstrap.css" rel="stylesheet" />
+	<script src="/js/bootstrap.js"></script>
+
+	<!-- WinJS references -->
+	<link href="WinJS/css/ui-dark.css" rel="stylesheet" />
+	<script src="WinJS/js/base.js"></script>
+	<script src="WinJS/js/ui.js"></script>
+
+	<!-- LittleJohn references -->
+	<link href="/css/default.css" rel="stylesheet" />
+	<script src="/js/robinhood.js"></script>
+	<script src="/js/main.js"></script>
+</head>
+<body class="win-type-body">
+	<!-- LOGIN VIEW -->
+	<center id="loginScreen" class="display-table full-screen">
+		<div class="win-type-body vert-center">
+			<h2 class="win-h2">LittleJohn</h2>
+			<p style="">Username: <input type="text" id="username" class="win-textbox" /></p>
+			<p style="">Password: <input type="password" id="password" class="win-textbox" /></p>
+			<button id="loginButton" class="win-button win-button-primary">Login</button>
+		</div>
+	</center>
+	<!-- MAIN VIEW -->
+	<div id="app" class="win-type-body hide">
+		<!-- SPLIT VIEW -->
+		<div class="splitView" data-win-control="WinJS.UI.SplitView">
+			<!-- Pane area -->
+			<div>
+				<div class="header">
+					<button class="win-splitviewpanetoggle"
+							data-win-control="WinJS.UI.SplitViewPaneToggle"
+							data-win-options="{ splitView: select('.splitView') }"></button>
+					<div class="title">
+						<div class="row">
+							<div class="col-xs-12">
+								<h5 class="win-h5">User Name</h5>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-xs-6">
+								<h2 class="win-h2">$1234</h5>
+							</div>
+							<div class="col-xs-6">
+								<h2 class="win-h2">$11.23</h2>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-xs-6">
+								<h5 class="win-h5">Portfolio Value</h5>
+							</div>
+							<div class="col-xs-6">
+								<h5 class="win-h5">Buying Power</h5>
+							</div>
+						</div>
+					</div>
+
+				</div>
+
+				<div class="nav-commands">
+					<div data-tab-id="portfolio" data-win-control="WinJS.UI.SplitViewCommand" data-win-options="{ label: 'Portfolio', icon: 'folder', oninvoked: mySplitView.tabClicked}"></div>
+					<div data-tab-id="account" data-win-control="WinJS.UI.SplitViewCommand" data-win-options="{ label: 'Account', icon: 'previewlink', oninvoked: mySplitView.tabClicked}"></div>
+					<div data-tab-id="banking" data-win-control="WinJS.UI.SplitViewCommand" data-win-options="{ label: 'Banking', icon: 'link', oninvoked: mySplitView.tabClicked}"></div>
+					<div data-tab-id="history" data-win-control="WinJS.UI.SplitViewCommand" data-win-options="{ label: 'History', icon: 'undo', oninvoked: mySplitView.tabClicked}"></div>
+					<div data-tab-id="settings" data-win-control="WinJS.UI.SplitViewCommand" data-win-options="{ label: 'Settings', icon: 'settings', oninvoked: mySplitView.tabClicked}"></div>
+					<div data-tab-id="refer" data-win-control="WinJS.UI.SplitViewCommand" data-win-options="{ label: 'Refer friends', icon: 'addfriend', oninvoked: mySplitView.tabClicked}"></div>
+					<div data-tab-id="help" data-win-control="WinJS.UI.SplitViewCommand" data-win-options="{ label: 'Help', icon: 'help', oninvoked: mySplitView.tabClicked}"></div>
+				</div>
+			</div>
+			<!-- Content area -->
+			<div class="contenttext">
+				<div class="row row-no-margin nav-row text-right">
+					<div class="display-inline-block">
+						<div class="icon-button" role="button">
+							<div class="icon-button-content">
+								<div class="icon-button-icon">&#xE71E;</div>
+							</div>
+						</div>
+					</div>
+					<div class="display-inline-block">
+						<div class="icon-button" role="button">
+							<div class="icon-button-content">
+								<div class="icon-button-icon">&#xE712;</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div id="portfolio-ui" class="main-tab active">
+					<div class="win-type-header text-center">$1234</div>
+					<div class="win-type-title text-center"><strong>+$37.90 (+13.12%) 04:00PM EDT</strong></div>
+					<div class="win-type-title text-center">$1437.21 +203.21 (+20.59%) After-hours</div>
+					<div class="container">
+						<div class="row">
+							<div class="col-xs-12">
+								<div class="thumbnail">
+									<img src="http://placehold.it/320x125/EEE">
+									<div class="tab-content">
+										<div class="tab-pane active" id="1D">
+											<p>1 Day</p>
+										</div><!--/tab-pane-->
+										<div class="tab-pane" id="1W">
+											<p>1 Week</p>
+										</div><!--/tab-pane-->
+										<div class="tab-pane" id="1M">
+											<p>1 Month</p>
+										</div><!--/tab-pane-->
+										<div class="tab-pane" id="3M">
+											<p>3 Months</p>
+										</div><!--/tab-pane-->
+										<div class="tab-pane" id="1Y">
+											<p>1 Year</p>
+										</div><!--/tab-pane-->
+										<div class="tab-pane" id="ALL">
+											<p>All</p>
+										</div><!--/tab-pane-->
+									</div><!--/tab-content-->
+									<ul class="nav nav-pills nav-justified">
+										<li class="active"><a href="#1D" data-toggle="tab">1D</a></li>
+										<li><a href="#1W" data-toggle="tab">1W</a></li>
+										<li><a href="#1M" data-toggle="tab">1M</a></li>
+										<li><a href="#3M" data-toggle="tab">3M</a></li>
+										<li><a href="#1Y" data-toggle="tab">1Y</a></li>
+										<li><a href="#ALL" data-toggle="tab">ALL</a></li>
+									</ul>
+								</div>
+							</div>
+						</div><!--/row-->
+					</div><!--/container -->
+					<div class="container">
+						<div class="row">
+							<div class="col-xs-12">
+								<div class="thumbnail text-center">
+									<p>You're all caught up!</p>
+									<p>New cards will be added here as they</p>
+									<p>become available.</p>
+								</div>
+							</div>
+						</div><!--/row-->
+					</div><!--/container -->
+				</div>
+				<div id="account-ui" class="main-tab hide">
+					<!-- TRAIL DESCRIPTION -->
+					<div class="description">
+						<!-- this is where the title, location and description are injected for each hiking page -->
+						<h2 class="trail-title"></h2>
+						<p class="trail-location"></p>
+						<p class="trail-description" id="description-content"></p>
+						<!--RATING-->
+						<table>
+							<tr class="detail">
+								<td>Rate this trail: </td>
+								<td class="control">
+									<div class="rating" data-win-control="WinJS.UI.Rating" data-win-options="{averageRating: 3.4}"></div>
+								</td>
+							</tr>
+						</table>
+						<!--END RATING-->
+					</div>
+				</div>  <!-- closes trail-ui-->
+			</div>
+		</div>
+	</div>
+
+		<!-- ListView and Repeater-->
+					<!--<div class="mainList">
+						<div id="inputForm" data-win-control="WinJS.Binding.Template">
+							<div>
+								<p style="display: inline-block" data-win-bind="textContent: label"></p>
+								<input type="text" class="win-textbox" data-win-bind="className: id BindingHelpers.appendToClasses" />
+							</div>
+						</div>
+						<div class="myFeaturesListTemplate" data-win-control="WinJS.Binding.Template">
+							<div class="col-xs-6">
+								<h4 class="win-h4" data-win-bind="textContent: title"></h4>
+								<div data-win-control="WinJS.UI.Repeater"
+										data-win-options="{template: select('#inputForm')}"
+										data-win-bind="winControl.data: inputArray">
+								</div>
+								<button class="win-button" data-win-bind="className: buttonId BindingHelpers.appendToClasses; textContent: title"></button>
+								<div class="win-code" data-win-bind="className: outputId BindingHelpers.appendToClasses"></div>
+							</div>
+						</div>
+
+						<div id="featureListView"
+							 class="win-selectionstylefilled"
+							 data-win-control="WinJS.UI.Repeater"
+							 data-win-options="{template: select('.myFeaturesListTemplate'), data: myFeaturesList.data}">
+						</div>
+						Ignore this one.
+						<div id="featureListView"
+							 class="win-selectionstylefilled"
+							 data-win-control="WinJS.UI.ListView"
+							 data-win-options="{
+							itemDataSource: myFeaturesList.data.dataSource,
+							itemTemplate: select('.myFeaturesListTemplate'),
+							selectionMode: 'none',
+							tapBehavior: 'none',
+							layout: { type: WinJS.UI.GridLayout }
+							}">
+						</div>
+					</div>-->
+					<!--End ListView-->
+
+		<!--<h3>investment_profile</h3>
+		<button id="investmentProfileButton">Get investment_profile</button>
+		<div id="investmentProfileOutput"></div>
+
+		<h3>instruments</h3>
+		<p>Type a symbol</p>
+		<input id="instrumentsInput" type="text" />
+		<button id="instrumentsButton">Get instruments</button>
+		<div id="instrumentsOutput"></div>
+
+		<h3>quote_data</h3>
+		<p>Type a symbol</p>
+		<input id="quoteInput" type="text" />
+		<button id="quoteButton">Get Quote</button>
+		<div id="quoteOutput"></div>
+
+		<h3>accounts</h3>
+		<button id="accountsButton">Get accounts</button>
+		<div id="accountsOutput"></div>
+
+		<h3>user</h3>
+		<button id="userButton">Get user</button>
+		<div id="userOutput"></div>
+
+		<h3>dividends</h3>
+		<button id="dividendsButton">Get dividends</button>
+		<div id="dividendsOutput"></div>
+
+		<h3>orders</h3>
+		<button id="ordersButton">Get orders</button>
+		<div id="ordersOutput"></div>
+
+		<h3>place_buy_order/place_sell_order</h3>
+		<p>Type a transaction ('buy' or 'sell')</p>
+		<input id="placeOrderTransactionInput" type="text" />
+		<p>Type an instrument.url</p>
+		<input id="placeOrderInstrumentUrlInput" type="text" />
+		<p>Type a bid_price</p>
+		<input id="placeOrderBidPriceInput" type="text" />
+		<p>Type a stop_price</p>
+		<input id="placeOrderStopPriceInput" type="text" />
+		<p>Type a quantity</p>
+		<input id="placeOrderQuantityInput" type="text" />
+		<p>Type an instrument.symbol</p>
+		<input id="placeOrderInstrumentSymbolInput" type="text" />
+		<p>Type a time (???, 'gtc', or 'gfd')</p>
+		<input id="placeOrderTimeInput" type="text" />
+		<p>Type a trigger (??? or 'immediate')</p>
+		<input id="placeOrderTriggerInput" type="text" />
+		<p>Type a type (???, 'limit', or 'market')</p>
+		<input id="placeOrderTypeInput" type="text" />
+		<button id="placeOrderButton">Place Order</button>
+		<div id="placeOrderOutput"></div>
+
+		<h3>positions</h3>
+		<button id="positionsButton">Get positions</button>
+		<div id="positionsOutput"></div>-->
+</body>
+</html>
