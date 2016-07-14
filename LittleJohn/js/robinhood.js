@@ -44,7 +44,7 @@ class Robinhood{
                 'Accept-Encoding': 'gzip, deflate',
                 'Accept-Language': 'en;q=1, fr;q=0.9, de;q=0.8, ja;q=0.7, nl;q=0.6, it;q=0.5',
                 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
-                'X-Robinhood-API-Version': '1.0.0',
+                'X-Robinhood-API-Version': '1.70.0',
                 'Connection': 'keep-alive',
                 'User-Agent': 'Robinhood/823 (iPhone; iOS 7.1.2; Scale/2.00)'
             },
@@ -274,7 +274,7 @@ class Robinhood{
         return new Promise(function(resolve, reject) {
             this._request.open(
                 'GET',
-                this._endpoints.historicals + this._private.account.account_number + this.formatParams({ span: options.span, interval: options.interval }),
+                this._endpoints.historicals + this._private.account.account_number + "/" + this.formatParams({ span: options.span, interval: options.interval }),
                 true
             );
             this._setHeaders();

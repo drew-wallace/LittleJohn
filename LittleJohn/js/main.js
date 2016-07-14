@@ -46,7 +46,6 @@
 
     }
 
-
     function _getValue(obj, path) {
         if (path) {
             for (var i = 0, len = path.length; i < len && (obj !== null && obj !== undefined) ; i++) {

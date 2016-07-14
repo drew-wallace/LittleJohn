@@ -197,6 +197,9 @@ button.win-splitview-button:after {
     text-decoration: none;
 }
 
+/*.news-card {
+    touch-action: cross-slide-x;
+}*/
 
 /* Global Classes */
 .hide {
