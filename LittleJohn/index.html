@@ -8,6 +8,7 @@
 	<script src="/js/jquery-2.2.4.js"></script>
 	<link href="/css/bootstrap.css" rel="stylesheet" />
 	<script src="/js/bootstrap.js"></script>
+	<script src="/js/d3.js"></script>
 
 	<!-- WinJS references -->
 	<link href="WinJS/css/ui-dark.css" rel="stylesheet" />
@@ -94,16 +95,16 @@
 					</div>
 				</div>
 				<div id="portfolio-ui" class="main-tab active">
-					<div class="win-type-header text-center">$1234</div>
+					<div id="portfolio-header" class="win-type-header text-center">$1234</div>
 					<div class="win-type-title text-center"><strong>+$37.90 (+13.12%) 04:00PM EDT</strong></div>
 					<div class="win-type-title text-center">$1437.21 +203.21 (+20.59%) After-hours</div>
 					<div class="container">
 						<div class="row">
 							<div class="col-xs-12">
 								<div class="thumbnail">
-									<img src="http://placehold.it/320x125/EEE">
 									<div class="tab-content">
 										<div class="tab-pane active" id="1D">
+											<div class="day-chart"></div>
 											<p>1 Day</p>
 										</div><!--/tab-pane-->
 										<div class="tab-pane" id="1W">
