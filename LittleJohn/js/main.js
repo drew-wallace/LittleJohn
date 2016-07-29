@@ -268,130 +268,21 @@
         // var usernameInput = document.querySelector("#username").value;
         // var passwordInput = document.querySelector("#password").value;
         // var loggedIn = robinhood.login(usernameInput, passwordInput);
-        var margin = {top: 20, right: 20, bottom: 30, left: 50},
-            width = 960 - margin.left - margin.right,
-            height = 500 - margin.top - margin.bottom;
-
-        var parseTime = d3.timeParse("%d-%b-%y"),
-            bisectDate = d3.bisector(function(d) { return d.date; }).left,
-            formatValue = d3.format(",.2f"),
-            formatCurrency = function(d) { return "$" + formatValue(d); };
-
-        var x = d3.scaleTime()
-            .range([0, width]);
-
-        var y = d3.scaleLinear()
-            .range([height, 0]);
-
-        var line = d3.line()
-            .x(function(d) { return x(d.date); })
-            .y(function(d) { return y(d.close); });
-
-        var svg = d3.select(".day-chart")
-            .append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-        robinhood.historicals({span: 'day', interval: '5minute'}).then(function (res) {
-            console.log(JSON.parse(res.response));
-            var data = JSON.parse(res.response).equity_historicals
-            // console.log(data);
-
-            data = data.map(function(d){
-                return {date: new Date(d.begins_at), close: +d.adjusted_close_equity};
-            });
-
-            console.log(data);
-
-            x.domain(d3.extent(data, function(d) { return d.date; }));
-            y.domain(d3.extent(data, function(d) { return d.close; }));
-
-            svg.append("g")
-                .attr("class", "axis axis--x")
-                .attr("transform", "translate(0," + height + ")")
-                .call(d3.axisBottom(x));
-
-            svg.append("g")
-                .attr("class", "axis axis--y")
-                .call(d3.axisLeft(y))
-                .append("text")
-                .attr("class", "axis-title")
-                .attr("transform", "rotate(-90)")
-                .attr("y", 6)
-                .attr("dy", ".71em")
-                .attr("fill", "#FFF")
-                .style("text-anchor", "end")
-                .text("Price ($)");
-
-            var mainLine = svg.append("path")
-                .datum(data)
-                .attr("class", "line")
-                .attr("d", line);
-
-            var focus = svg.append("g")
-                .attr("height", height)
-                .attr("class", "focus")
-                .style("display", "none");
-
-            focus.append("line")
-                .attr('x1', 0)
-                .attr('y1', 0)
-                .attr('x2', 0)
-                .attr('y2', height)
-                .attr("stroke", "steelblue")
-                .attr('class', 'verticalLine');
-
-            // focus.append("text")
-            //     .attr("x", 9)
-            //     .attr("dy", ".35em")
-            //     .attr("fill", "white");
-
-            svg.append("rect")
-                .attr("class", "overlay")
-                .attr("width", width)
-                .attr("height", height)
-                .style("fill", "transparent")
-                .on("mouseover", function() { focus.style("display", null); })
-                .on("mouseout", function() { focus.style("display", "none"); })
-                .on("mousemove", mousemove);
-
-            function mousemove() {
-                var x0 = x.invert(d3.mouse(this)[0]),
-                    i = bisectDate(data, x0, 1),
-                    d0 = data[i - 1],
-                    d1 = data[i],
-                    d = x0 - d0.date > d1.date - x0 ? d1 : d0;
-
-                document.getElementById("portfolio-header").innerText = formatCurrency(d.close);
-
-                var xPos = d3.mouse(this)[0];
-                d3.select(".verticalLine").attr("transform", function () {
-                    return "translate(" + xPos + ",0)";
-                });
-
-                var pathLength = mainLine.node().getTotalLength();
-                var thisX = xPos;
-                var beginning = thisX,
-                    end = pathLength,
-                    target, pos;
-                while (true) {
-                    target = Math.floor((beginning + end) / 2);
-                    pos = mainLine.node().getPointAtLength(target);
-                    if ((target === end || target === beginning) && pos.x !== thisX) {
-                        break;
-                    }
-                    if (pos.x > thisX) end = target;
-                    else if (pos.x < thisX) beginning = target;
-                    else break; //position found
-                }
-            }
-        });
+        if(loggedIn) {
             document.getElementById("loginScreen").classList.remove("display-table");
             document.getElementById("loginScreen").classList.add("hide");
             document.getElementById("app").classList.remove("hide");
-        // }
+
+            var chart = new D3LineChart("#oneDay > .day-chart");
+
+            robinhood.historicals({span: 'day', interval: '5minute'}).then(function (res) {
+                console.log(JSON.parse(res.response));
+                var data = JSON.parse(res.response).equity_historicals
+                chart.setup(data, "portfolio-header");
+                chart.redrawChart();
+                window.addEventListener('resize', function() {chart.redrawChart()});
+            });
+        }
     }
 
     function investmentProfileButtonClickHandler(eventInfo) {

@@ -68,6 +68,7 @@
     <Content Include="images\StoreLogo.png" />
     <Content Include="images\Wide310x150Logo.scale-200.png" />
     <Content Include="js\bootstrap.js" />
+    <Content Include="js\d3-line-chart.js" />
     <Content Include="js\d3.js" />
     <Content Include="js\jquery-2.2.4.js" />
     <Content Include="js\main.js" />
