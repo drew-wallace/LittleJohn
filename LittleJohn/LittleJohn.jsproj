@@ -73,6 +73,7 @@
     <Content Include="js\jquery-2.2.4.js" />
     <Content Include="js\main.js" />
     <Content Include="css\default.css" />
+    <Content Include="js\numeral.js" />
     <Content Include="js\robinhood.js" />
     <Content Include="packages.config" />
     <Content Include="WinJS\css\ui-dark.css" />

@@ -115,6 +115,8 @@ class D3LineChart{
         this.focus.style("display", null);
         document.getElementById(this.afterHoursElement).style.visibility = "hidden";
         d3.select('.overlay').on("mouseover", function() { this.focus.style("display", null); }.bind(this));
+        document.getElementById(this.highlightedEquityValueElement).originalValue = document.getElementById(this.highlightedEquityValueElement).innerText;
+        document.getElementById(this.highlightedEquityChangeValueElement).originalValue = document.getElementById(this.highlightedEquityChangeValueElement).innerText;
     }
     _dragging(ignoreThis, elmIndex, elms) {
         // -$7.41 (-3.11%) 10:55 AM EDT
@@ -161,6 +163,8 @@ class D3LineChart{
         this.focus.style("display", "none");
         document.getElementById(this.afterHoursElement).style.visibility = null;
         d3.select('.overlay').on("mouseover", function() { this.focus.style("display", "none"); }.bind(this));
+        document.getElementById(this.highlightedEquityValueElement).innerText = document.getElementById(this.highlightedEquityValueElement).originalValue;
+        document.getElementById(this.highlightedEquityChangeValueElement).innerText = document.getElementById(this.highlightedEquityChangeValueElement).originalValue;
     }
     redrawChart() {
         //get dimensions based on window size

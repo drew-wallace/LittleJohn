@@ -54,6 +54,18 @@
         return obj;
     }
 
+    function _formatEquity(d) {
+        return numeral(d).format('$0,0.00');
+    }
+
+    function _formatCurrency(d) {
+        return numeral(d).format('+$0,0.00');
+    }
+
+    function _formatPercent(d) {
+        return numeral(d).format('+0.00%');
+    }
+
     WinJS.Namespace.define("BindingHelpers", {
         appendToClasses: WinJS.Binding.initializer(function (source, sourceProperty, dest, destProperty) {
             var appendHelper = function () {
@@ -146,6 +158,12 @@
                     outputId: "accountsOutput"
                 },
                 {
+                    title: "portfolios",
+                    inputArray: new WinJS.Binding.List([]),
+                    buttonId: "portfoliosButton",
+                    outputId: "portfoliosOutput"
+                },
+                {
                     title: "user",
                     inputArray: new WinJS.Binding.List([]),
                     buttonId: "userButton",
@@ -233,6 +251,9 @@
             // var accountsButton = document.querySelector(".accountsButton");
             // accountsButton.addEventListener("click", accountsButtonClickHandler, false);
 
+            var portfoliosButton = document.querySelector(".portfoliosButton");
+            portfoliosButton.addEventListener("click", portfoliosButtonClickHandler, false);
+
             // var userButton = document.querySelector(".userButton");
             // userButton.addEventListener("click", userButtonClickHandler, false);
 
@@ -274,13 +295,41 @@
 
             var chart = new D3LineChart("#oneDay > .day-chart");
 
-            robinhood.historicals({span: 'day', interval: '5minute'}).then(function (res) {
-                console.log(JSON.parse(res.response));
-                var data = JSON.parse(res.response).equity_historicals
-                chart.setup(data, "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
-                chart.redrawChart();
-                window.addEventListener('resize', function() {chart.redrawChart()});
+            document.querySelector('.day-chart').addEventListener("contextmenu", function(e){ e.preventDefault();})
+
+            robinhood.portfolios().then(function (res) {
+                var data = JSON.parse(res.response).results[0];
+                data.equity = +data.equity;
+                data.extended_hours_equity = +data.extended_hours_equity;
+
+                document.getElementById('portfolio-header').innerText = _formatEquity(data.equity);
+
+                var afterHoursReturn = data.extended_hours_equity - data.equity,
+                    afterHoursPercentReturn = afterHoursReturn / data.equity,
+                    afterHoursText = _formatEquity(data.extended_hours_equity) + ' ' + _formatCurrency(afterHoursReturn) + ' (' + _formatPercent(afterHoursPercentReturn) + ') After-hours';
+
+                document.getElementById('after-hours-sub-header').innerText = afterHoursText;
+
+                return data.equity;
+            }).then(function(equity) {
+                robinhood.historicals({span: 'day', interval: '5minute'}).then(function (res) {
+                    console.log(JSON.parse(res.response));
+
+                    var data = JSON.parse(res.response).equity_historicals,
+                        startingEquity = +data[0].adjusted_open_equity,
+                        endingEquity = equity,
+                        netReturn = endingEquity - startingEquity,
+                        netPercentReturn = netReturn / startingEquity,
+                        equityChangeText = _formatCurrency(netReturn) + ' (' + _formatPercent(netPercentReturn) + ') 04:00 PM EDT';
+
+                    document.getElementById('current-equity-change-sub-header').innerText = equityChangeText;
+
+                    chart.setup(data, "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
+                    chart.redrawChart();
+                    window.addEventListener('resize', function() {chart.redrawChart()});
+                });
             });
+
         }
     }
 
@@ -323,6 +372,16 @@
 
         robinhood.accounts().then(function (res) {
             accountsOutput.innerText = JSON.stringify(JSON.parse(res.response), null, '    ');
+        });
+    }
+
+    function portfoliosButtonClickHandler(eventInfo) {
+        var portfoliosOutput = document.querySelector(".portfoliosOutput");
+        var loadingString = "Loading...";
+        portfoliosOutput.innerText = loadingString;
+
+        robinhood.portfolios().then(function (res) {
+            portfoliosOutput.innerText = JSON.stringify(JSON.parse(res.response), null, '    ');
         });
     }
 

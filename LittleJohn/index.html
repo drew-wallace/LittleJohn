@@ -9,6 +9,7 @@
 	<link href="/css/bootstrap.css" rel="stylesheet" />
 	<script src="/js/bootstrap.js"></script>
 	<script src="/js/d3.js"></script>
+	<script src="/js/numeral.js"></script>
 
 	<!-- WinJS references -->
 	<link href="WinJS/css/ui-dark.css" rel="stylesheet" />
@@ -96,9 +97,9 @@
 					</div>
 				</div>
 				<div id="portfolio-ui" class="main-tab active">
-					<div id="portfolio-header" class="win-type-header text-center">$1234</div>
-					<div class="win-type-title text-center"><strong id="current-equity-change-sub-header">+$37.90 (+13.12%) 04:00PM EDT</strong></div>
-					<div class="win-type-title text-center" id="after-hours-sub-header">$1437.21 +203.21 (+20.59%) After-hours</div>
+					<div id="portfolio-header" class="win-type-header text-center">Equity</div>
+					<div class="win-type-title text-center"><strong id="current-equity-change-sub-header">Net Return (Net Return Percent) Time</strong></div>
+					<div class="win-type-title text-center" id="after-hours-sub-header">Extended Hours Equity, Extended Hours Return, (Extended Hours Return Percent)</div>
 					<div class="container">
 						<div class="row">
 							<div class="col-xs-12">
@@ -106,7 +107,6 @@
 									<div class="tab-content">
 										<div class="tab-pane active" id="oneDay">
 											<div class="day-chart"></div>
-											<p>1 Day</p>
 										</div><!--/tab-pane-->
 										<div class="tab-pane" id="oneWeek">
 											<p>1 Week</p>
@@ -125,11 +125,11 @@
 										</div><!--/tab-pane-->
 									</div><!--/tab-content-->
 									<ul class="nav nav-pills nav-justified">
-										<li class="active"><a href="#1D" data-toggle="tab">1D</a></li>
-										<li><a href="#1W" data-toggle="tab">1W</a></li>
-										<li><a href="#1M" data-toggle="tab">1M</a></li>
-										<li><a href="#3M" data-toggle="tab">3M</a></li>
-										<li><a href="#1Y" data-toggle="tab">1Y</a></li>
+										<li class="active"><a href="#oneDay" data-toggle="tab">1D</a></li>
+										<li><a href="#oneWeek" data-toggle="tab">1W</a></li>
+										<li><a href="#oneMonth" data-toggle="tab">1M</a></li>
+										<li><a href="#threeMonths" data-toggle="tab">3M</a></li>
+										<li><a href="#oneYear" data-toggle="tab">1Y</a></li>
 										<li><a href="#ALL" data-toggle="tab">ALL</a></li>
 									</ul>
 								</div>
@@ -143,6 +143,17 @@
 									<p>You're all caught up!</p>
 									<p>New cards will be added here as they</p>
 									<p>become available.</p>
+								</div>
+							</div>
+						</div><!--/row-->
+					</div><!--/container -->
+					<div class="container news-card">
+						<div class="row">
+							<div class="col-xs-12">
+								<div class="thumbnail text-center">
+									<h3>Portfolios</h3>
+									<button class="portfoliosButton">Get portfolios</button>
+									<div class="portfoliosOutput"></div>
 								</div>
 							</div>
 						</div><!--/row-->
