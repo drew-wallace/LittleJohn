@@ -43,7 +43,6 @@
                 context._gestureInfos.started = false;
             }
         });
-
     }
 
     function _getValue(obj, path) {
@@ -278,7 +277,7 @@
             robinhood.historicals({span: 'day', interval: '5minute'}).then(function (res) {
                 console.log(JSON.parse(res.response));
                 var data = JSON.parse(res.response).equity_historicals
-                chart.setup(data, "portfolio-header");
+                chart.setup(data, "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
                 chart.redrawChart();
                 window.addEventListener('resize', function() {chart.redrawChart()});
             });

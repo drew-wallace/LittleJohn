@@ -87,6 +87,7 @@
 }
 
 #app .contenttext {
+    touch-action: pan-y;
     /*padding-right: 20px;*/
     /*margin-left: 10px;*/
     margin-top: 48px;
@@ -223,8 +224,8 @@ button.win-splitview-button:after {
 
 .line {
   fill: none;
-  stroke: steelblue;
-  stroke-width: 1.5px;
+  stroke: #6dad62;
+  stroke-width: 2.5px;
 }
 
 .svg-container {
@@ -246,10 +247,6 @@ button.win-splitview-button:after {
 }
 
 /* Global Classes */
-.hide {
-    display: none;
-}
-
 .display-table {
     display: table;
 }
