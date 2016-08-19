@@ -50,13 +50,22 @@ class Robinhood{
             auth_token: null
         };
     }
-
     _setHeaders(request) {
         Object.keys(this._private.headers).forEach(function (key) {
             request.setRequestHeader(key, this._private.headers[key]);
         }.bind(this));
     }
-
+    _parseResponse(res) {
+        return JSON.parse(res);
+    }
+    _formatParams(params, isPost){
+        return (isPost ? '' : "?") + Object
+                .keys(params)
+                .map(function(key){
+                    return key+"="+params[key]
+                })
+                .join("&")
+    }
     login(username, password) {
         var request = new XMLHttpRequest();
         request.open(
@@ -67,7 +76,7 @@ class Robinhood{
         this._setHeaders(request);
         request.send('username=' + (username || this._private.username) + '&password=' + (password || this._private.password));
         if (request.status == 200) {
-            var body = JSON.parse(request.response);
+            var body = this._parseResponse(request.response);
 
             this._private.auth_token = body.token;
             this._private.headers.Authorization = 'Token ' + this._private.auth_token;
@@ -81,7 +90,7 @@ class Robinhood{
             this._setHeaders(request);
             request.send();
             if (request.status == 200) {
-                var accountBody = JSON.parse(request.response);
+                var accountBody = this._parseResponse(request.response);
 
                 if (accountBody.results) {
                     this._private.account = accountBody.results[0];
@@ -97,19 +106,6 @@ class Robinhood{
             return false;
         }
     }
-
-    formatParams(params, isPost){
-        return (isPost ? '' : "?") + Object
-                .keys(params)
-                .map(function(key){
-                    return key+"="+params[key]
-                })
-                .join("&")
-    }
-
-    /* +--------------------------------+ *
-     * |      Define API methods        | *
-     * +--------------------------------+ */
     investment_profile() {
         return new Promise(function(resolve, reject) {
             var request = new XMLHttpRequest();
@@ -120,41 +116,52 @@ class Robinhood{
             );
             this._setHeaders(request);
             request.send();
-            request.onload = function () { resolve(request);}.bind(this);
+            request.onload = function () { request.responseJSON = JSON.parse(request.response); resolve(request);}.bind(this);
             request.onerror = function () { reject(request);}.bind(this);
         }.bind(this));
     }
-
     instruments(symbol) {
         return new Promise(function(resolve, reject) {
             var request = new XMLHttpRequest();
             request.open(
                 'GET',
-                this._endpoints.instruments + this.formatParams({ 'query': symbol.toUpperCase() }),
+                this._endpoints.instruments + this._formatParams({ 'query': symbol.toUpperCase() }),
                 true
             );
             this._setHeaders(request);
             request.send();
-            request.onload = function () { resolve(request);}.bind(this);
+            request.onload = function () { request.responseJSON = JSON.parse(request.response); resolve(request);}.bind(this);
             request.onerror = function () { reject(request);}.bind(this);
         }.bind(this));
     }
-
+    instrument(url) {
+        return new Promise(function(resolve, reject) {
+            var request = new XMLHttpRequest();
+            request.open(
+                'GET',
+                url,
+                true
+            );
+            this._setHeaders(request);
+            request.send();
+            request.onload = function () { request.responseJSON = JSON.parse(request.response); resolve(request);}.bind(this);
+            request.onerror = function () { reject(request);}.bind(this);
+        }.bind(this));
+    }
     quote_data(symbol) {
         return new Promise(function(resolve, reject) {
             var request = new XMLHttpRequest();
             request.open(
                 'GET',
-                this._endpoints.quotes + this.formatParams({ 'symbols': symbol.toUpperCase() }),
+                this._endpoints.quotes + this._formatParams({ 'symbols': symbol.toUpperCase() }),
                 true
             );
             this._setHeaders(request);
             request.send();
-            request.onload = function () { resolve(request);}.bind(this);
+            request.onload = function () { request.responseJSON = JSON.parse(request.response); resolve(request);}.bind(this);
             request.onerror = function () { reject(request);}.bind(this);
         }.bind(this));
     }
-
     accounts() {
         return new Promise(function(resolve, reject) {
             var request = new XMLHttpRequest();
@@ -165,11 +172,10 @@ class Robinhood{
             );
             this._setHeaders(request);
             request.send();
-            request.onload = function () { resolve(request);}.bind(this);
+            request.onload = function () { request.responseJSON = JSON.parse(request.response); resolve(request);}.bind(this);
             request.onerror = function () { reject(request);}.bind(this);
         }.bind(this));
     }
-
     user() {
         return new Promise(function(resolve, reject) {
             var request = new XMLHttpRequest();
@@ -180,11 +186,10 @@ class Robinhood{
             );
             this._setHeaders(request);
             request.send();
-            request.onload = function () { resolve(request);}.bind(this);
+            request.onload = function () { request.responseJSON = JSON.parse(request.response); resolve(request);}.bind(this);
             request.onerror = function () { reject(request);}.bind(this);
         }.bind(this));
     }
-
     dividends() {
         return new Promise(function(resolve, reject) {
             var request = new XMLHttpRequest();
@@ -195,11 +200,10 @@ class Robinhood{
             );
             this._setHeaders(request);
             request.send();
-            request.onload = function () { resolve(request);}.bind(this);
+            request.onload = function () { request.responseJSON = JSON.parse(request.response); resolve(request);}.bind(this);
             request.onerror = function () { reject(request);}.bind(this);
         }.bind(this));
     }
-
     orders() {
         return new Promise(function(resolve, reject) {
             var request = new XMLHttpRequest();
@@ -210,11 +214,10 @@ class Robinhood{
             );
             this._setHeaders(request);
             request.send();
-            request.onload = function () { resolve(request);}.bind(this);
+            request.onload = function () { request.responseJSON = JSON.parse(request.response); resolve(request);}.bind(this);
             request.onerror = function () { reject(request);}.bind(this);
         }.bind(this));
     }
-
     _place_order(options) {
         return new Promise(function(resolve, reject) {
             var request = new XMLHttpRequest();
@@ -224,7 +227,7 @@ class Robinhood{
                 true
             );
             this._setHeaders(request);
-            request.send(this.formatParams({
+            request.send(this._formatParams({
                     account: this._private.account.url,
                     instrument: options.instrument.url,
                     price: options.bid_price,
@@ -236,35 +239,33 @@ class Robinhood{
                     trigger: options.trigger || 'immediate',
                     type: options.type || 'market'
                 }, true));
-            request.onload = function () { resolve(request);}.bind(this);
+            request.onload = function () { request.responseJSON = JSON.parse(request.response); resolve(request);}.bind(this);
         }.bind(this));
     }
-
     place_buy_order(options) {
         options.transaction = 'buy';
         return this._place_order(options);
     }
-
     place_sell_order(options) {
         options.transaction = 'sell';
         return this._place_order(options);
     }
+    positions(options) {
+        options = options || {};
 
-    positions() {
         return new Promise(function(resolve, reject) {
             var request = new XMLHttpRequest();
             request.open(
                 'GET',
-                this._endpoints.positions,
+                this._endpoints.positions + this._formatParams({ nonzero: options.nonzero || false, cursor: options.cursor || '', ordering: options.ordering || '' }),
                 true
             );
             this._setHeaders(request);
             request.send();
-            request.onload = function () { resolve(request);}.bind(this);
+            request.onload = function () { request.responseJSON = JSON.parse(request.response); resolve(request);}.bind(this);
             request.onerror = function () { reject(request);}.bind(this);
         }.bind(this));
     }
-
     portfolios() {
         return new Promise(function(resolve, reject) {
             var request = new XMLHttpRequest();
@@ -275,22 +276,21 @@ class Robinhood{
             );
             this._setHeaders(request);
             request.send();
-            request.onload = function () { resolve(request);}.bind(this);
+            request.onload = function () { request.responseJSON = JSON.parse(request.response); resolve(request);}.bind(this);
             request.onerror = function () { reject(request);}.bind(this);
         }.bind(this));
     }
-
     historicals(options) {
         return new Promise(function(resolve, reject) {
             var request = new XMLHttpRequest();
             request.open(
                 'GET',
-                this._endpoints.historicals + this._private.account.account_number + "/" + this.formatParams({ span: options.span, interval: options.interval }),
+                this._endpoints.historicals + this._private.account.account_number + "/" + this._formatParams({ span: options.span, interval: options.interval }),
                 true
             );
             this._setHeaders(request);
             request.send();
-            request.onload = function () { resolve(request);}.bind(this);
+            request.onload = function () { request.responseJSON = JSON.parse(request.response); resolve(request);}.bind(this);
             request.onerror = function () { reject(request);}.bind(this);
         }.bind(this));
     }

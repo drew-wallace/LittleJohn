@@ -88,26 +88,20 @@ class D3LineChart{
             .attr('y1', 0)
             .attr('x2', 0)
             .attr('y2', this.height)
-            .attr("stroke", "steelblue")
+            .attr("stroke", "white")
+            .attr("stroke-width", "2.5px")
             .attr('class', 'verticalLine');
-
-        // focus.append("text")
-        //     .attr("x", 9)
-        //     .attr("dy", ".35em")
-        //     .attr("fill", "white");
 
         this.svg.append("rect")
             .attr("class", "overlay")
             .attr("width", this.width)
             .attr("height", this.height)
             .style("fill", "transparent")
-            // .on("mouseover", function() { this.focus.style("display", null); }.bind(this))
             .on("mouseout", function() { this.focus.style("display", "none"); }.bind(this))
             .call(d3.drag()
                 .on("start", this._startdrag.bind(this))
                 .on("drag", this._dragging.bind(this))
                 .on("end", this._enddrag.bind(this))
-                // .container(function() { return document.querySelector(".line-chart-container-svg"); })
                 .container(function() { return this; })
             );
     }

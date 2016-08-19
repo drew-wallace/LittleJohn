@@ -147,37 +147,89 @@
 							</div>
 						</div><!--/row-->
 					</div><!--/container -->
+					<!-- ListView and Repeater-->
 					<div class="container news-card">
-						<div class="row">
-							<div class="col-xs-12">
-								<div class="thumbnail text-center">
-									<h3>Portfolios</h3>
-									<button class="portfoliosButton">Get portfolios</button>
-									<div class="portfoliosOutput"></div>
+						<div class="thumbnail text-center">
+							<div class="positionsList">
+								<div class="positionsListTemplate" data-win-control="WinJS.Binding.Template">
+									<div class="row">
+										<div class="col-xs-4">
+											<div class="row">
+												<div class="col-xs-12">
+													<span class="" data-win-bind="textContent: instrument.symbol"></span>
+												</div>
+											</div>
+											<div class="row">
+												<div class="col-xs-12">
+													<span class="" data-win-bind="textContent: quantity"></span> Shares
+												</div>
+											</div>
+										</div>
+										<div class="col-xs-4">
+											Fancy micro graph
+										</div>
+										<div class="col-xs-4">
+											<span class="" data-win-bind="textContent: quote.last_trade_price_text"></span>
+										</div>
+									</div>
 								</div>
-							</div>
-						</div><!--/row-->
+								<div id="positionsListView"
+									class="win-selectionstylefilled"
+									data-win-control="WinJS.UI.Repeater"
+									data-win-options="{template: select('.positionsListTemplate'), data: positionsList}">
+								</div>
+							</div><!--End ListView-->
+						</div>
 					</div><!--/container -->
+
 				</div>
 				<div id="account-ui" class="main-tab hide">
-					<!-- TRAIL DESCRIPTION -->
-					<div class="description">
-						<!-- this is where the title, location and description are injected for each hiking page -->
-						<h2 class="trail-title"></h2>
-						<p class="trail-location"></p>
-						<p class="trail-description" id="description-content"></p>
-						<!--RATING-->
-						<table>
-							<tr class="detail">
-								<td>Rate this trail: </td>
-								<td class="control">
-									<div class="rating" data-win-control="WinJS.UI.Rating" data-win-options="{averageRating: 3.4}"></div>
-								</td>
-							</tr>
-						</table>
-						<!--END RATING-->
+					<!-- ListView and Repeater-->
+					<div class="mainList">
+						<div id="inputForm" data-win-control="WinJS.Binding.Template">
+							<div>
+								<p style="display: inline-block" data-win-bind="textContent: label"></p>
+								<input type="text" class="win-textbox" data-win-bind="className: id BindingHelpers.appendToClasses" />
+							</div>
+						</div>
+						<div class="myFeaturesListTemplate" data-win-control="WinJS.Binding.Template">
+							<div class="container news-card">
+								<div class="row">
+									<div class="col-xs-12">
+										<div class="thumbnail text-center">
+											<h4 class="win-h4" data-win-bind="textContent: title"></h4>
+											<div data-win-control="WinJS.UI.Repeater"
+													data-win-options="{template: select('#inputForm')}"
+													data-win-bind="winControl.data: inputArray">
+											</div>
+											<button class="win-button" data-win-bind="className: buttonId BindingHelpers.appendToClasses; textContent: title"></button>
+											<div class="win-code" data-win-bind="className: outputId BindingHelpers.appendToClasses"></div>
+										</div>
+									</div>
+								</div><!--/row-->
+							</div><!--/container -->
+						</div>
+
+						<div id="featureListView"
+							 class="win-selectionstylefilled"
+							 data-win-control="WinJS.UI.Repeater"
+							 data-win-options="{template: select('.myFeaturesListTemplate'), data: featuresList}">
+						</div>
+						<!--Ignore this one.
+						<div id="featureListView"
+							 class="win-selectionstylefilled"
+							 data-win-control="WinJS.UI.ListView"
+							 data-win-options="{
+							itemDataSource: featuresList.dataSource,
+							itemTemplate: select('.myFeaturesListTemplate'),
+							selectionMode: 'none',
+							tapBehavior: 'none',
+							layout: { type: WinJS.UI.GridLayout }
+							}">
+						</div>-->
 					</div>
-				</div>  <!-- closes trail-ui-->
+					<!--End ListView-->
+				</div><!-- closes account-ui-->
 			</div>
 		</div>
 	</div>
@@ -205,14 +257,14 @@
 						<div id="featureListView"
 							 class="win-selectionstylefilled"
 							 data-win-control="WinJS.UI.Repeater"
-							 data-win-options="{template: select('.myFeaturesListTemplate'), data: myFeaturesList.data}">
+							 data-win-options="{template: select('.myFeaturesListTemplate'), data: featuresList}">
 						</div>
 						Ignore this one.
 						<div id="featureListView"
 							 class="win-selectionstylefilled"
 							 data-win-control="WinJS.UI.ListView"
 							 data-win-options="{
-							itemDataSource: myFeaturesList.data.dataSource,
+							itemDataSource: featuresList.dataSource,
 							itemTemplate: select('.myFeaturesListTemplate'),
 							selectionMode: 'none',
 							tapBehavior: 'none',

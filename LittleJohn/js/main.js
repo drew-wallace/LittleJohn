@@ -54,15 +54,15 @@
         return obj;
     }
 
-    function _formatEquity(d) {
+    function _formatCurrency(d) {
         return numeral(d).format('$0,0.00');
     }
 
-    function _formatCurrency(d) {
+    function _formatCurrencyDiff(d) {
         return numeral(d).format('+$0,0.00');
     }
 
-    function _formatPercent(d) {
+    function _formatPercentDiff(d) {
         return numeral(d).format('+0.00%');
     }
 
@@ -204,12 +204,6 @@
                     outputId: "positionsOutput"
                 },
                 {
-                    title: "portfolios",
-                    inputArray: new WinJS.Binding.List([]),
-                    buttonId: "portfoliosButton",
-                    outputId: "portfoliosOutput"
-                },
-                {
                     title: "historicals",
                     inputArray: new WinJS.Binding.List([]),
                     buttonId: "historicalsButton",
@@ -217,18 +211,7 @@
                 }
             ]
 
-            //create an array of trails to turn the allTrails object into an array
-            var featuresArray = [];
-
-            //add each trail in the allTrails object into the trailArray
-            for (var i = 0; i < allFeatures.length ; ++i) {
-                featuresArray.push(allFeatures[i]);
-            }
-
-            //create a binding list out of the trailArray we just created
-            var myFeatureList = window.myFeaturesList = {
-                data: new WinJS.Binding.List(featuresArray)
-            };
+            window.featuresList = new WinJS.Binding.List(allFeatures);
 
             args.setPromise(WinJS.UI.processAll().then(function () {
                 mySplitView.splitView = document.querySelector(".splitView").winControl;
@@ -239,41 +222,38 @@
             var loginButton = document.querySelector("#loginButton");
             loginButton.addEventListener("click", loginButtonClickHandler, false);
 
-            // var investmentProfileButton = document.querySelector(".investmentProfileButton");
-            // investmentProfileButton.addEventListener("click", investmentProfileButtonClickHandler, false);
+            var investmentProfileButton = document.querySelector(".investmentProfileButton");
+            investmentProfileButton.addEventListener("click", investmentProfileButtonClickHandler, false);
 
-            // var instrumentsButton = document.querySelector(".instrumentsButton");
-            // instrumentsButton.addEventListener("click", instrumentsButtonClickHandler, false);
+            var instrumentsButton = document.querySelector(".instrumentsButton");
+            instrumentsButton.addEventListener("click", instrumentsButtonClickHandler, false);
 
-            // var quoteButton = document.querySelector(".quoteButton");
-            // quoteButton.addEventListener("click", quoteButtonClickHandler, false);
+            var quoteButton = document.querySelector(".quoteButton");
+            quoteButton.addEventListener("click", quoteButtonClickHandler, false);
 
-            // var accountsButton = document.querySelector(".accountsButton");
-            // accountsButton.addEventListener("click", accountsButtonClickHandler, false);
+            var accountsButton = document.querySelector(".accountsButton");
+            accountsButton.addEventListener("click", accountsButtonClickHandler, false);
+
+            var userButton = document.querySelector(".userButton");
+            userButton.addEventListener("click", userButtonClickHandler, false);
+
+            var dividendsButton = document.querySelector(".dividendsButton");
+            dividendsButton.addEventListener("click", dividendsButtonClickHandler, false);
+
+            var ordersButton = document.querySelector(".ordersButton");
+            ordersButton.addEventListener("click", ordersButtonClickHandler, false);
+
+            var placeOrderButton = document.querySelector(".placeOrderButton");
+            placeOrderButton.addEventListener("click", placeOrderButtonClickHandler, false);
+
+            var positionsButton = document.querySelector(".positionsButton");
+            positionsButton.addEventListener("click", positionsButtonClickHandler, false);
 
             var portfoliosButton = document.querySelector(".portfoliosButton");
             portfoliosButton.addEventListener("click", portfoliosButtonClickHandler, false);
 
-            // var userButton = document.querySelector(".userButton");
-            // userButton.addEventListener("click", userButtonClickHandler, false);
-
-            // var dividendsButton = document.querySelector(".dividendsButton");
-            // dividendsButton.addEventListener("click", dividendsButtonClickHandler, false);
-
-            // var ordersButton = document.querySelector(".ordersButton");
-            // ordersButton.addEventListener("click", ordersButtonClickHandler, false);
-
-            // var placeOrderButton = document.querySelector(".placeOrderButton");
-            // placeOrderButton.addEventListener("click", placeOrderButtonClickHandler, false);
-
-            // var positionsButton = document.querySelector(".positionsButton");
-            // positionsButton.addEventListener("click", positionsButtonClickHandler, false);
-
-            // var portfoliosButton = document.querySelector(".portfoliosButton");
-            // portfoliosButton.addEventListener("click", portfoliosButtonClickHandler, false);
-
-            // var historicalsButton = document.querySelector(".historicalsButton");
-            // historicalsButton.addEventListener("click", historicalsButtonClickHandler, false);
+            var historicalsButton = document.querySelector(".historicalsButton");
+            historicalsButton.addEventListener("click", historicalsButtonClickHandler, false);
         }
     };
 
@@ -282,7 +262,6 @@
         // You might use the WinJS.Application.sessionState object, which is automatically saved and restored across suspension.
         // If you need to complete an asynchronous operation before your application is suspended, call args.setPromise().
     };
-
 
     function loginButtonClickHandler(eventInfo) {
         // var usernameInput = document.querySelector("#username").value;
@@ -298,35 +277,54 @@
             document.querySelector('.day-chart').addEventListener("contextmenu", function(e){ e.preventDefault();})
 
             robinhood.portfolios().then(function (res) {
-                var data = JSON.parse(res.response).results[0];
+                var data = res.responseJSON.results[0];
                 data.equity = +data.equity;
                 data.extended_hours_equity = +data.extended_hours_equity;
 
-                document.getElementById('portfolio-header').innerText = _formatEquity(data.equity);
+                document.getElementById('portfolio-header').innerText = _formatCurrency(data.equity);
 
                 var afterHoursReturn = data.extended_hours_equity - data.equity,
                     afterHoursPercentReturn = afterHoursReturn / data.equity,
-                    afterHoursText = _formatEquity(data.extended_hours_equity) + ' ' + _formatCurrency(afterHoursReturn) + ' (' + _formatPercent(afterHoursPercentReturn) + ') After-hours';
+                    afterHoursText = _formatCurrency(data.extended_hours_equity) + ' ' + _formatCurrencyDiff(afterHoursReturn) + ' (' + _formatPercentDiff(afterHoursPercentReturn) + ') After-hours';
 
                 document.getElementById('after-hours-sub-header').innerText = afterHoursText;
 
                 return data.equity;
             }).then(function(equity) {
                 robinhood.historicals({span: 'day', interval: '5minute'}).then(function (res) {
-                    console.log(JSON.parse(res.response));
-
-                    var data = JSON.parse(res.response).equity_historicals,
+                    var data = res.responseJSON.equity_historicals,
                         startingEquity = +data[0].adjusted_open_equity,
                         endingEquity = equity,
                         netReturn = endingEquity - startingEquity,
                         netPercentReturn = netReturn / startingEquity,
-                        equityChangeText = _formatCurrency(netReturn) + ' (' + _formatPercent(netPercentReturn) + ') 04:00 PM EDT';
+                        equityChangeText = _formatCurrencyDiff(netReturn) + ' (' + _formatPercentDiff(netPercentReturn) + ') 04:00 PM EDT';
 
                     document.getElementById('current-equity-change-sub-header').innerText = equityChangeText;
 
                     chart.setup(data, "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
                     chart.redrawChart();
                     window.addEventListener('resize', function() {chart.redrawChart()});
+                });
+
+                robinhood.positions({nonzero: false}).then(function(positions){
+                    var promises = [];
+                    var currentPositions = positions.responseJSON.results.filter(function(position){
+                        promises.push(robinhood.instrument(position.instrument).then(function(response){
+                            position.instrument = response.responseJSON;
+                            return response.responseJSON.symbol;
+                        }).then(function(symbol){
+                            return robinhood.quote_data(symbol);
+                        }).then(function(response){
+                            position.quote = response.responseJSON.results[0];
+                            position.quote.last_trade_price_text = _formatCurrency(position.quote.last_trade_price);
+                            return position;
+                        }));
+                    });
+                    return Promise.all(promises).then(function(positions){
+                        console.log(positions);
+                        window.positionsList = new WinJS.Binding.List(positions);
+                        document.getElementById('positionsListView').winControl.data = window.positionsList;
+                    })
                 });
             });
 
@@ -372,16 +370,6 @@
 
         robinhood.accounts().then(function (res) {
             accountsOutput.innerText = JSON.stringify(JSON.parse(res.response), null, '    ');
-        });
-    }
-
-    function portfoliosButtonClickHandler(eventInfo) {
-        var portfoliosOutput = document.querySelector(".portfoliosOutput");
-        var loadingString = "Loading...";
-        portfoliosOutput.innerText = loadingString;
-
-        robinhood.portfolios().then(function (res) {
-            portfoliosOutput.innerText = JSON.stringify(JSON.parse(res.response), null, '    ');
         });
     }
 
