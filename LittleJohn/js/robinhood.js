@@ -281,11 +281,12 @@ class Robinhood{
         }.bind(this));
     }
     historicals(options) {
+        options = options || {};
         return new Promise(function(resolve, reject) {
             var request = new XMLHttpRequest();
             request.open(
                 'GET',
-                this._endpoints.historicals + this._private.account.account_number + "/" + this._formatParams({ span: options.span, interval: options.interval }),
+                this._endpoints.historicals + this._private.account.account_number + "/" + this._formatParams({ span: options.span || '', interval: options.interval || '' }),
                 true
             );
             this._setHeaders(request);

@@ -1,11 +1,12 @@
 'use strict';
 
 class D3LineChart{
-    constructor(containerElement) {
+    constructor(containerElement, elementForWidth) {
         this.containerElement = containerElement;
+        this.elementForWidth = elementForWidth;
         // this.margin = {top: 20, right: 20, bottom: 30, left: 50};
         this.margin = {top: 0, right: 0, bottom: 0, left: 0};
-        this.width = 500 - this.margin.left - this.margin.right;
+        this.width = 683 - this.margin.left - this.margin.right;
         this.height = 500 - this.margin.top - this.margin.bottom;
 
         this.parseTime = d3.timeParse("%d-%b-%y");
@@ -33,13 +34,13 @@ class D3LineChart{
             .x(function(d) { return this.x(d.date); }.bind(this))
             .y(function(d) { return this.y(d.open); }.bind(this));
 
-        // this.svg = d3.select(".day-chart")
         this.svg = d3.select(containerElement)
             .append("svg")
             .attr('class', 'line-chart-svg')
             .attr("width", this.width + this.margin.left + this.margin.right)
             .attr("height", this.height + this.margin.top + this.margin.bottom)
-            .append("g")
+
+        this.svgContainer = this.svg.append("g")
             .attr('class', 'line-chart-container-svg')
             .attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
     }
@@ -56,15 +57,15 @@ class D3LineChart{
         this.x.domain(d3.extent(this.data, function(d) { return d.date; }));
         this.y.domain(d3.extent(this.data, function(d) { return d.open; }));
 
-        this.svg.append("g")
+        this.xAxis = this.svgContainer.append("g")
             .attr("class", "axis axis--x hide")
             .attr("transform", "translate(0," + this.height + ")")
             .call(d3.axisBottom(this.x));
 
-        this.svg.append("g")
+        this.yAxis = this.svgContainer.append("g")
             .attr("class", "axis axis--y hide")
-            .call(d3.axisLeft(this.y))
-            .append("text")
+            .call(d3.axisLeft(this.y));
+        this.yAxisTitle = this.yAxis.append("text")
             .attr("class", "axis-title")
             .attr("transform", "rotate(-90)")
             .attr("y", 6)
@@ -73,17 +74,17 @@ class D3LineChart{
             .style("text-anchor", "end")
             .text("Price ($)");
 
-        this.mainLine = this.svg.append("path")
+        this.mainLine = this.svgContainer.append("path")
             .datum(this.data)
             .attr("class", "line")
             .attr("d", this.line);
 
-        this.focus = this.svg.append("g")
+        this.focus = this.svgContainer.append("g")
             .attr("height", this.height)
             .attr("class", "focus")
             .style("display", "none");
 
-        this.focus.append("line")
+        this.verticalLine = this.focus.append("line")
             .attr('x1', 0)
             .attr('y1', 0)
             .attr('x2', 0)
@@ -92,7 +93,7 @@ class D3LineChart{
             .attr("stroke-width", "2.5px")
             .attr('class', 'verticalLine');
 
-        this.svg.append("rect")
+        this.overlay = this.svgContainer.append("rect")
             .attr("class", "overlay")
             .attr("width", this.width)
             .attr("height", this.height)
@@ -108,7 +109,7 @@ class D3LineChart{
     _startdrag() {
         this.focus.style("display", null);
         document.getElementById(this.afterHoursElement).style.visibility = "hidden";
-        d3.select('.overlay').on("mouseover", function() { this.focus.style("display", null); }.bind(this));
+        this.overlay.on("mouseover", function() { this.focus.style("display", null); }.bind(this));
         document.getElementById(this.highlightedEquityValueElement).originalValue = document.getElementById(this.highlightedEquityValueElement).innerText;
         document.getElementById(this.highlightedEquityChangeValueElement).originalValue = document.getElementById(this.highlightedEquityChangeValueElement).innerText;
     }
@@ -133,7 +134,7 @@ class D3LineChart{
         document.getElementById(this.highlightedEquityChangeValueElement).innerText = equityChangeText;
 
         var xPos = d3.mouse(elms[elmIndex])[0];
-        d3.select(".verticalLine").attr("transform", function () {
+        this.focus.attr("transform", function () {
             return "translate(" + xPos + ",0)";
         });
 
@@ -156,14 +157,14 @@ class D3LineChart{
     _enddrag() {
         this.focus.style("display", "none");
         document.getElementById(this.afterHoursElement).style.visibility = null;
-        d3.select('.overlay').on("mouseover", function() { this.focus.style("display", "none"); }.bind(this));
+        this.overlay.on("mouseover", function() { this.focus.style("display", "none"); }.bind(this));
         document.getElementById(this.highlightedEquityValueElement).innerText = document.getElementById(this.highlightedEquityValueElement).originalValue;
         document.getElementById(this.highlightedEquityChangeValueElement).innerText = document.getElementById(this.highlightedEquityChangeValueElement).originalValue;
     }
     redrawChart() {
         //get dimensions based on window size
-        this.width = document.querySelector(this.containerElement).offsetWidth - this.margin.left - this.margin.right;
-        this.height = (document.querySelector(this.containerElement).offsetWidth * 0.75) - this.margin.top - this.margin.bottom;
+        this.width = document.querySelector(this.elementForWidth).offsetWidth - this.margin.left - this.margin.right;
+        this.height = (document.querySelector(this.elementForWidth).offsetWidth * 0.75) - this.margin.top - this.margin.bottom;
 
         this.x = d3.scaleTime()
             .range([0, this.width]);
@@ -175,33 +176,33 @@ class D3LineChart{
             .x(function(d) { return this.x(d.date); }.bind(this))
             .y(function(d) { return this.y(d.open); }.bind(this));
 
-        d3.select('.line-chart-svg')
+        this.svg
             .attr("width", this.width + this.margin.left + this.margin.right)
             .attr("height", this.height + this.margin.top + this.margin.bottom);
 
-        d3.select('.line-chart-container-svg')
+        this.svgContainer
             .attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
 
         this.x.domain(d3.extent(this.data, function(d) { return d.date; }));
         this.y.domain(d3.extent(this.data, function(d) { return d.open; }));
 
-        d3.select('.axis--x')
+        this.xAxis
             .attr("transform", "translate(0," + this.height + ")")
             .call(d3.axisBottom(this.x));
 
-        d3.select('.axis--y')
+        this.yAxis
             .call(d3.axisLeft(this.y));
 
-        d3.select('.line')
+        this.mainLine
             .attr("d", this.line);
 
-        d3.select('.focus')
+        this.focus
             .attr("height", this.height);
 
-        d3.select('.verticalLine')
+        this.verticalLine
             .attr('y2', this.height);
 
-        d3.select('.overlay')
+        this.overlay
             .attr("width", this.width)
             .attr("height", this.height);
     }
