@@ -10,12 +10,11 @@ class D3LineChart{
         this.height = 500 - this.margin.top - this.margin.bottom;
 
         this.parseTime = d3.timeParse("%d-%b-%y");
-        this.bisectDate = d3.bisector(function(d) { return d.date; }).left;
+        this.bisectDate = d3.bisector(function(d) { return d.xVal; }).left;
         this.formatValue = d3.format(",.2f");
         this.formatCurrency = function(d) { return "$" + this.formatValue(d); };
         this.formatPercent = function(d) { return this.formatValue(d * 100) + '%'; };
         this.formatTime = function(d) {
-            if(!(d instanceof Date)) d = new Date(d);
             var hours = d.getHours(),
                 minutes = d.getMinutes();
 
@@ -32,8 +31,8 @@ class D3LineChart{
             .range([this.height, 0]);
 
         this.line = d3.line()
-            .x(function(d) { return this.x(d.date); }.bind(this))
-            .y(function(d) { return this.y(d.open); }.bind(this));
+            .x(function(d) { return this.x(d.xVal); }.bind(this))
+            .y(function(d) { return this.y(d.yVal); }.bind(this));
 
         this.svg = d3.select(containerElement)
             .append("svg")
@@ -45,21 +44,19 @@ class D3LineChart{
             .attr('class', 'line-chart-container-svg')
             .attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
     }
-    setup(data, highlightedEquityValueElement, highlightedEquityChangeValueElement, afterHoursElement) {
+    setup(data, yKey, highlightedEquityValueElement, highlightedEquityChangeValueElement, afterHoursElement) {
         this.highlightedEquityValueElement = highlightedEquityValueElement;
         this.highlightedEquityChangeValueElement = highlightedEquityChangeValueElement;
         this.afterHoursElement = afterHoursElement;
-        var dataRef = {};
         this.data = data.map(function(d, i){
-            dataRef[i] = (new Date(d.begins_at).valueOf());
-            d.date = i;
-            d.open = +d.adjusted_close_equity;
+            d.xVal = i;
+            d.yVal = +d[yKey];
+            // open for day, close for all else
             return d;
         });
-        this.dataRef = dataRef;
 
-        this.x.domain(d3.extent(this.data, function(d) { return d.date; }));
-        this.y.domain(d3.extent(this.data, function(d) { return d.open; }));
+        this.x.domain(d3.extent(this.data, function(d) { return d.xVal; }));
+        this.y.domain(d3.extent(this.data, function(d) { return d.yVal; }));
 
         this.xAxis = this.svgContainer.append("g")
             .attr("class", "axis axis--x hide")
@@ -126,14 +123,14 @@ class D3LineChart{
 
         var d0 = this.data[i - 1],
             d1 = this.data[i],
-            d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+            d = x0 - d0.xVal > d1.xVal - x0 ? d1 : d0;
 
-        document.getElementById(this.highlightedEquityValueElement).innerText = this.formatCurrency(d.open);
+        document.getElementById(this.highlightedEquityValueElement).innerText = this.formatCurrency(d.yVal);
 
-        var netReturn = d.open - this.data[0].open,
-            netPercentReturn = netReturn / this.data[0].open,
+        var netReturn = d.yVal - this.data[0].yVal,
+            netPercentReturn = netReturn / this.data[0].yVal,
             sign = (netReturn >= 0 ? '+' : '-'),
-            equityChangeText = sign + this.formatCurrency(Math.abs(netReturn)) + ' (' + sign + this.formatPercent(Math.abs(netPercentReturn)) + ') ' + this.formatTime(this.dataRef[d.date]);
+            equityChangeText = sign + this.formatCurrency(Math.abs(netReturn)) + ' (' + sign + this.formatPercent(Math.abs(netPercentReturn)) + ') ' + this.formatTime(new Date(d.begins_at));
 
         document.getElementById(this.highlightedEquityChangeValueElement).innerText = equityChangeText;
 
@@ -177,8 +174,8 @@ class D3LineChart{
             .range([this.height, 0]);
 
         this.line = d3.line()
-            .x(function(d) { return this.x(d.date); }.bind(this))
-            .y(function(d) { return this.y(d.open); }.bind(this));
+            .x(function(d) { return this.x(d.xVal); }.bind(this))
+            .y(function(d) { return this.y(d.yVal); }.bind(this));
 
         this.svg
             .attr("width", this.width + this.margin.left + this.margin.right)
@@ -187,8 +184,8 @@ class D3LineChart{
         this.svgContainer
             .attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
 
-        this.x.domain(d3.extent(this.data, function(d) { return d.date; }));
-        this.y.domain(d3.extent(this.data, function(d) { return d.open; }));
+        this.x.domain(d3.extent(this.data, function(d) { return d.xVal; }));
+        this.y.domain(d3.extent(this.data, function(d) { return d.yVal; }));
 
         this.xAxis
             .attr("transform", "translate(0," + this.height + ")")

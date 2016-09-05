@@ -314,7 +314,7 @@
 
                     document.getElementById('current-equity-change-sub-header').innerText = equityChangeText;
 
-                    dayChart.setup(data, "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
+                    dayChart.setup(data, 'adjusted_open_equity', "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
                     dayChart.redrawChart();
                 };
 
@@ -329,17 +329,30 @@
 
                     document.getElementById('current-equity-change-sub-header').innerText = equityChangeText;
 
-                    weekChart.setup(data, "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
+                    weekChart.setup(data, 'adjusted_close_equity', "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
                     weekChart.redrawChart();
                 };
 
                 // Month Day, Year
                 function year(equity) {
                     // var data = Year.equity_historicals.slice(Year.equity_historicals.length - 30, Year.equity_historicals.length),
-                    var data = Year.equity_historicals.filter(function(v,i){
-                        return moment(v.begins_at).hour(0).minute(0).second(0).isAfter(moment('08/13/2015').hour(0).minute(0).second(0));
+                    var threeMonthData = [],
+                        monthData = [],
+                        data = [];
+
+                    Year.equity_historicals.forEach(function(v,i){
+                        if(!moment(v.begins_at).hour(0).minute(0).second(0).isAfter(moment('08/13/2015').hour(0).minute(0).second(0))) return;
+                        if(moment(v.begins_at).hour(0).minute(0).second(0).isAfter(moment().hour(0).minute(0).second(0).subtract(3, 'month'))) {
+                            threeMonthData.push(Object.assign({}, v));
+                            if(moment(v.begins_at).hour(0).minute(0).second(0).isAfter(moment().hour(0).minute(0).second(0).subtract(1, 'month'))) {
+                                monthData.push(Object.assign({}, v));
+                            }
+                        }
+                        data.push(Object.assign({}, v));
                     });
 
+
+                    // STARTS SEPT 3, 2015, ENDS SEPT 1
                     var startingEquity = +data[0].adjusted_open_equity,
                         endingEquity = equity,
                         netReturn = endingEquity - startingEquity,
@@ -348,14 +361,12 @@
 
                     document.getElementById('current-equity-change-sub-header').innerText = equityChangeText;
 
-                    yearChart.setup(data, "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
+                    yearChart.setup(data, 'adjusted_close_equity', "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
                     yearChart.redrawChart();
 
-                    data = data.filter(function(v,i){
-                        return moment(v.begins_at).hour(0).minute(0).second(0).isAfter(moment().hour(0).minute(0).second(0).subtract(3, 'month'));
-                    });
-                    console.log(data);
-                    startingEquity = +data[0].adjusted_open_equity;
+
+                    // STARTS JUNE 7, ENDS SEPT 1
+                    startingEquity = +threeMonthData[0].adjusted_open_equity;
                     endingEquity = equity;
                     netReturn = endingEquity - startingEquity;
                     netPercentReturn = netReturn / startingEquity;
@@ -363,27 +374,26 @@
 
                     document.getElementById('current-equity-change-sub-header').innerText = equityChangeText;
 
-                    threeMonthChart.setup(data, "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
+                    threeMonthChart.setup(threeMonthData, 'adjusted_close_equity', "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
                     threeMonthChart.redrawChart();
 
-                    data = data.filter(function(v,i){
-                        return moment(v.begins_at).hour(0).minute(0).second(0).isAfter(moment().hour(0).minute(0).second(0).subtract(1, 'month'));
-                    });
-                    console.log(data);
-                    startingEquity = +data[0].adjusted_open_equity,
-                    endingEquity = equity,
-                    netReturn = endingEquity - startingEquity,
-                    netPercentReturn = netReturn / startingEquity,
+
+                    // STARTS AUG 7, ENDS SEPT 1
+                    startingEquity = +monthData[0].adjusted_open_equity;
+                    endingEquity = equity;
+                    netReturn = endingEquity - startingEquity;
+                    netPercentReturn = netReturn / startingEquity;
                     equityChangeText = _formatCurrencyDiff(netReturn) + ' (' + _formatPercentDiff(netPercentReturn) + ') 04:00 PM EDT';
 
                     document.getElementById('current-equity-change-sub-header').innerText = equityChangeText;
 
-                    monthChart.setup(data, "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
+                    monthChart.setup(monthData, 'adjusted_close_equity', "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
                     monthChart.redrawChart();
                 };
 
                 // Month Day, Year
                 function fiveYear(equity) {
+                    // STARTS SEPT 21, 2015, ENDS SEPT 1
                     var data = FiveYear.equity_historicals.filter(function(v,i){
                             return moment(v.begins_at).hour(0).minute(0).second(0).isAfter(moment('08/13/2015').hour(0).minute(0).second(0));
                         }),
@@ -395,7 +405,7 @@
 
                     document.getElementById('current-equity-change-sub-header').innerText = equityChangeText;
 
-                    fiveYearChart.setup(data, "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
+                    fiveYearChart.setup(data, 'adjusted_close_equity', "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
                     fiveYearChart.redrawChart();
                 };
 
