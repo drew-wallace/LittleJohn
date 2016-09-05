@@ -15,6 +15,7 @@ class D3LineChart{
         this.formatCurrency = function(d) { return "$" + this.formatValue(d); };
         this.formatPercent = function(d) { return this.formatValue(d * 100) + '%'; };
         this.formatTime = function(d) {
+            if(!(d instanceof Date)) d = new Date(d);
             var hours = d.getHours(),
                 minutes = d.getMinutes();
 
@@ -24,7 +25,7 @@ class D3LineChart{
             return hours + ':' + minutes + ' EDT'
         };
 
-        this.x = d3.scaleTime()
+        this.x = d3.scaleLinear()
             .range([0, this.width]);
 
         this.y = d3.scaleLinear()
@@ -48,11 +49,14 @@ class D3LineChart{
         this.highlightedEquityValueElement = highlightedEquityValueElement;
         this.highlightedEquityChangeValueElement = highlightedEquityChangeValueElement;
         this.afterHoursElement = afterHoursElement;
-        this.data = data.map(function(d){
-            d.date = new Date(d.begins_at);
-            d.open = +d.adjusted_open_equity;
+        var dataRef = {};
+        this.data = data.map(function(d, i){
+            dataRef[i] = (new Date(d.begins_at).valueOf());
+            d.date = i;
+            d.open = +d.adjusted_close_equity;
             return d;
         });
+        this.dataRef = dataRef;
 
         this.x.domain(d3.extent(this.data, function(d) { return d.date; }));
         this.y.domain(d3.extent(this.data, function(d) { return d.open; }));
@@ -129,7 +133,7 @@ class D3LineChart{
         var netReturn = d.open - this.data[0].open,
             netPercentReturn = netReturn / this.data[0].open,
             sign = (netReturn >= 0 ? '+' : '-'),
-            equityChangeText = sign + this.formatCurrency(Math.abs(netReturn)) + ' (' + sign + this.formatPercent(Math.abs(netPercentReturn)) + ') ' + this.formatTime(d.date);
+            equityChangeText = sign + this.formatCurrency(Math.abs(netReturn)) + ' (' + sign + this.formatPercent(Math.abs(netPercentReturn)) + ') ' + this.formatTime(this.dataRef[d.date]);
 
         document.getElementById(this.highlightedEquityChangeValueElement).innerText = equityChangeText;
 
@@ -166,7 +170,7 @@ class D3LineChart{
         this.width = document.querySelector(this.elementForWidth).offsetWidth - this.margin.left - this.margin.right;
         this.height = (document.querySelector(this.elementForWidth).offsetWidth * 0.75) - this.margin.top - this.margin.bottom;
 
-        this.x = d3.scaleTime()
+        this.x = d3.scaleLinear()
             .range([0, this.width]);
 
         this.y = d3.scaleLinear()

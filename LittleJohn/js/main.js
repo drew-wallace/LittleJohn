@@ -277,7 +277,7 @@
                 monthChart = new D3LineChart("#oneMonth > .month-chart", ".tab-content"),
                 threeMonthChart = new D3LineChart("#threeMonth > .three-month-chart", ".tab-content"),
                 yearChart = new D3LineChart("#oneYear > .year-chart", ".tab-content"),
-                fiveYear = new D3LineChart("#fiveYear > .five-year-chart", ".tab-content");
+                fiveYearChart = new D3LineChart("#fiveYear > .five-year-chart", ".tab-content");
 
             window.addEventListener('resize', function() {
                 dayChart.redrawChart();
@@ -285,13 +285,13 @@
                 monthChart.redrawChart();
                 threeMonthChart.redrawChart();
                 yearChart.redrawChart();
-                fiveYear.redrawChart();
+                fiveYearChart.redrawChart();
             });
 
             document.querySelector('.day-chart').addEventListener("contextmenu", function(e){ e.preventDefault();})
 
-            robinhood.portfolios().then(function (res) {
-                var data = res.responseJSON.results[0];
+            function getAndShowChartData() {
+                var data = Portfolios.results[0];
                 data.equity = +data.equity;
                 data.extended_hours_equity = +data.extended_hours_equity;
 
@@ -303,11 +303,9 @@
 
                 document.getElementById('after-hours-sub-header').innerText = afterHoursText;
 
-                return data.equity;
-            }).then(function(equity) {
                 // time
-                robinhood.historicals({span: 'day', interval: '5minute'}).then(function (res) {
-                    var data = res.responseJSON.equity_historicals,
+                function day(equity) {
+                    var data = Day.equity_historicals,
                         startingEquity = +data[0].adjusted_open_equity,
                         endingEquity = equity,
                         netReturn = endingEquity - startingEquity,
@@ -318,11 +316,11 @@
 
                     dayChart.setup(data, "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
                     dayChart.redrawChart();
-                });
+                };
 
                 // time and Month Day
-                robinhood.historicals({span: 'week', interval: '10minute'}).then(function (res) {
-                    var data = res.responseJSON.equity_historicals,
+                function week(equity) {
+                    var data = Week.equity_historicals,
                         startingEquity = +data[0].adjusted_open_equity,
                         endingEquity = equity,
                         netReturn = endingEquity - startingEquity,
@@ -333,12 +331,16 @@
 
                     weekChart.setup(data, "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
                     weekChart.redrawChart();
-                });
+                };
 
                 // Month Day, Year
-                robinhood.historicals({span: 'year', interval: 'day'}).then(function (res) {
-                    var data = res.responseJSON.equity_historicals.slice(res.responseJSON.equity_historicals.length - 1 - 30, res.responseJSON.equity_historicals.length),
-                        startingEquity = +data[0].adjusted_open_equity,
+                function year(equity) {
+                    // var data = Year.equity_historicals.slice(Year.equity_historicals.length - 30, Year.equity_historicals.length),
+                    var data = Year.equity_historicals.filter(function(v,i){
+                        return moment(v.begins_at).hour(0).minute(0).second(0).isAfter(moment('08/13/2015').hour(0).minute(0).second(0));
+                    });
+
+                    var startingEquity = +data[0].adjusted_open_equity,
                         endingEquity = equity,
                         netReturn = endingEquity - startingEquity,
                         netPercentReturn = netReturn / startingEquity,
@@ -346,10 +348,13 @@
 
                     document.getElementById('current-equity-change-sub-header').innerText = equityChangeText;
 
-                    monthChart.setup(data, "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
-                    monthChart.redrawChart();
+                    yearChart.setup(data, "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
+                    yearChart.redrawChart();
 
-                    data = res.responseJSON.equity_historicals.slice(res.responseJSON.equity_historicals.length - 1 - 90, res.responseJSON.equity_historicals.length);
+                    data = data.filter(function(v,i){
+                        return moment(v.begins_at).hour(0).minute(0).second(0).isAfter(moment().hour(0).minute(0).second(0).subtract(3, 'month'));
+                    });
+                    console.log(data);
                     startingEquity = +data[0].adjusted_open_equity;
                     endingEquity = equity;
                     netReturn = endingEquity - startingEquity;
@@ -361,52 +366,27 @@
                     threeMonthChart.setup(data, "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
                     threeMonthChart.redrawChart();
 
-                    data = res.responseJSON.equity_historicals;
-                    startingEquity = +data[0].adjusted_open_equity;
-                    endingEquity = equity;
-                    netReturn = endingEquity - startingEquity;
-                    netPercentReturn = netReturn / startingEquity;
+                    data = data.filter(function(v,i){
+                        return moment(v.begins_at).hour(0).minute(0).second(0).isAfter(moment().hour(0).minute(0).second(0).subtract(1, 'month'));
+                    });
+                    console.log(data);
+                    startingEquity = +data[0].adjusted_open_equity,
+                    endingEquity = equity,
+                    netReturn = endingEquity - startingEquity,
+                    netPercentReturn = netReturn / startingEquity,
                     equityChangeText = _formatCurrencyDiff(netReturn) + ' (' + _formatPercentDiff(netPercentReturn) + ') 04:00 PM EDT';
 
                     document.getElementById('current-equity-change-sub-header').innerText = equityChangeText;
 
-                    yearChart.setup(data, "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
-                    yearChart.redrawChart();
-                });
-
-                // // Month Day, Year
-                // robinhood.historicals({span: 'year', interval: 'day'}).then(function (res) {
-                //     var data = res.responseJSON.equity_historicals.slice(res.responseJSON.equity_historicals.length - 1 - 90, res.responseJSON.equity_historicals.length),
-                //         startingEquity = +data[0].adjusted_open_equity,
-                //         endingEquity = equity,
-                //         netReturn = endingEquity - startingEquity,
-                //         netPercentReturn = netReturn / startingEquity,
-                //         equityChangeText = _formatCurrencyDiff(netReturn) + ' (' + _formatPercentDiff(netPercentReturn) + ') 04:00 PM EDT';
-
-                //     document.getElementById('current-equity-change-sub-header').innerText = equityChangeText;
-
-                //     threeMonthChart.setup(data, "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
-                //     threeMonthChart.redrawChart();
-                // });
-
-                // // Month Day, Year
-                // robinhood.historicals({span: 'year', interval: 'day'}).then(function (res) {
-                //     var data = res.responseJSON.equity_historicals,
-                //         startingEquity = +data[0].adjusted_open_equity,
-                //         endingEquity = equity,
-                //         netReturn = endingEquity - startingEquity,
-                //         netPercentReturn = netReturn / startingEquity,
-                //         equityChangeText = _formatCurrencyDiff(netReturn) + ' (' + _formatPercentDiff(netPercentReturn) + ') 04:00 PM EDT';
-
-                //     document.getElementById('current-equity-change-sub-header').innerText = equityChangeText;
-
-                //     yearChart.setup(data, "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
-                //     yearChart.redrawChart();
-                // });
+                    monthChart.setup(data, "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
+                    monthChart.redrawChart();
+                };
 
                 // Month Day, Year
-                robinhood.historicals({span: '5year', interval: 'week'}).then(function (res) {
-                    var data = res.responseJSON.equity_historicals,
+                function fiveYear(equity) {
+                    var data = FiveYear.equity_historicals.filter(function(v,i){
+                            return moment(v.begins_at).hour(0).minute(0).second(0).isAfter(moment('08/13/2015').hour(0).minute(0).second(0));
+                        }),
                         startingEquity = +data[0].adjusted_open_equity,
                         endingEquity = equity,
                         netReturn = endingEquity - startingEquity,
@@ -415,31 +395,165 @@
 
                     document.getElementById('current-equity-change-sub-header').innerText = equityChangeText;
 
-                    fiveYear.setup(data, "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
-                    fiveYear.redrawChart();
-                });
+                    fiveYearChart.setup(data, "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
+                    fiveYearChart.redrawChart();
+                };
 
-                robinhood.positions({nonzero: false}).then(function(positions){
-                    var promises = [];
-                    var currentPositions = positions.responseJSON.results.filter(function(position){
-                        promises.push(robinhood.instrument(position.instrument).then(function(response){
-                            position.instrument = response.responseJSON;
-                            return response.responseJSON.symbol;
-                        }).then(function(symbol){
-                            return robinhood.quote_data(symbol);
-                        }).then(function(response){
-                            position.quote = response.responseJSON.results[0];
-                            position.quote.last_trade_price_text = _formatCurrency(position.quote.last_trade_price);
-                            return position;
-                        }));
-                    });
-                    return Promise.all(promises).then(function(positions){
-                        window.positionsList = new WinJS.Binding.List(positions);
-                        document.getElementById('positionsListView').winControl.data = window.positionsList;
-                    })
-                });
-            });
+                function positions(){
+                    window.positionsList = new WinJS.Binding.List(Positions);
+                    document.getElementById('positionsListView').winControl.data = window.positionsList;
+                };
 
+                day(data.equity);
+                week(data.equity);
+                year(data.equity);
+                fiveYear(data.equity);
+                positions();
+            }
+
+            getAndShowChartData();
+
+            // robinhood.portfolios().then(function (res) {
+            //     var data = res.responseJSON.results[0];
+            //     // Windows.Storage.ApplicationData.current.localFolder.createFileAsync("portfolios.json", Windows.Storage.CreationCollisionOption.replaceExisting).then(function (sampleFile) {
+            //     //     return Windows.Storage.FileIO.writeTextAsync(sampleFile, res.responseText);
+            //     // });
+            //     data.equity = +data.equity;
+            //     data.extended_hours_equity = +data.extended_hours_equity;
+
+            //     document.getElementById('portfolio-header').innerText = _formatCurrency(data.equity);
+
+            //     var afterHoursReturn = data.extended_hours_equity - data.equity,
+            //         afterHoursPercentReturn = afterHoursReturn / data.equity,
+            //         afterHoursText = _formatCurrency(data.extended_hours_equity) + ' ' + _formatCurrencyDiff(afterHoursReturn) + ' (' + _formatPercentDiff(afterHoursPercentReturn) + ') After-hours';
+
+            //     document.getElementById('after-hours-sub-header').innerText = afterHoursText;
+
+            //     return data.equity;
+            // }).then(function(equity) {
+            //     // time
+            //     robinhood.historicals({span: 'day', interval: '5minute'}).then(function (res) {
+            //         var data = res.responseJSON.equity_historicals,
+            //             startingEquity = +data[0].adjusted_open_equity,
+            //             endingEquity = equity,
+            //             netReturn = endingEquity - startingEquity,
+            //             netPercentReturn = netReturn / startingEquity,
+            //             equityChangeText = _formatCurrencyDiff(netReturn) + ' (' + _formatPercentDiff(netPercentReturn) + ') 04:00 PM EDT';
+
+            //         // Windows.Storage.ApplicationData.current.localFolder.createFileAsync("day.json", Windows.Storage.CreationCollisionOption.replaceExisting).then(function (sampleFile) {
+            //         //     return Windows.Storage.FileIO.writeTextAsync(sampleFile, res.responseText);
+            //         // });
+
+            //         document.getElementById('current-equity-change-sub-header').innerText = equityChangeText;
+
+            //         dayChart.setup(data, "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
+            //         dayChart.redrawChart();
+            //     });
+
+            //     // time and Month Day
+            //     robinhood.historicals({span: 'week', interval: '10minute'}).then(function (res) {
+            //         var data = res.responseJSON.equity_historicals,
+            //             startingEquity = +data[0].adjusted_open_equity,
+            //             endingEquity = equity,
+            //             netReturn = endingEquity - startingEquity,
+            //             netPercentReturn = netReturn / startingEquity,
+            //             equityChangeText = _formatCurrencyDiff(netReturn) + ' (' + _formatPercentDiff(netPercentReturn) + ') 04:00 PM EDT';
+
+            //         // Windows.Storage.ApplicationData.current.localFolder.createFileAsync("week.json", Windows.Storage.CreationCollisionOption.replaceExisting).then(function (sampleFile) {
+            //         //     return Windows.Storage.FileIO.writeTextAsync(sampleFile, res.responseText);
+            //         // });
+
+            //         document.getElementById('current-equity-change-sub-header').innerText = equityChangeText;
+
+            //         weekChart.setup(data, "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
+            //         weekChart.redrawChart();
+            //     });
+
+            //     // Month Day, Year
+            //     robinhood.historicals({span: 'year', interval: 'day'}).then(function (res) {
+            //         var data = res.responseJSON.equity_historicals.slice(res.responseJSON.equity_historicals.length - 1 - 30, res.responseJSON.equity_historicals.length),
+            //             startingEquity = +data[0].adjusted_open_equity,
+            //             endingEquity = equity,
+            //             netReturn = endingEquity - startingEquity,
+            //             netPercentReturn = netReturn / startingEquity,
+            //             equityChangeText = _formatCurrencyDiff(netReturn) + ' (' + _formatPercentDiff(netPercentReturn) + ') 04:00 PM EDT';
+
+            //         // Windows.Storage.ApplicationData.current.localFolder.createFileAsync("year.json", Windows.Storage.CreationCollisionOption.replaceExisting).then(function (sampleFile) {
+            //         //     return Windows.Storage.FileIO.writeTextAsync(sampleFile, res.responseText);
+            //         // });
+
+            //         document.getElementById('current-equity-change-sub-header').innerText = equityChangeText;
+
+            //         monthChart.setup(data, "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
+            //         monthChart.redrawChart();
+
+            //         data = res.responseJSON.equity_historicals.slice(res.responseJSON.equity_historicals.length - 1 - 90, res.responseJSON.equity_historicals.length);
+            //         startingEquity = +data[0].adjusted_open_equity;
+            //         endingEquity = equity;
+            //         netReturn = endingEquity - startingEquity;
+            //         netPercentReturn = netReturn / startingEquity;
+            //         equityChangeText = _formatCurrencyDiff(netReturn) + ' (' + _formatPercentDiff(netPercentReturn) + ') 04:00 PM EDT';
+
+            //         document.getElementById('current-equity-change-sub-header').innerText = equityChangeText;
+
+            //         threeMonthChart.setup(data, "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
+            //         threeMonthChart.redrawChart();
+
+            //         data = res.responseJSON.equity_historicals;
+            //         startingEquity = +data[0].adjusted_open_equity;
+            //         endingEquity = equity;
+            //         netReturn = endingEquity - startingEquity;
+            //         netPercentReturn = netReturn / startingEquity;
+            //         equityChangeText = _formatCurrencyDiff(netReturn) + ' (' + _formatPercentDiff(netPercentReturn) + ') 04:00 PM EDT';
+
+            //         document.getElementById('current-equity-change-sub-header').innerText = equityChangeText;
+
+            //         yearChart.setup(data, "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
+            //         yearChart.redrawChart();
+            //     });
+
+            //     // Month Day, Year
+            //     robinhood.historicals({span: '5year', interval: 'week'}).then(function (res) {
+            //         var data = res.responseJSON.equity_historicals,
+            //             startingEquity = +data[0].adjusted_open_equity,
+            //             endingEquity = equity,
+            //             netReturn = endingEquity - startingEquity,
+            //             netPercentReturn = netReturn / startingEquity,
+            //             equityChangeText = _formatCurrencyDiff(netReturn) + ' (' + _formatPercentDiff(netPercentReturn) + ') 04:00 PM EDT';
+
+            //         // Windows.Storage.ApplicationData.current.localFolder.createFileAsync("5year.json", Windows.Storage.CreationCollisionOption.replaceExisting).then(function (sampleFile) {
+            //         //     return Windows.Storage.FileIO.writeTextAsync(sampleFile, res.responseText);
+            //         // });
+
+            //         document.getElementById('current-equity-change-sub-header').innerText = equityChangeText;
+
+            //         fiveYearChart.setup(data, "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
+            //         fiveYearChart.redrawChart();
+            //     });
+
+            //     robinhood.positions({nonzero: false}).then(function(positions){
+            //         var promises = [];
+            //         var currentPositions = positions.responseJSON.results.filter(function(position){
+            //             promises.push(robinhood.instrument(position.instrument).then(function(response){
+            //                 position.instrument = response.responseJSON;
+            //                 return response.responseJSON.symbol;
+            //             }).then(function(symbol){
+            //                 return robinhood.quote_data(symbol);
+            //             }).then(function(response){
+            //                 position.quote = response.responseJSON.results[0];
+            //                 position.quote.last_trade_price_text = _formatCurrency(position.quote.last_trade_price);
+            //                 return position;
+            //             }));
+            //         });
+            //         return Promise.all(promises).then(function(positions){
+            //             // Windows.Storage.ApplicationData.current.localFolder.createFileAsync("positions.json", Windows.Storage.CreationCollisionOption.replaceExisting).then(function (sampleFile) {
+            //             //     return Windows.Storage.FileIO.writeTextAsync(sampleFile, JSON.stringify(positions));
+            //             // });
+            //             window.positionsList = new WinJS.Binding.List(positions);
+            //             document.getElementById('positionsListView').winControl.data = window.positionsList;
+            //         })
+            //     });
+            // });
         }
     }
 
