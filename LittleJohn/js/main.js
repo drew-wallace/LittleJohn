@@ -218,9 +218,19 @@
                 new WinJS.UI._WinKeyboard(mySplitView.splitView.paneElement);
             }));
 
-            // Retrieve the button and register our event handler.
             var loginButton = document.querySelector("#loginButton");
             loginButton.addEventListener("click", loginButtonClickHandler, false);
+
+            document.querySelector('.one-day-chart').addEventListener("contextmenu", function(e){ e.preventDefault();});
+            document.querySelector(".one-week-chart").addEventListener("contextmenu", function(e){ e.preventDefault();});
+            document.querySelector(".one-month-chart").addEventListener("contextmenu", function(e){ e.preventDefault();});
+            document.querySelector(".three-month-chart").addEventListener("contextmenu", function(e){ e.preventDefault();});
+            document.querySelector(".one-year-chart").addEventListener("contextmenu", function(e){ e.preventDefault();});
+            document.querySelector(".five-year-chart").addEventListener("contextmenu", function(e){ e.preventDefault();});
+
+            Array.prototype.slice.call(document.querySelectorAll('.chart-tab > a')).forEach(function(e){
+                e.addEventListener("click", chartNavClickHandler, false);
+            });
 
             var investmentProfileButton = document.querySelector(".investmentProfileButton");
             investmentProfileButton.addEventListener("click", investmentProfileButtonClickHandler, false);
@@ -264,31 +274,29 @@
     };
 
     function loginButtonClickHandler(eventInfo) {
-        // var usernameInput = document.querySelector("#username").value;
-        // var passwordInput = document.querySelector("#password").value;
-        // var loggedIn = robinhood.login(usernameInput, passwordInput);
+        var usernameInput = document.querySelector("#username").value;
+        var passwordInput = document.querySelector("#password").value;
+        var loggedIn = robinhood.login(usernameInput, passwordInput);
         if(loggedIn) {
             document.getElementById("loginScreen").classList.remove("display-table");
             document.getElementById("loginScreen").classList.add("hide");
             document.getElementById("app").classList.remove("hide");
 
-            var dayChart = new D3LineChart("#oneDay > .day-chart", ".tab-content"),
-                weekChart = new D3LineChart("#oneWeek > .week-chart", ".tab-content"),
-                monthChart = new D3LineChart("#oneMonth > .month-chart", ".tab-content"),
+            var oneDayChart = new D3LineChart("#oneDay > .one-day-chart", ".tab-content"),
+                oneWeekChart = new D3LineChart("#oneWeek > .one-week-chart", ".tab-content"),
+                oneMonthChart = new D3LineChart("#oneMonth > .one-month-chart", ".tab-content"),
                 threeMonthChart = new D3LineChart("#threeMonth > .three-month-chart", ".tab-content"),
-                yearChart = new D3LineChart("#oneYear > .year-chart", ".tab-content"),
+                oneYearChart = new D3LineChart("#oneYear > .one-year-chart", ".tab-content"),
                 fiveYearChart = new D3LineChart("#fiveYear > .five-year-chart", ".tab-content");
 
             window.addEventListener('resize', function() {
-                dayChart.redrawChart();
-                weekChart.redrawChart();
-                monthChart.redrawChart();
+                oneDayChart.redrawChart();
+                oneWeekChart.redrawChart();
+                oneMonthChart.redrawChart();
                 threeMonthChart.redrawChart();
-                yearChart.redrawChart();
+                oneYearChart.redrawChart();
                 fiveYearChart.redrawChart();
             });
-
-            document.querySelector('.day-chart').addEventListener("contextmenu", function(e){ e.preventDefault();})
 
             function getAndShowChartData() {
                 var data = Portfolios.results[0];
@@ -313,9 +321,11 @@
                         equityChangeText = _formatCurrencyDiff(netReturn) + ' (' + _formatPercentDiff(netPercentReturn) + ') 04:00 PM EDT';
 
                     document.getElementById('current-equity-change-sub-header').innerText = equityChangeText;
+                    document.getElementById('current-equity-change-sub-header').originalValue = equityChangeText;
+                    document.getElementById('current-equity-change-sub-header').oneDayValue = equityChangeText;
 
-                    dayChart.setup(data, 'adjusted_open_equity', "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
-                    dayChart.redrawChart();
+                    oneDayChart.setup(data, 'adjusted_open_equity', "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
+                    oneDayChart.redrawChart();
                 };
 
                 // time and Month Day
@@ -327,10 +337,10 @@
                         netPercentReturn = netReturn / startingEquity,
                         equityChangeText = _formatCurrencyDiff(netReturn) + ' (' + _formatPercentDiff(netPercentReturn) + ') 04:00 PM EDT';
 
-                    document.getElementById('current-equity-change-sub-header').innerText = equityChangeText;
+                    document.getElementById('current-equity-change-sub-header').oneWeekValue = equityChangeText;
 
-                    weekChart.setup(data, 'adjusted_close_equity', "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
-                    weekChart.redrawChart();
+                    oneWeekChart.setup(data, 'adjusted_close_equity', "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
+                    oneWeekChart.redrawChart();
                 };
 
                 // Month Day, Year
@@ -359,10 +369,10 @@
                         netPercentReturn = netReturn / startingEquity,
                         equityChangeText = _formatCurrencyDiff(netReturn) + ' (' + _formatPercentDiff(netPercentReturn) + ') 04:00 PM EDT';
 
-                    document.getElementById('current-equity-change-sub-header').innerText = equityChangeText;
+                    document.getElementById('current-equity-change-sub-header').oneYearValue = equityChangeText;
 
-                    yearChart.setup(data, 'adjusted_close_equity', "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
-                    yearChart.redrawChart();
+                    oneYearChart.setup(data, 'adjusted_close_equity', "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
+                    oneYearChart.redrawChart();
 
 
                     // STARTS JUNE 7, ENDS SEPT 1
@@ -372,7 +382,7 @@
                     netPercentReturn = netReturn / startingEquity;
                     equityChangeText = _formatCurrencyDiff(netReturn) + ' (' + _formatPercentDiff(netPercentReturn) + ') 04:00 PM EDT';
 
-                    document.getElementById('current-equity-change-sub-header').innerText = equityChangeText;
+                    document.getElementById('current-equity-change-sub-header').threeMonthValue = equityChangeText;
 
                     threeMonthChart.setup(threeMonthData, 'adjusted_close_equity', "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
                     threeMonthChart.redrawChart();
@@ -385,10 +395,10 @@
                     netPercentReturn = netReturn / startingEquity;
                     equityChangeText = _formatCurrencyDiff(netReturn) + ' (' + _formatPercentDiff(netPercentReturn) + ') 04:00 PM EDT';
 
-                    document.getElementById('current-equity-change-sub-header').innerText = equityChangeText;
+                    document.getElementById('current-equity-change-sub-header').oneMonthValue = equityChangeText;
 
-                    monthChart.setup(monthData, 'adjusted_close_equity', "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
-                    monthChart.redrawChart();
+                    oneMonthChart.setup(monthData, 'adjusted_close_equity', "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
+                    oneMonthChart.redrawChart();
                 };
 
                 // Month Day, Year
@@ -403,7 +413,7 @@
                         netPercentReturn = netReturn / startingEquity,
                         equityChangeText = _formatCurrencyDiff(netReturn) + ' (' + _formatPercentDiff(netPercentReturn) + ') 04:00 PM EDT';
 
-                    document.getElementById('current-equity-change-sub-header').innerText = equityChangeText;
+                    document.getElementById('current-equity-change-sub-header').fiveYearValue = equityChangeText;
 
                     fiveYearChart.setup(data, 'adjusted_close_equity', "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
                     fiveYearChart.redrawChart();
@@ -456,8 +466,8 @@
 
             //         document.getElementById('current-equity-change-sub-header').innerText = equityChangeText;
 
-            //         dayChart.setup(data, "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
-            //         dayChart.redrawChart();
+            //         oneDayChart.setup(data, "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
+            //         oneDayChart.redrawChart();
             //     });
 
             //     // time and Month Day
@@ -475,8 +485,8 @@
 
             //         document.getElementById('current-equity-change-sub-header').innerText = equityChangeText;
 
-            //         weekChart.setup(data, "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
-            //         weekChart.redrawChart();
+            //         oneWeekChart.setup(data, "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
+            //         oneWeekChart.redrawChart();
             //     });
 
             //     // Month Day, Year
@@ -494,8 +504,8 @@
 
             //         document.getElementById('current-equity-change-sub-header').innerText = equityChangeText;
 
-            //         monthChart.setup(data, "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
-            //         monthChart.redrawChart();
+            //         oneMonthChart.setup(data, "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
+            //         oneMonthChart.redrawChart();
 
             //         data = res.responseJSON.equity_historicals.slice(res.responseJSON.equity_historicals.length - 1 - 90, res.responseJSON.equity_historicals.length);
             //         startingEquity = +data[0].adjusted_open_equity;
@@ -518,8 +528,8 @@
 
             //         document.getElementById('current-equity-change-sub-header').innerText = equityChangeText;
 
-            //         yearChart.setup(data, "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
-            //         yearChart.redrawChart();
+            //         oneYearChart.setup(data, "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
+            //         oneYearChart.redrawChart();
             //     });
 
             //     // Month Day, Year
@@ -565,6 +575,11 @@
             //     });
             // });
         }
+    }
+
+    function chartNavClickHandler(eventInfo){
+        var tab = this.getAttribute('href').substring(1);
+        document.getElementById('current-equity-change-sub-header').innerText = document.getElementById('current-equity-change-sub-header')[tab + 'Value'];
     }
 
     function investmentProfileButtonClickHandler(eventInfo) {
