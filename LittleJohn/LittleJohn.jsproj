@@ -73,15 +73,8 @@
     <Content Include="images\Square44x44Logo.targetsize-24_altform-unplated.png" />
     <Content Include="images\StoreLogo.png" />
     <Content Include="images\Wide310x150Logo.scale-200.png" />
-    <Content Include="js\bootstrap.js" />
-    <Content Include="js\d3-line-chart.js" />
-    <Content Include="js\d3.js" />
-    <Content Include="js\jquery-2.2.4.js" />
     <Content Include="js\main.js" />
     <Content Include="css\default.css" />
-    <Content Include="js\moment.js" />
-    <Content Include="js\numeral.js" />
-    <Content Include="js\robinhood.js" />
     <Content Include="packages.config" />
     <Content Include="WinJS\css\ui-dark.css" />
     <Content Include="WinJS\css\ui-dark.min.css" />
