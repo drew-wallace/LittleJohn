@@ -2,7 +2,7 @@
   "name": "LittleJohn",
   "version": "0.0.1",
   "scripts": {
-    "build": "browserify js/src.js -o js/main.js -t [ babelify --presets [ es2015 react ] --plugins [ transform-class-properties transform-object-rest-spread ] ]"
+    "build": "browserify js/main.js -o compiled/bundle.js -t [ babelify --presets [ es2015 react ] --plugins [ transform-class-properties transform-object-rest-spread ] ]"
   },
   "dependencies": {
     "d3": "^4.4.0",

@@ -245,4 +245,5 @@ ModelManifest.xml
 .fake/
 
 jsconfig.json
-LittleJohn/js/main.js
+LittleJohn/compiled/*
+LittleJohn/data/*
