@@ -1,44 +1,39 @@
 import React, { Component } from 'react';
 import { NavPane, NavPaneItem, Text } from 'react-desktop/windows';
+import PortfolioPane from './portfolio-pane';
 
 export default class extends Component {
   static defaultProps = {
 	color: '#cc7f29',
 	theme: 'dark',
+	background: '#333',
 	defaultIsPaneExpanded: false
   };
 
   constructor() {
 	super();
 	this.state = {
-	  selected: 'Item 1'
-	}
+	  selected: 'Portfolio'
+	};
   }
 
   render() {
 	return (
-	  <NavPane openLength={200} push color={this.props.color} theme={this.props.theme} defaultIsPaneExpanded={this.props.defaultIsPaneExpanded}>
-		{this.renderItem('Item 1', 'Content 1')}
-		{this.renderItem('Item 2', 'Content 2')}
-		{this.renderItem('Item 3', 'Content 3')}
-	  </NavPane>
-	);
-  }
-
-  renderItem(title, content) {
-	return (
-	  <NavPaneItem
-		title={title}
-		icon={this.renderIcon(title)}
-		theme="dark"
-		background="#ffffff"
-		selected={this.state.selected === title}
-		onSelect={() => this.setState({ selected: title })}
-		padding="10px 20px"
-		push
-	  >
-		<Text>{content}</Text>
-	  </NavPaneItem>
+		<NavPane openLength={200} color={this.props.color} theme={this.props.theme} defaultIsPaneExpanded={this.props.defaultIsPaneExpanded}>
+			<NavPaneItem
+				title="Portfolio"
+				icon={this.renderIcon("Item 1")}
+				theme={this.props.theme}
+				color={this.props.theme === 'dark' ? '#ffffff' : '#000000'}
+				background={this.props.background}
+				selected={this.state.selected === "Portfolio"}
+				onSelect={() => this.setState({selected: "Portfolio"})}
+				padding="10px 20px"
+				push={true}
+			>
+				<PortfolioPane/>
+			</NavPaneItem>
+  		</NavPane>
 	);
   }
 

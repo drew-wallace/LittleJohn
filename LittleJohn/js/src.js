@@ -2,8 +2,8 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-// import NavPane from './nav-pane';
-import Sidebar from './sidebar';
+import NavPane from './nav-pane';
+// import Sidebar from './sidebar';
 import { MuiThemeProvider } from 'material-ui';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
@@ -31,8 +31,8 @@ app.onactivated = function (args) {
             // To create a smooth user experience, restore application state here so that it looks like the app never stopped running.
         }
 
-        // ReactDOM.render(<div style={{position: 'absolute', display: 'flex', height: '100%', width: '100%'}}><NavPane color={cssColorString}/></div>, document.getElementById('main'));
-        ReactDOM.render(<MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}><Sidebar/></MuiThemeProvider>, document.getElementById('main'));
+        ReactDOM.render(<div style={{backgroundColor: '#6DAD62', position: 'absolute', display: 'flex', height: '100%', width: '100%'}}><NavPane color={cssColorString}/></div>, document.getElementById('main'));
+        // ReactDOM.render(<MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}><Sidebar/></MuiThemeProvider>, document.getElementById('main'));
 
         // var allFeatures = [
         //     {

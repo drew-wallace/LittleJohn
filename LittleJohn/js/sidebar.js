@@ -4,6 +4,8 @@ import { Drawer, AppBar, MenuItem} from 'material-ui'
 // import baseTheme from 'material-ui/styles/baseThemes/lightBaseTheme'
 // import getMuiTheme from 'material-ui/styles/getMuiTheme'
 
+import Hammer from 'react-hammerjs';
+
 class Menu extends Component {
 
 	constructor(props){
