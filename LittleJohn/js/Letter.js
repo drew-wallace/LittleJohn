@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { select } from 'd3';
 
 const ExitColor = 'brown',
-      UpdateColor = '#ffffff',
+      UpdateColor = '#000000',
       EnterColor = 'green';
 
 class Letter extends Component {

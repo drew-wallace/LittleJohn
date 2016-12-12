@@ -4,16 +4,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import NavPane from './nav-pane';
 // import Sidebar from './sidebar';
-import { MuiThemeProvider } from 'material-ui';
-import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
-import getMuiTheme from 'material-ui/styles/getMuiTheme';
-import injectTapEventPlugin from 'react-tap-event-plugin';
 import rgbHex from 'rgb-hex';
 import env from '../env.js';
-
-// Needed for onTouchTap
-// http://stackoverflow.com/a/34015469/988941
-injectTapEventPlugin();
 
 let app = WinJS.Application;
 const activation = Windows.ApplicationModel.Activation;

@@ -20,6 +20,7 @@ export default class extends Component {
   render() {
 	return (
 		<NavPane openLength={200} color={this.props.color} theme={this.props.theme} defaultIsPaneExpanded={this.props.defaultIsPaneExpanded}>
+			{/*Parent of parent of this needs to have flex shrink off*/}
 			<NavPaneItem
 				title="Portfolio"
 				icon={this.renderIcon("Item 1")}
