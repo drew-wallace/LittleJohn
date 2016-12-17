@@ -19,7 +19,7 @@ class FancyText extends Component {
             newLastId = this.state.lastId;
 
         // find change
-        for (; newText[indexOfChange] == (oldText[indexOfChange] && oldText[indexOfChange][0]); indexOfChange++);
+        for (; newText[indexOfChange] == (oldText[indexOfChange] && oldText[indexOfChange][0]) && indexOfChange < newText.length; indexOfChange++);
 
         // calculate size of change
         if (newText.length > oldText.length) {
@@ -27,7 +27,7 @@ class FancyText extends Component {
                     && indexOfChange+sizeOfChange < newText.length) {
                         sizeOfChange = sizeOfChange+1;
             }
-        }else{
+        } else {
             while (newText[indexOfChange] != (oldText[indexOfChange+sizeOfChange] && oldText[indexOfChange+sizeOfChange][0])
                     && indexOfChange+sizeOfChange < oldText.length) {
                         sizeOfChange = sizeOfChange+1;
@@ -47,15 +47,15 @@ class FancyText extends Component {
             // use existing ids from change to end
             range(indexOfChange+sizeOfChange, newText.length).forEach((i) =>
                 newText[i] = oldText[i-sizeOfChange]);
-        }else{
+        } else {
             // use existing ids from change to end, but skip what's gone
             range(indexOfChange, newText.length).forEach((i) =>
                 newText[i] = oldText[i+sizeOfChange]);
         }
 
         this.setState({text: newProps.text,
-                       textWithIds: newText,
-                       lastId: newLastId});
+                    textWithIds: newText,
+                    lastId: newLastId});
     }
 
     render() {
