@@ -1,4 +1,3 @@
-
 import React, { Component } from 'react';
 import Alphabet from './Alphabet';
 import FancyText from './FancyText';
@@ -60,7 +59,7 @@ class PortfolioPane extends Component {
 				                               margin: '0px auto',
 				                               width: '80%'}}/>
 				                <svg width="100%" height="300">
-
+									<FancyText x="32" y="300" text={this.state.text} />
 				                </svg>
 					        </Tab>
 					        <Tab label="1M" value="1M">

@@ -248,3 +248,4 @@ jsconfig.json
 LittleJohn/env.js
 LittleJohn/compiled/*
 LittleJohn/data/*
+LittleJohn/.vscode/*
