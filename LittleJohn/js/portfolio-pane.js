@@ -37,6 +37,20 @@ class PortfolioPane extends Component {
 	constructor(props) {
 	    super(props);
 
+		let portfolio = Portfolios.results[0];
+		portfolio.equity = +portfolio.equity;
+		portfolio.extended_hours_equity = +portfolio.extended_hours_equity;
+
+		// document.getElementById('portfolio-header').innerText = this.formatCurrency(portfolio.equity);
+
+		let afterHoursReturn = portfolio.extended_hours_equity - portfolio.equity;
+		let afterHoursPercentReturn = afterHoursReturn / portfolio.equity;
+		let afterHoursText = `${this.formatCurrency(portfolio.extended_hours_equity)} ${this.formatCurrencyDiff(afterHoursReturn)} (${this.formatPercentDiff(afterHoursPercentReturn)}) After-hours`;
+
+		// document.getElementById('after-hours-sub-header').innerText = afterHoursText;
+
+		let day = Day.equity_historicals;
+
         this.parseTime = timeParse("%d-%b-%y");
         this.bisectDate = bisector(function(d) { return d.xVal; }).left;
         this.formatValue = format(",.2f");
@@ -54,6 +68,12 @@ class PortfolioPane extends Component {
 		this.y = y;
 
 		this.state = {
+			portfolio,
+			afterHoursText,
+			title: portfolio.equity,
+			subtitle: afterHoursText,
+			day,
+			chartData: null,
 			tab: '1D',
 			text: '',
 			margin,
@@ -103,9 +123,7 @@ class PortfolioPane extends Component {
 	}
 
 	day(equity) {
-		let data = Day.equity_historicals;
-		this.data = data;
-		let startingEquity = +data[0].adjusted_open_equity;
+		let startingEquity = +this.state.day[0].adjusted_open_equity;
 		let endingEquity = equity;
 		let netReturn = endingEquity - startingEquity;
 		let netPercentReturn = netReturn / startingEquity;
@@ -115,14 +133,11 @@ class PortfolioPane extends Component {
 		// document.getElementById('current-equity-change-sub-header').originalValue = equityChangeText;
 		// document.getElementById('current-equity-change-sub-header').oneDayValue = equityChangeText;
 
-		// oneDayChart.setup(data, 'adjusted_open_equity', "portfolio-header", "current-equity-change-sub-header", "after-hours-sub-header");
-		// oneDayChart.redrawChart();
-
-		return this.buildChart(data, 'day');
+		return this.buildChart('day');
 	}
 
-	buildChart(data, timeSpan) {
-        data = data.map(function(d, i){
+	buildChart(timeSpan) {
+		let data = this.state[timeSpan].map(function(d, i){
             d.xVal = i;
             // data key: open for day timeSpan, close for all others
             d.yVal = +d[timeSpan == 'day' ? 'adjusted_open_equity' : 'adjusted_close_equity'];
@@ -145,13 +160,17 @@ class PortfolioPane extends Component {
 				<path ref="mainLine" className="line" d={this.lineD3(data)}></path>
 
 				<g height={this.state.height} className="focus" transform={this.state.focusTransform} style={{display: this.state.focusDisplay}}>
-					<line x1='0' y1='0' x2='0' y2={this.state.height} stroke="white" stroke-width="2.5px" className="verticalLine"></line>
+					<line x1='0' y1='0' x2='0' y2={this.state.height} stroke="white" strokeWidth="2.5px" className="verticalLine"></line>
 				</g>
 
-				<rect ref="overlay" className="overlay" width={this.state.width} height={this.state.height} style={{fill: 'transparent'}} onMouseout={() => this.setState({focusDisplay: 'none'})}></rect>
+				<rect ref="overlay" className="overlay" width={this.state.width} height={this.state.height} style={{fill: 'transparent'}} onMouseOut={() => this.setState({focusDisplay: 'none'})}></rect>
 			</g>
 		);
 	}
+
+	// componentWillMount() {
+
+	// }
 
 	componentDidMount() {
 		const overlay = select(ReactDOM.findDOMNode(this.refs.overlay));
@@ -164,40 +183,33 @@ class PortfolioPane extends Component {
 
 	_startdrag() {
     	this.setState({focusDisplay: null});
-    	// document.getElementById(this.afterHoursElement).style.visibility = "hidden";
-    	select(ReactDOM.findDOMNode(this.refs.overlay)).on("mouseover", function() { this.setState({focusDisplay: null}); }.bind(this));
-    	// document.getElementById(this.highlightedEquityValueElement).originalValue = document.getElementById(this.highlightedEquityValueElement).innerText;
-    	// document.getElementById(this.highlightedEquityChangeValueElement).originalValue = document.getElementById(this.highlightedEquityChangeValueElement).innerText;
     }
 
     _dragging(ignoreThis, elmIndex, elms) {
     	// -$7.41 (-3.11%) 10:55 AM EDT
     	var x0 = this.x.invert(mouse(elms[elmIndex])[0]),
-            i = this.bisectDate(this.data, x0, 1);
+            i = this.bisectDate(this.state.day, x0, 1);
 
-        if(i >= this.data.length) return false;
+        if(i >= this.state.day.length) return false;
 
-        var d0 = this.data[i - 1],
-            d1 = this.data[i],
+        var d0 = this.state.day[i - 1],
+            d1 = this.state.day[i],
             d = x0 - d0.xVal > d1.xVal - x0 ? d1 : d0;
 
-        // document.getElementById(this.highlightedEquityValueElement).innerText = this.formatCurrency(d.yVal);
-
-        var netReturn = d.yVal - this.data[0].yVal,
-            netPercentReturn = netReturn / this.data[0].yVal,
+        var netReturn = d.yVal - this.state.day[0].yVal,
+            netPercentReturn = netReturn / this.state.day[0].yVal,
             sign = (netReturn >= 0 ? '+' : '-'),
             equityChangeText = sign + this.formatCurrency(Math.abs(netReturn)) + ' (' + sign + this.formatPercent(Math.abs(netPercentReturn)) + ') ' + this.formatTime(new Date(d.begins_at));
 
-        // document.getElementById(this.highlightedEquityChangeValueElement).innerText = equityChangeText;
 
         var xPos = mouse(elms[elmIndex])[0];
-        this.setState({focusTransform: `translate(${xPos},0)`});
 
 		var pathLength = ReactDOM.findDOMNode(this.refs.mainLine).getTotalLength();
         var thisX = xPos;
         var beginning = thisX,
             end = pathLength,
             target, pos;
+
         while (true) {
             target = Math.floor((beginning + end) / 2);
 			pos = ReactDOM.findDOMNode(this.refs.mainLine).getPointAtLength(target);
@@ -208,59 +220,56 @@ class PortfolioPane extends Component {
             else if (pos.x < thisX) beginning = target;
             else break; //position found
         }
+
+		this.setState({
+			title: d.yVal,
+			subtitle: equityChangeText,
+			focusTransform: `translate(${xPos},0)`
+		});
     }
 
     _enddrag() {
-		this.setState({focusDisplay: 'none'});
-        // document.getElementById(this.afterHoursElement).style.visibility = null;
-        select(ReactDOM.findDOMNode(this.refs.overlay)).on("mouseover", function() { this.setState({focusDisplay: 'none'}); }.bind(this));
-        // document.getElementById(this.highlightedEquityValueElement).innerText = document.getElementById(this.highlightedEquityValueElement).originalValue;
-        // document.getElementById(this.highlightedEquityChangeValueElement).innerText = document.getElementById(this.highlightedEquityChangeValueElement).originalValue;
+		this.setState({
+			focusDisplay: 'none',
+			title: this.state.portfolio.equity,
+			subtitle: this.state.afterHoursText
+		});
     }
 
     render() {
-		let data = Portfolios.results[0];
-		data.equity = +data.equity;
-		data.extended_hours_equity = +data.extended_hours_equity;
-
-		// document.getElementById('portfolio-header').innerText = this.formatCurrency(data.equity);
-
-		let afterHoursReturn = data.extended_hours_equity - data.equity;
-		let afterHoursPercentReturn = afterHoursReturn / data.equity;
-		let afterHoursText = `${this.formatCurrency(data.extended_hours_equity)} ${this.formatCurrencyDiff(afterHoursReturn)} (${this.formatPercentDiff(afterHoursPercentReturn)}) After-hours`;
-
-		// document.getElementById('after-hours-sub-header').innerText = afterHoursText;
-
-        return (
-        	<MuiThemeProvider muiTheme={muiTheme}>
-	        	<Card>
-					<CardHeader
-						title={this.formatCurrency(data.equity)}
-						subtitle={afterHoursText}
-					/>
-				    <CardText>
-						<Tabs value={this.state.tab} onChange={this.handleChange.bind(this)}>
-					        <Tab label="1D" value="1D">
-					        	<svg className="line-chart-svg" width={this.state.width + this.state.margin.left + this.state.margin.right} height={this.state.height + this.state.margin.top + this.state.margin.bottom}>
-										{this.day(data.equity)}
-										{/*<FancyText x="32" y="150" text={this.state.text} />*/}
-				                </svg>
-					        </Tab>
-					        <Tab label="1M" value="1M">
-					          	<div>
-					            	<h2 style={styles.headline}>Controllable Tab B</h2>
-					            	<p>
-					            		This is another example of a controllable tab. Remember, if you
-					            		use controllable Tabs, you need to give all of your tabs values or else
-					              		you wont be able to select them.
-					            	</p>
-					          	</div>
-					        </Tab>
-				      	</Tabs>
-				    </CardText>
-				</Card>
-			</MuiThemeProvider>
-        );
+		if(!this.state.portfolio) {
+			return (<div>Loading...</div>);
+		} else {
+			return (
+				<MuiThemeProvider muiTheme={muiTheme}>
+					<Card>
+						<CardHeader
+							title={this.formatCurrency(this.state.title)}
+							subtitle={this.state.subtitle}
+						/>
+						<CardText>
+							<Tabs value={this.state.tab} onChange={this.handleChange.bind(this)}>
+								<Tab label="1D" value="1D">
+									<svg className="line-chart-svg" width={this.state.width + this.state.margin.left + this.state.margin.right} height={this.state.height + this.state.margin.top + this.state.margin.bottom}>
+											{this.day(this.state.portfolio.equity)}
+									</svg>
+								</Tab>
+								<Tab label="1M" value="1M">
+									<div>
+										<h2 style={styles.headline}>Controllable Tab B</h2>
+										<p>
+											This is another example of a controllable tab. Remember, if you
+											use controllable Tabs, you need to give all of your tabs values or else
+											you wont be able to select them.
+										</p>
+									</div>
+								</Tab>
+							</Tabs>
+						</CardText>
+					</Card>
+				</MuiThemeProvider>
+			);
+		}
     }
 }
 
