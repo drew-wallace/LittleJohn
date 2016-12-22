@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
 import numeral from 'numeral';
-import { timeParse, bisector, format, scaleLinear, line, extent } from 'd3';
+import { timeParse, bisector, format, scaleLinear, line, select, extent, drag, mouse } from 'd3';
 import {Card, CardActions, CardHeader, CardText} from 'material-ui/Card';
 import {Tabs, Tab} from 'material-ui/Tabs';
 import { MuiThemeProvider } from 'material-ui';
@@ -59,7 +60,8 @@ class PortfolioPane extends Component {
 			width,
 			height,
 			equity: '$0',
-			focusDisplay: 'none'
+			focusDisplay: 'none',
+			focusTransform: 'translate(0,0)'
 	    };
 	}
 
@@ -102,6 +104,7 @@ class PortfolioPane extends Component {
 
 	day(equity) {
 		let data = Day.equity_historicals;
+		this.data = data;
 		let startingEquity = +data[0].adjusted_open_equity;
 		let endingEquity = equity;
 		let netReturn = endingEquity - startingEquity;
@@ -139,21 +142,81 @@ class PortfolioPane extends Component {
 				</g>*/}
 				{/*.call(axisLeft(this.y));*/}
 
-				<path className="line" d={this.lineD3(data)}></path>
+				<path ref="mainLine" className="line" d={this.lineD3(data)}></path>
 
-				<g height={this.state.height} className="focus" style={{display: this.state.focusDisplay}}>
+				<g height={this.state.height} className="focus" transform={this.state.focusTransform} style={{display: this.state.focusDisplay}}>
 					<line x1='0' y1='0' x2='0' y2={this.state.height} stroke="white" stroke-width="2.5px" className="verticalLine"></line>
 				</g>
 
-				<rect className="overlay" width={this.state.width} height={this.state.height} style={{fill: 'transparent'}} onMouseout={() => this.setState({focusDisplay: 'none'})}></rect>
-					{/*.call(drag()
-					    .on("start", this._startdrag.bind(this))
-					    .on("drag", this._dragging.bind(this))
-					    .on("end", this._enddrag.bind(this))
-					    .container(function() { return this; })*/}
+				<rect ref="overlay" className="overlay" width={this.state.width} height={this.state.height} style={{fill: 'transparent'}} onMouseout={() => this.setState({focusDisplay: 'none'})}></rect>
 			</g>
 		);
 	}
+
+	componentDidMount() {
+		const overlay = select(ReactDOM.findDOMNode(this.refs.overlay));
+		overlay.call(drag()
+					    .on("start", this._startdrag.bind(this))
+					    .on("drag", this._dragging.bind(this))
+					    .on("end", this._enddrag.bind(this))
+					    .container(function() { return this; }));
+	}
+
+	_startdrag() {
+    	this.setState({focusDisplay: null});
+    	// document.getElementById(this.afterHoursElement).style.visibility = "hidden";
+    	select(ReactDOM.findDOMNode(this.refs.overlay)).on("mouseover", function() { this.setState({focusDisplay: null}); }.bind(this));
+    	// document.getElementById(this.highlightedEquityValueElement).originalValue = document.getElementById(this.highlightedEquityValueElement).innerText;
+    	// document.getElementById(this.highlightedEquityChangeValueElement).originalValue = document.getElementById(this.highlightedEquityChangeValueElement).innerText;
+    }
+
+    _dragging(ignoreThis, elmIndex, elms) {
+    	// -$7.41 (-3.11%) 10:55 AM EDT
+    	var x0 = this.x.invert(mouse(elms[elmIndex])[0]),
+            i = this.bisectDate(this.data, x0, 1);
+
+        if(i >= this.data.length) return false;
+
+        var d0 = this.data[i - 1],
+            d1 = this.data[i],
+            d = x0 - d0.xVal > d1.xVal - x0 ? d1 : d0;
+
+        // document.getElementById(this.highlightedEquityValueElement).innerText = this.formatCurrency(d.yVal);
+
+        var netReturn = d.yVal - this.data[0].yVal,
+            netPercentReturn = netReturn / this.data[0].yVal,
+            sign = (netReturn >= 0 ? '+' : '-'),
+            equityChangeText = sign + this.formatCurrency(Math.abs(netReturn)) + ' (' + sign + this.formatPercent(Math.abs(netPercentReturn)) + ') ' + this.formatTime(new Date(d.begins_at));
+
+        // document.getElementById(this.highlightedEquityChangeValueElement).innerText = equityChangeText;
+
+        var xPos = mouse(elms[elmIndex])[0];
+        this.setState({focusTransform: `translate(${xPos},0)`});
+
+		var pathLength = ReactDOM.findDOMNode(this.refs.mainLine).getTotalLength();
+        var thisX = xPos;
+        var beginning = thisX,
+            end = pathLength,
+            target, pos;
+        while (true) {
+            target = Math.floor((beginning + end) / 2);
+			pos = ReactDOM.findDOMNode(this.refs.mainLine).getPointAtLength(target);
+            if ((target === end || target === beginning) && pos.x !== thisX) {
+                break;
+            }
+            if (pos.x > thisX) end = target;
+            else if (pos.x < thisX) beginning = target;
+            else break; //position found
+        }
+    }
+
+    _enddrag() {
+		this.setState({focusDisplay: 'none'});
+        // document.getElementById(this.afterHoursElement).style.visibility = null;
+        select(ReactDOM.findDOMNode(this.refs.overlay)).on("mouseover", function() { this.setState({focusDisplay: 'none'}); }.bind(this));
+        // document.getElementById(this.highlightedEquityValueElement).innerText = document.getElementById(this.highlightedEquityValueElement).originalValue;
+        // document.getElementById(this.highlightedEquityChangeValueElement).innerText = document.getElementById(this.highlightedEquityChangeValueElement).originalValue;
+    }
 
     render() {
 		let data = Portfolios.results[0];
