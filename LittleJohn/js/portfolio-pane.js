@@ -41,18 +41,21 @@ class PortfolioPane extends Component {
 		portfolio.equity = +portfolio.equity;
 		portfolio.extended_hours_equity = +portfolio.extended_hours_equity;
 
-		// document.getElementById('portfolio-header').innerText = this.formatCurrency(portfolio.equity);
-
 		let afterHoursReturn = portfolio.extended_hours_equity - portfolio.equity;
 		let afterHoursPercentReturn = afterHoursReturn / portfolio.equity;
 		let afterHoursText = `${this.formatCurrency(portfolio.extended_hours_equity)} ${this.formatCurrencyDiff(afterHoursReturn)} (${this.formatPercentDiff(afterHoursPercentReturn)}) After-hours`;
 
-		// document.getElementById('after-hours-sub-header').innerText = afterHoursText;
-
+		this.timeSpan = 'day';
 		let day = Day.equity_historicals;
+		day = day.map(function(d, i){
+            d.xVal = i;
+            // data key: open for day timeSpan, close for all others
+            d.yVal = +d[this.timeSpan == 'day' ? 'adjusted_open_equity' : 'adjusted_close_equity'];
+            return d;
+        }.bind(this));
 
         this.parseTime = timeParse("%d-%b-%y");
-        this.bisectDate = bisector(function(d) { return d.xVal; }).left;
+		this.bisectDate = bisector(function(d) { return d.xVal; }).left;
         this.formatValue = format(",.2f");
 
 		const margin = {top: 0, right: 0, bottom: 0, left: 0};
@@ -79,9 +82,7 @@ class PortfolioPane extends Component {
 			margin,
 			width,
 			height,
-			equity: '$0',
-			focusDisplay: 'none',
-			focusTransform: 'translate(0,0)'
+			equity: '$0'
 	    };
 	}
 
@@ -122,55 +123,16 @@ class PortfolioPane extends Component {
 		});
 	}
 
-	day(equity) {
-		let startingEquity = +this.state.day[0].adjusted_open_equity;
-		let endingEquity = equity;
-		let netReturn = endingEquity - startingEquity;
-		let netPercentReturn = netReturn / startingEquity;
-		let equityChangeText = this.formatCurrencyDiff(netReturn) + ' (' + this.formatPercentDiff(netPercentReturn) + ') 04:00 PM EDT';
+	getPath(timeSpan) {
+		this.timeSpan = timeSpan;
 
-		// document.getElementById('current-equity-change-sub-header').innerText = equityChangeText;
-		// document.getElementById('current-equity-change-sub-header').originalValue = equityChangeText;
-		// document.getElementById('current-equity-change-sub-header').oneDayValue = equityChangeText;
-
-		return this.buildChart('day');
-	}
-
-	buildChart(timeSpan) {
-		let data = this.state[timeSpan].map(function(d, i){
-            d.xVal = i;
-            // data key: open for day timeSpan, close for all others
-            d.yVal = +d[timeSpan == 'day' ? 'adjusted_open_equity' : 'adjusted_close_equity'];
-            return d;
-        });
-
-        this.x.domain(extent(data, function(d) { return d.xVal; }));
-        this.y.domain(extent(data, function(d) { return d.yVal; }));
+        this.x.domain(extent(this.state[this.timeSpan], function(d) { return d.xVal }));
+		this.y.domain(extent(this.state[this.timeSpan], function(d) { return d.yVal; }));
 
 		return (
-			<g className="line-chart-container-svg" transform={`translate(${this.state.margin.left}, ${this.state.margin.top})`}>
-				{/*<g className="axis axis--x hide" transform={`translate(0, ${this.height})`}></g>*/}
-				{/*.call(axisBottom(this.x));*/}
-
-				{/*<g className="axis axis--y hide">
-					<text className="axis-title" transform="rotate(-90)" y="6" dy=".71em" fill="#FFF" style={{textAnchor: 'end'}}>Price ($)</text>
-				</g>*/}
-				{/*.call(axisLeft(this.y));*/}
-
-				<path ref="mainLine" className="line" d={this.lineD3(data)}></path>
-
-				<g height={this.state.height} className="focus" transform={this.state.focusTransform} style={{display: this.state.focusDisplay}}>
-					<line x1='0' y1='0' x2='0' y2={this.state.height} stroke="white" strokeWidth="2.5px" className="verticalLine"></line>
-				</g>
-
-				<rect ref="overlay" className="overlay" width={this.state.width} height={this.state.height} style={{fill: 'transparent'}} onMouseOut={() => this.setState({focusDisplay: 'none'})}></rect>
-			</g>
+			<path ref="mainLine" className="line" d={this.lineD3(this.state[this.timeSpan])}></path>
 		);
 	}
-
-	// componentWillMount() {
-
-	// }
 
 	componentDidMount() {
 		const overlay = select(ReactDOM.findDOMNode(this.refs.overlay));
@@ -182,22 +144,34 @@ class PortfolioPane extends Component {
 	}
 
 	_startdrag() {
-    	this.setState({focusDisplay: null});
+    	select(ReactDOM.findDOMNode(this.refs.focus))
+			.style('display', null);
+
+		let startingEquity = +this.state[this.timeSpan][0].adjusted_open_equity;
+		let endingEquity = this.state.portfolio.equity;
+		let netReturn = endingEquity - startingEquity;
+		let netPercentReturn = netReturn / startingEquity;
+		let equityChangeText = this.formatCurrencyDiff(netReturn) + ' (' + this.formatPercentDiff(netPercentReturn) + ') 04:00 PM EDT';
+
+		this.setState({
+			title: startingEquity,
+			subtitle: equityChangeText
+		});
     }
 
     _dragging(ignoreThis, elmIndex, elms) {
     	// -$7.41 (-3.11%) 10:55 AM EDT
     	var x0 = this.x.invert(mouse(elms[elmIndex])[0]),
-            i = this.bisectDate(this.state.day, x0, 1);
+			i = this.bisectDate(this.state[this.timeSpan], x0, 1);
 
-        if(i >= this.state.day.length) return false;
+		if(i >= this.state[this.timeSpan].length) return false;
 
-        var d0 = this.state.day[i - 1],
-            d1 = this.state.day[i],
+		var d0 = this.state[this.timeSpan][i - 1],
+			d1 = this.state[this.timeSpan][i],
             d = x0 - d0.xVal > d1.xVal - x0 ? d1 : d0;
 
-        var netReturn = d.yVal - this.state.day[0].yVal,
-            netPercentReturn = netReturn / this.state.day[0].yVal,
+		var netReturn = d.yVal - this.state[this.timeSpan][0].yVal,
+			netPercentReturn = netReturn / this.state[this.timeSpan][0].yVal,
             sign = (netReturn >= 0 ? '+' : '-'),
             equityChangeText = sign + this.formatCurrency(Math.abs(netReturn)) + ' (' + sign + this.formatPercent(Math.abs(netPercentReturn)) + ') ' + this.formatTime(new Date(d.begins_at));
 
@@ -221,16 +195,28 @@ class PortfolioPane extends Component {
             else break; //position found
         }
 
-		this.setState({
-			title: d.yVal,
-			subtitle: equityChangeText,
-			focusTransform: `translate(${xPos},0)`
-		});
+		// Performance issue
+		// this.setState({
+		// 	title: d[this.yVal],
+		// 	subtitle: equityChangeText,
+		// });
+
+		select(ReactDOM.findDOMNode(this.refs.header))
+			.select("div span:nth-child(1)")
+			.text(this.formatCurrency(d.yVal));
+		select(ReactDOM.findDOMNode(this.refs.header))
+			.select("div span:nth-child(2)")
+			.text(equityChangeText);
+
+		select(ReactDOM.findDOMNode(this.refs.focus))
+			.attr('transform', `translate(${xPos},0)`);
     }
 
     _enddrag() {
+		select(ReactDOM.findDOMNode(this.refs.focus))
+			.style('display', 'none');
+
 		this.setState({
-			focusDisplay: 'none',
 			title: this.state.portfolio.equity,
 			subtitle: this.state.afterHoursText
 		});
@@ -244,6 +230,7 @@ class PortfolioPane extends Component {
 				<MuiThemeProvider muiTheme={muiTheme}>
 					<Card>
 						<CardHeader
+							ref="header"
 							title={this.formatCurrency(this.state.title)}
 							subtitle={this.state.subtitle}
 						/>
@@ -251,7 +238,15 @@ class PortfolioPane extends Component {
 							<Tabs value={this.state.tab} onChange={this.handleChange.bind(this)}>
 								<Tab label="1D" value="1D">
 									<svg className="line-chart-svg" width={this.state.width + this.state.margin.left + this.state.margin.right} height={this.state.height + this.state.margin.top + this.state.margin.bottom}>
-											{this.day(this.state.portfolio.equity)}
+											<g className="line-chart-container-svg" transform={`translate(${this.state.margin.left}, ${this.state.margin.top})`}>
+												{this.getPath('day')}
+
+												<g ref="focus" height={this.state.height} transform="translate(0,0)" style={{display: 'none'}}>
+													<line x1='0' y1='0' x2='0' y2={this.state.height} stroke="white" strokeWidth="2.5px" className="verticalLine"></line>
+												</g>
+
+												<rect ref="overlay" width={this.state.width} height={this.state.height} style={{fill: 'transparent'}}></rect>
+											</g>
 									</svg>
 								</Tab>
 								<Tab label="1M" value="1M">
