@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import numeral from 'numeral';
+import _ from "lodash";
 import { timeParse, bisector, format, scaleLinear, line, select, extent, drag, mouse } from 'd3';
 import {Card, CardActions, CardHeader, CardText} from 'material-ui/Card';
 import {Tabs, Tab} from 'material-ui/Tabs';
@@ -24,11 +25,11 @@ injectTapEventPlugin();
 
 const styles = {
 	headline: {
-    fontSize: 24,
-    paddingTop: 16,
-    marginBottom: 12,
-    fontWeight: 400,
-  }
+		fontSize: 24,
+		paddingTop: 16,
+		marginBottom: 12,
+		fontWeight: 400,
+	}
 };
 
 const muiTheme = getMuiTheme(darkBaseTheme);
@@ -141,6 +142,31 @@ class PortfolioPane extends Component {
 					    .on("drag", this._dragging.bind(this))
 					    .on("end", this._enddrag.bind(this))
 					    .container(function() { return this; }));
+
+		this.onResizeThrottled = _.throttle(this.onResize.bind(this), 10);
+		window.addEventListener("resize", this.onResizeThrottled);
+	}
+
+	onResize() {
+		if(document.getElementById('tabs')) {
+			let position = document.getElementById(`${this.timeSpan}-chart`).style.position;
+			document.getElementById(`${this.timeSpan}-chart`).style.position = 'absolute';
+			const width = document.getElementById('tabs').offsetWidth - this.state.margin.left - this.state.margin.right;
+			const height = (document.getElementById('tabs').offsetWidth * 0.5) - this.state.margin.top - this.state.margin.bottom;
+			document.getElementById(`${this.timeSpan}-chart`).style.position = position;
+			this.setState({
+				width,
+				height
+			});
+		}
+	}
+
+	componentWillMount() {
+		this.onResize();
+	}
+
+	componentWillUnmount() {
+		window.removeEventListener("resize", this.onResizeThrottled);
 	}
 
 	_startdrag() {
@@ -195,12 +221,6 @@ class PortfolioPane extends Component {
             else break; //position found
         }
 
-		// Performance issue
-		// this.setState({
-		// 	title: d[this.yVal],
-		// 	subtitle: equityChangeText,
-		// });
-
 		select(ReactDOM.findDOMNode(this.refs.header))
 			.select("div span:nth-child(1)")
 			.text(this.formatCurrency(d.yVal));
@@ -226,6 +246,16 @@ class PortfolioPane extends Component {
 		if(!this.state.portfolio) {
 			return (<div>Loading...</div>);
 		} else {
+			this.x = scaleLinear()
+				.range([0, this.state.width]);
+
+			this.y = scaleLinear()
+				.range([this.state.height, 0]);
+
+			this.lineD3 = line()
+				.x(function(d) { return this.x(d.xVal); }.bind(this))
+				.y(function(d) { return this.y(d.yVal); }.bind(this));
+
 			return (
 				<MuiThemeProvider muiTheme={muiTheme}>
 					<Card>
@@ -235,18 +265,18 @@ class PortfolioPane extends Component {
 							subtitle={this.state.subtitle}
 						/>
 						<CardText>
-							<Tabs value={this.state.tab} onChange={this.handleChange.bind(this)}>
+							<Tabs ref="tab" value={this.state.tab} onChange={this.handleChange.bind(this)} id="tabs">
 								<Tab label="1D" value="1D">
-									<svg className="line-chart-svg" width={this.state.width + this.state.margin.left + this.state.margin.right} height={this.state.height + this.state.margin.top + this.state.margin.bottom}>
-											<g className="line-chart-container-svg" transform={`translate(${this.state.margin.left}, ${this.state.margin.top})`}>
-												{this.getPath('day')}
+									<svg id="day-chart" className="line-chart-svg" width={this.state.width + this.state.margin.left + this.state.margin.right} height={this.state.height + this.state.margin.top + this.state.margin.bottom}>
+										<g className="line-chart-container-svg" transform={`translate(${this.state.margin.left}, ${this.state.margin.top})`}>
+											{this.getPath('day')}
 
-												<g ref="focus" height={this.state.height} transform="translate(0,0)" style={{display: 'none'}}>
-													<line x1='0' y1='0' x2='0' y2={this.state.height} stroke="white" strokeWidth="2.5px" className="verticalLine"></line>
-												</g>
-
-												<rect ref="overlay" width={this.state.width} height={this.state.height} style={{fill: 'transparent'}}></rect>
+											<g ref="focus" height={this.state.height} transform="translate(0,0)" style={{display: 'none'}}>
+												<line x1='0' y1='0' x2='0' y2={this.state.height} stroke="white" strokeWidth="2.5px" className="verticalLine"></line>
 											</g>
+
+											<rect ref="overlay" width={this.state.width} height={this.state.height} style={{fill: 'transparent'}}></rect>
+										</g>
 									</svg>
 								</Tab>
 								<Tab label="1M" value="1M">
