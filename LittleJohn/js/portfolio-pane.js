@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import numeral from 'numeral';
+import moment from 'moment';
 import _ from "lodash";
 import { timeParse, bisector, format, scaleLinear, line, select, extent, drag, mouse } from 'd3';
 import {Card, CardActions, CardHeader, CardText} from 'material-ui/Card';
 import {Tabs, Tab} from 'material-ui/Tabs';
 import { MuiThemeProvider } from 'material-ui';
+import FlatButton from 'material-ui/FlatButton';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 
@@ -55,6 +57,75 @@ class PortfolioPane extends Component {
             return d;
         }.bind(this));
 
+
+		let week = Week.equity_historicals;
+		if(moment(week[0].begins_at).hour(0).minute(0).second(0).isAfter(moment(portfolio.start_date).hour(0).minute(0).second(0))) {
+			week = week.map(function(d, i){
+				d.xVal = i;
+				// data key: open for day timeSpan, close for all others
+				d.yVal = +d[this.timeSpan == 'day' ? 'adjusted_open_equity' : 'adjusted_close_equity'];
+				return d;
+			}.bind(this));
+		} else {
+			week = _.filter(week, function(d, i){
+				d.xVal = i;
+				d.yVal = +d[this.timeSpan == 'day' ? 'adjusted_open_equity' : 'adjusted_close_equity'];
+				return moment(d.begins_at).hour(0).minute(0).second(0).isAfter(moment(portfolio.start_date).hour(0).minute(0).second(0).subtract(1, 'day'));
+			}.bind(this));
+		}
+
+		let month = [];
+		let quarter = [];
+		let year = [];
+		let yearData = Year.equity_historicals;
+
+		if(moment(yearData[0].begins_at).hour(0).minute(0).second(0).isAfter(moment(portfolio.start_date).hour(0).minute(0).second(0))) {
+			_.each(yearData, function(d, i){
+				d.xVal = i;
+				d.yVal = +d[this.timeSpan == 'day' ? 'adjusted_open_equity' : 'adjusted_close_equity'];
+
+				if(moment(d.begins_at).hour(0).minute(0).second(0).isAfter(moment(_.last(Year.equity_historicals).begins_at).hour(0).minute(0).second(0).subtract(3, 'month'))) {
+					quarter.push(Object.assign({}, d));
+					if(moment(d.begins_at).hour(0).minute(0).second(0).isAfter(moment(_.last(Year.equity_historicals).begins_at).hour(0).minute(0).second(0).subtract(1, 'month'))) {
+						month.push(Object.assign({}, d));
+					}
+				}
+
+				year.push(Object.assign({}, d));
+			}.bind(this));
+		} else {
+			yearData = _.filter(yearData, function(d, i){
+				d.xVal = i;
+				d.yVal = +d[this.timeSpan == 'day' ? 'adjusted_open_equity' : 'adjusted_close_equity'];
+
+				if(moment(d.begins_at).hour(0).minute(0).second(0).isAfter(moment(_.last(Year.equity_historicals).begins_at).hour(0).minute(0).second(0).subtract(3, 'month'))) {
+					quarter.push(Object.assign({}, d));
+					if(moment(d.begins_at).hour(0).minute(0).second(0).isAfter(moment(_.last(Year.equity_historicals).begins_at).hour(0).minute(0).second(0).subtract(1, 'month'))) {
+						month.push(Object.assign({}, d));
+					}
+				}
+
+				year.push(Object.assign({}, d));
+				return moment(d.begins_at).hour(0).minute(0).second(0).isAfter(moment(portfolio.start_date).hour(0).minute(0).second(0).subtract(1, 'month'));
+			}.bind(this));
+		}
+
+		let all = AllTime.equity_historicals;
+		if(moment(all[0].begins_at).hour(0).minute(0).second(0).isAfter(moment(portfolio.start_date).hour(0).minute(0).second(0))) {
+			all = all.map(function(d, i){
+				d.xVal = i;
+				// data key: open for day timeSpan, close for all others
+				d.yVal = +d[this.timeSpan == 'day' ? 'adjusted_open_equity' : 'adjusted_close_equity'];
+				return d;
+			}.bind(this));
+		} else {
+			all = _.filter(all, function(d, i){
+				d.xVal = i;
+				d.yVal = +d[this.timeSpan == 'day' ? 'adjusted_open_equity' : 'adjusted_close_equity'];
+				return moment(d.begins_at).hour(0).minute(0).second(0).isAfter(moment(portfolio.start_date).hour(0).minute(0).second(0).subtract(1, 'month'));
+			}.bind(this));
+		}
+
         this.parseTime = timeParse("%d-%b-%y");
 		this.bisectDate = bisector(function(d) { return d.xVal; }).left;
         this.formatValue = format(",.2f");
@@ -77,9 +148,12 @@ class PortfolioPane extends Component {
 			title: portfolio.equity,
 			subtitle: afterHoursText,
 			day,
-			chartData: null,
-			tab: '1D',
-			text: '',
+			week,
+			month,
+			quarter,
+			year,
+			all,
+			tab: 'day',
 			margin,
 			width,
 			height,
@@ -118,9 +192,9 @@ class PortfolioPane extends Component {
 		return hours + ':' + minutes + ' EDT'
 	}
 
-	handleChange(tab) {
+	handleChange(e) {
 		this.setState({
-			tab
+			tab: e.currentTarget.id
 		});
 	}
 
@@ -265,31 +339,27 @@ class PortfolioPane extends Component {
 							subtitle={this.state.subtitle}
 						/>
 						<CardText>
-							<Tabs ref="tab" value={this.state.tab} onChange={this.handleChange.bind(this)} id="tabs">
-								<Tab label="1D" value="1D">
-									<svg id="day-chart" className="line-chart-svg" width={this.state.width + this.state.margin.left + this.state.margin.right} height={this.state.height + this.state.margin.top + this.state.margin.bottom}>
-										<g className="line-chart-container-svg" transform={`translate(${this.state.margin.left}, ${this.state.margin.top})`}>
-											{this.getPath('day')}
+							<div id="tabs">
+								<svg id={`${this.state.tab}-chart`} className="line-chart-svg" width={this.state.width + this.state.margin.left + this.state.margin.right} height={this.state.height + this.state.margin.top + this.state.margin.bottom}>
+									<g className="line-chart-container-svg" transform={`translate(${this.state.margin.left}, ${this.state.margin.top})`}>
+										{this.getPath(this.state.tab)}
 
-											<g ref="focus" height={this.state.height} transform="translate(0,0)" style={{display: 'none'}}>
-												<line x1='0' y1='0' x2='0' y2={this.state.height} stroke="white" strokeWidth="2.5px" className="verticalLine"></line>
-											</g>
-
-											<rect ref="overlay" width={this.state.width} height={this.state.height} style={{fill: 'transparent'}}></rect>
+										<g ref="focus" height={this.state.height} transform="translate(0,0)" style={{display: 'none'}}>
+											<line x1='0' y1='0' x2='0' y2={this.state.height} stroke="white" strokeWidth="2.5px" className="verticalLine"></line>
 										</g>
-									</svg>
-								</Tab>
-								<Tab label="1M" value="1M">
-									<div>
-										<h2 style={styles.headline}>Controllable Tab B</h2>
-										<p>
-											This is another example of a controllable tab. Remember, if you
-											use controllable Tabs, you need to give all of your tabs values or else
-											you wont be able to select them.
-										</p>
-									</div>
-								</Tab>
-							</Tabs>
+
+										<rect ref="overlay" width={this.state.width} height={this.state.height} style={{fill: 'transparent'}}></rect>
+									</g>
+								</svg>
+							</div>
+							<CardActions>
+								<FlatButton id="day" onTouchTap={this.handleChange.bind(this)} label="1D" labelStyle={{color: (this.state.tab == 'day' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'day' ? 'active' : '')}`}/>
+								<FlatButton id="week" onTouchTap={this.handleChange.bind(this)} label="1W" labelStyle={{color: (this.state.tab == 'week' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'week' ? 'active' : '')}`}/>
+								<FlatButton id="month" onTouchTap={this.handleChange.bind(this)} label="1M" labelStyle={{color: (this.state.tab == 'month' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'month' ? 'active' : '')}`}/>
+								<FlatButton id="quarter" onTouchTap={this.handleChange.bind(this)} label="3W" labelStyle={{color: (this.state.tab == 'quarter' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'quarter' ? 'active' : '')}`}/>
+								<FlatButton id="year" onTouchTap={this.handleChange.bind(this)} label="1Y" labelStyle={{color: (this.state.tab == 'year' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'year' ? 'active' : '')}`}/>
+								<FlatButton id="all" onTouchTap={this.handleChange.bind(this)} label="ALL" labelStyle={{color: (this.state.tab == 'all' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'all' ? 'active' : '')}`}/>
+							</CardActions>
 						</CardText>
 					</Card>
 				</MuiThemeProvider>

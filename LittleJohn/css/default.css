@@ -277,3 +277,13 @@ button.win-splitview-button:after {
 .icon-button-icon {
     padding: 14px
 }
+
+.chart-button.active {
+    text-decoration: none !important;
+    background-color: transparent !important;
+    border-bottom-width: 2px !important;
+    border-bottom-color: white !important;
+    border-bottom-style: solid !important;
+    border-radius: 0px !important;
+    color: white !important;
+}
