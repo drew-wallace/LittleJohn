@@ -189,7 +189,20 @@ class PortfolioPane extends Component {
 		if(hours < 10) hours = '0' + hours;
 		if(minutes < 10) minutes = '0' + minutes;
 
-		return hours + ':' + minutes + ' EDT'
+		switch(this.timeSpan) {
+			case 'day':
+				return `${hours}:${minutes} EDT`;
+			case 'week':
+				return `${hours}:${minutes} EDT ${moment(d).format('MMM D')}`;
+			case 'month':
+				return `${moment(d).format('MMM D YYYY')}`;
+			case 'quarter':
+				return `${moment(d).format('MMM D YYYY')}`;
+			case 'year':
+				return `${moment(d).format('MMM D YYYY')}`;
+			case 'all':
+				return `${moment(d).format('MMM D YYYY')}`;
+		}
 	}
 
 	handleChange(e) {
@@ -352,13 +365,13 @@ class PortfolioPane extends Component {
 									</g>
 								</svg>
 							</div>
-							<CardActions>
-								<FlatButton id="day" onTouchTap={this.handleChange.bind(this)} label="1D" labelStyle={{color: (this.state.tab == 'day' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'day' ? 'active' : '')}`}/>
-								<FlatButton id="week" onTouchTap={this.handleChange.bind(this)} label="1W" labelStyle={{color: (this.state.tab == 'week' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'week' ? 'active' : '')}`}/>
-								<FlatButton id="month" onTouchTap={this.handleChange.bind(this)} label="1M" labelStyle={{color: (this.state.tab == 'month' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'month' ? 'active' : '')}`}/>
-								<FlatButton id="quarter" onTouchTap={this.handleChange.bind(this)} label="3W" labelStyle={{color: (this.state.tab == 'quarter' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'quarter' ? 'active' : '')}`}/>
-								<FlatButton id="year" onTouchTap={this.handleChange.bind(this)} label="1Y" labelStyle={{color: (this.state.tab == 'year' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'year' ? 'active' : '')}`}/>
-								<FlatButton id="all" onTouchTap={this.handleChange.bind(this)} label="ALL" labelStyle={{color: (this.state.tab == 'all' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'all' ? 'active' : '')}`}/>
+							<CardActions style={{display: 'flex'}}>
+								<FlatButton id="day" style={{flex: 1}} onTouchTap={this.handleChange.bind(this)} label="1D" labelStyle={{color: (this.state.tab == 'day' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'day' ? 'active' : '')}`}/>
+								<FlatButton id="week" style={{flex: 1}} onTouchTap={this.handleChange.bind(this)} label="1W" labelStyle={{color: (this.state.tab == 'week' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'week' ? 'active' : '')}`}/>
+								<FlatButton id="month" style={{flex: 1}} onTouchTap={this.handleChange.bind(this)} label="1M" labelStyle={{color: (this.state.tab == 'month' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'month' ? 'active' : '')}`}/>
+								<FlatButton id="quarter" style={{flex: 1}} onTouchTap={this.handleChange.bind(this)} label="3W" labelStyle={{color: (this.state.tab == 'quarter' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'quarter' ? 'active' : '')}`}/>
+								<FlatButton id="year" style={{flex: 1}} onTouchTap={this.handleChange.bind(this)} label="1Y" labelStyle={{color: (this.state.tab == 'year' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'year' ? 'active' : '')}`}/>
+								<FlatButton id="all" style={{flex: 1}} onTouchTap={this.handleChange.bind(this)} label="ALL" labelStyle={{color: (this.state.tab == 'all' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'all' ? 'active' : '')}`}/>
 							</CardActions>
 						</CardText>
 					</Card>
