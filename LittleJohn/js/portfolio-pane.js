@@ -3,22 +3,25 @@ import ReactDOM from 'react-dom';
 import numeral from 'numeral';
 import moment from 'moment';
 import _ from "lodash";
+
 import { timeParse, bisector, format, scaleLinear, line, select, extent, drag, mouse } from 'd3';
+
 import {Card, CardActions, CardHeader, CardText} from 'material-ui/Card';
 import {Tabs, Tab} from 'material-ui/Tabs';
 import { MuiThemeProvider } from 'material-ui';
 import FlatButton from 'material-ui/FlatButton';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
+import Lightbulb from 'material-ui/svg-icons/action/lightbulb-outline';
+import Avatar from 'material-ui/Avatar';
+
+import Hammer from 'react-hammerjs'
 
 import Portfolios from '../data/portfolios';
 import Day from '../data/day';
 import Week from '../data/week';
 import Year from '../data/year';
 import AllTime from '../data/5year';
-
-// import Alphabet from './Alphabet';
-// import FancyText from './FancyText';
 
 import injectTapEventPlugin from 'react-tap-event-plugin';
 // Needed for onTouchTap
@@ -235,11 +238,11 @@ class PortfolioPane extends Component {
 	}
 
 	onResize() {
-		if(document.getElementById('tabs')) {
+		if(document.getElementById('chart-container')) {
 			let position = document.getElementById(`${this.timeSpan}-chart`).style.position;
 			document.getElementById(`${this.timeSpan}-chart`).style.position = 'absolute';
-			const width = document.getElementById('tabs').offsetWidth - this.state.margin.left - this.state.margin.right;
-			const height = (document.getElementById('tabs').offsetWidth * 0.5) - this.state.margin.top - this.state.margin.bottom;
+			const width = document.getElementById('chart-container').offsetWidth - this.state.margin.left - this.state.margin.right;
+			const height = (document.getElementById('chart-container').offsetWidth * 0.5) - this.state.margin.top - this.state.margin.bottom;
 			document.getElementById(`${this.timeSpan}-chart`).style.position = position;
 			this.setState({
 				width,
@@ -329,6 +332,23 @@ class PortfolioPane extends Component {
 		});
     }
 
+	handleSwipe(e) {
+		let element = ReactDOM.findDOMNode(this.refs.article);
+		element.style.transform =  `translate(${e.deltaX}px,0px)`;
+	}
+
+	handleSwipeEnd(e) {
+		let element = ReactDOM.findDOMNode(this.refs.article);
+		element.style.transform =  `translate(${e.deltaX}px,0px)`;
+		if(Math.abs(e.deltaX / this.state.width) >= 0.5) {
+			// pop article off stack
+			// setstate
+			element.parentNode.removeChild(element);
+		} else {
+			ReactDOM.findDOMNode(this.refs.article).style.transform =  `translate(0px,0px)`;
+		}
+	}
+
     render() {
 		if(!this.state.portfolio) {
 			return (<div>Loading...</div>);
@@ -344,38 +364,59 @@ class PortfolioPane extends Component {
 				.y(function(d) { return this.y(d.yVal); }.bind(this));
 
 			return (
-				<MuiThemeProvider muiTheme={muiTheme}>
-					<Card>
-						<CardHeader
-							ref="header"
-							title={this.formatCurrency(this.state.title)}
-							subtitle={this.state.subtitle}
-						/>
-						<CardText>
-							<div id="tabs">
-								<svg id={`${this.state.tab}-chart`} className="line-chart-svg" width={this.state.width + this.state.margin.left + this.state.margin.right} height={this.state.height + this.state.margin.top + this.state.margin.bottom}>
-									<g className="line-chart-container-svg" transform={`translate(${this.state.margin.left}, ${this.state.margin.top})`}>
-										{this.getPath(this.state.tab)}
-
-										<g ref="focus" height={this.state.height} transform="translate(0,0)" style={{display: 'none'}}>
-											<line x1='0' y1='0' x2='0' y2={this.state.height} stroke="white" strokeWidth="2.5px" className="verticalLine"></line>
-										</g>
-
-										<rect ref="overlay" width={this.state.width} height={this.state.height} style={{fill: 'transparent'}}></rect>
-									</g>
-								</svg>
-							</div>
-							<CardActions style={{display: 'flex'}}>
-								<FlatButton id="day" style={{flex: 1, minWidth: 0}} onTouchTap={this.handleChange.bind(this)} label="1D" labelStyle={{color: (this.state.tab == 'day' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'day' ? 'active' : '')}`}/>
-								<FlatButton id="week" style={{flex: 1, minWidth: 0}} onTouchTap={this.handleChange.bind(this)} label="1W" labelStyle={{color: (this.state.tab == 'week' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'week' ? 'active' : '')}`}/>
-								<FlatButton id="month" style={{flex: 1, minWidth: 0}} onTouchTap={this.handleChange.bind(this)} label="1M" labelStyle={{color: (this.state.tab == 'month' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'month' ? 'active' : '')}`}/>
-								<FlatButton id="quarter" style={{flex: 1, minWidth: 0}} onTouchTap={this.handleChange.bind(this)} label="3W" labelStyle={{color: (this.state.tab == 'quarter' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'quarter' ? 'active' : '')}`}/>
-								<FlatButton id="year" style={{flex: 1, minWidth: 0}} onTouchTap={this.handleChange.bind(this)} label="1Y" labelStyle={{color: (this.state.tab == 'year' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'year' ? 'active' : '')}`}/>
-								<FlatButton id="all" style={{flex: 1, minWidth: 0}} onTouchTap={this.handleChange.bind(this)} label="ALL" labelStyle={{color: (this.state.tab == 'all' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'all' ? 'active' : '')}`}/>
-							</CardActions>
-						</CardText>
-					</Card>
-				</MuiThemeProvider>
+				<div>
+					<MuiThemeProvider muiTheme={muiTheme}>
+						<div>
+							<Card style={{paddingBottom: 15}}>
+								<CardHeader
+									ref="header"
+									title={this.formatCurrency(this.state.title)}
+									subtitle={this.state.subtitle}
+								/>
+								<CardText>
+									<div id="chart-container">
+										<svg id={`${this.state.tab}-chart`} className="line-chart-svg" width={this.state.width + this.state.margin.left + this.state.margin.right} height={this.state.height + this.state.margin.top + this.state.margin.bottom}>
+											<g className="line-chart-container-svg" transform={`translate(${this.state.margin.left}, ${this.state.margin.top})`}>
+												{this.getPath(this.state.tab)}
+		
+												<g ref="focus" height={this.state.height} transform="translate(0,0)" style={{display: 'none'}}>
+													<line x1='0' y1='0' x2='0' y2={this.state.height} stroke="white" strokeWidth="2.5px" className="verticalLine"></line>
+												</g>
+		
+												<rect ref="overlay" width={this.state.width} height={this.state.height} style={{fill: 'transparent'}}></rect>
+											</g>
+										</svg>
+									</div>
+								</CardText>
+								<CardActions style={{display: 'flex'}}>
+									<FlatButton id="day" style={{flex: 1, minWidth: 0}} onTouchTap={this.handleChange.bind(this)} label="1D" labelStyle={{color: (this.state.tab == 'day' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'day' ? 'active' : '')}`}/>
+									<FlatButton id="week" style={{flex: 1, minWidth: 0}} onTouchTap={this.handleChange.bind(this)} label="1W" labelStyle={{color: (this.state.tab == 'week' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'week' ? 'active' : '')}`}/>
+									<FlatButton id="month" style={{flex: 1, minWidth: 0}} onTouchTap={this.handleChange.bind(this)} label="1M" labelStyle={{color: (this.state.tab == 'month' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'month' ? 'active' : '')}`}/>
+									<FlatButton id="quarter" style={{flex: 1, minWidth: 0}} onTouchTap={this.handleChange.bind(this)} label="3W" labelStyle={{color: (this.state.tab == 'quarter' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'quarter' ? 'active' : '')}`}/>
+									<FlatButton id="year" style={{flex: 1, minWidth: 0}} onTouchTap={this.handleChange.bind(this)} label="1Y" labelStyle={{color: (this.state.tab == 'year' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'year' ? 'active' : '')}`}/>
+									<FlatButton id="all" style={{flex: 1, minWidth: 0}} onTouchTap={this.handleChange.bind(this)} label="ALL" labelStyle={{color: (this.state.tab == 'all' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'all' ? 'active' : '')}`}/>
+								</CardActions>
+							</Card>
+							<Hammer onPan={this.handleSwipe.bind(this)} onPanEnd={this.handleSwipeEnd.bind(this)}>
+								<Card ref="article">
+									<CardHeader
+										title='Introduction'
+										avatar={<Avatar
+											icon={<Lightbulb/>}
+											size={30}/>
+										}
+									/>
+									<CardText>
+										<p>Hello</p>
+									</CardText>
+									<CardActions style={{display: 'flex'}}>
+										<FlatButton id="day" style={{flex: 1, minWidth: 0}} onTouchTap={this.handleChange.bind(this)} label="1D" labelStyle={{color: (this.state.tab == 'day' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'day' ? 'active' : '')}`}/>
+									</CardActions>
+								</Card>
+							</Hammer>
+						</div>
+					</MuiThemeProvider>
+				</div>
 			);
 		}
     }

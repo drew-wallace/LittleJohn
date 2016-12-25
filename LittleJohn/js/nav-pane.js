@@ -8,7 +8,7 @@ export default class extends Component {
   	static defaultProps = {
 		color: '#cc7f29',
 		theme: 'dark',
-		background: '#333',
+		background: 'black',
 		defaultIsPaneExpanded: false
   	};
 
