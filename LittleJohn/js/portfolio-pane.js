@@ -10,6 +10,7 @@ import {Card, CardActions, CardHeader, CardText} from 'material-ui/Card';
 import {Tabs, Tab} from 'material-ui/Tabs';
 import { MuiThemeProvider } from 'material-ui';
 import FlatButton from 'material-ui/FlatButton';
+import Badge from 'material-ui/Badge';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import Lightbulb from 'material-ui/svg-icons/action/lightbulb-outline';
@@ -367,7 +368,7 @@ class PortfolioPane extends Component {
 				<div>
 					<MuiThemeProvider muiTheme={muiTheme}>
 						<div>
-							<Card style={{paddingBottom: 15}}>
+							<Card style={{marginBottom: 15}}>
 								<CardHeader
 									ref="header"
 									title={this.formatCurrency(this.state.title)}
@@ -398,20 +399,18 @@ class PortfolioPane extends Component {
 								</CardActions>
 							</Card>
 							<Hammer onPan={this.handleSwipe.bind(this)} onPanEnd={this.handleSwipeEnd.bind(this)}>
-								<Card ref="article">
-									<CardHeader
-										title='Introduction'
-										avatar={<Avatar
-											icon={<Lightbulb/>}
-											size={30}/>
-										}
-									/>
+								<Card ref="article" style={{marginBottom: 15}}>
 									<CardText>
-										<p>Hello</p>
+										<div style={{display: 'flex'}}>
+											<div style={{flex: 1}}><Lightbulb/> <span className="card-title">Introduction</span></div>
+											<div style={{flex: 0}}>
+												<Badge badgeContent={4} primary={true}/>
+											</div>
+										</div>
+										<div>Hello</div>
+										<p>Welcome! We've added a new  home for your personalized content and notifications</p>
+										<div>SWIPE TO LEARN MORE</div>
 									</CardText>
-									<CardActions style={{display: 'flex'}}>
-										<FlatButton id="day" style={{flex: 1, minWidth: 0}} onTouchTap={this.handleChange.bind(this)} label="1D" labelStyle={{color: (this.state.tab == 'day' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'day' ? 'active' : '')}`}/>
-									</CardActions>
 								</Card>
 							</Hammer>
 						</div>

@@ -32,6 +32,7 @@ export default class extends Component {
 			<NavPane style={{border: '2px solid red'}} openLength={200} color={this.props.color} theme={this.props.theme} defaultIsPaneExpanded={this.props.defaultIsPaneExpanded}>
 				{/*Parent of parent of this needs to have flex shrink off*/}
 				<NavPaneItem
+					className="scrollable-pane"
 					title="Portfolio"
 					icon={this.renderIcon("Item 1")}
 					theme={this.props.theme}
