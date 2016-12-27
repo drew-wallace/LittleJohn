@@ -19,6 +19,7 @@ import Avatar from 'material-ui/Avatar';
 import Hammer from 'react-hammerjs'
 
 import Portfolios from '../data/portfolios';
+import Positions from '../data/positions';
 import Day from '../data/day';
 import Week from '../data/week';
 import Year from '../data/year';
@@ -350,6 +351,61 @@ class PortfolioPane extends Component {
 		}
 	}
 
+	getPositions() {
+		let positionList = [];
+		_.each(Positions, function(v, i) {
+			const margin = {top: 0, right: 0, bottom: 0, left: 0};
+			const width = 100 - margin.left - margin.right;
+			const height = 25 - margin.top - margin.bottom;
+			const x = scaleLinear().range([0, width]);
+			const y = scaleLinear().range([height, 0]);
+			const lineD3 = line()
+						.x(function(d) { return x(d.xVal); })
+						.y(function(d) { return y(d.yVal); });
+
+			// untested
+			let data = this.state.day;
+			// let day = v.equity_historicals;
+			// day = day.map(function(d, i){
+			// 	d.xVal = i;
+			// 	// data key: open for day timeSpan, close for all others
+			// 	d.yVal = +d.adjusted_open_equity;
+			// 	return d;
+			// }.bind(this));
+
+			// hard-coding portfolio day amount for now
+			x.domain(extent(data, function(d) { return d.xVal }));
+			y.domain(extent(data, function(d) { return d.yVal; }));
+
+			positionList.push(
+				<Card style={{marginBottom: 15}} key={i}>
+					<CardText>
+						<div style={{display: 'flex', height: '100%', alignItems: 'center'}}>
+							<div style={{display: 'flex', flexDirection: 'column', flex: 1}}>
+								<div style={{flex: 1}}><span className="card-title">{v.instrument.symbol}</span></div>
+								<div style={{flex: 1}}>
+									{v.quantity} Shares
+								</div>
+							</div>
+							<div style={{flex: 1}}>
+								<svg className="line-chart-svg" width={width + margin.left + margin.right} height={height + margin.top + margin.bottom}>
+									<g className="line-chart-container-svg" transform={`translate(${margin.left}, ${margin.top})`}>
+										<path className="line" d={lineD3(data)}></path>
+									</g>
+								</svg>
+							</div>
+							<div style={{flex: 0}}>
+								{this.formatCurrency(v.quote.last_trade_price)}
+							</div>
+						</div>
+					</CardText>
+				</Card>
+			);
+		}.bind(this));
+
+		return positionList;
+	}
+
     render() {
 		if(!this.state.portfolio) {
 			return (<div>Loading...</div>);
@@ -379,11 +435,11 @@ class PortfolioPane extends Component {
 										<svg id={`${this.state.tab}-chart`} className="line-chart-svg" width={this.state.width + this.state.margin.left + this.state.margin.right} height={this.state.height + this.state.margin.top + this.state.margin.bottom}>
 											<g className="line-chart-container-svg" transform={`translate(${this.state.margin.left}, ${this.state.margin.top})`}>
 												{this.getPath(this.state.tab)}
-		
+
 												<g ref="focus" height={this.state.height} transform="translate(0,0)" style={{display: 'none'}}>
 													<line x1='0' y1='0' x2='0' y2={this.state.height} stroke="white" strokeWidth="2.5px" className="verticalLine"></line>
 												</g>
-		
+
 												<rect ref="overlay" width={this.state.width} height={this.state.height} style={{fill: 'transparent'}}></rect>
 											</g>
 										</svg>
@@ -413,6 +469,7 @@ class PortfolioPane extends Component {
 									</CardText>
 								</Card>
 							</Hammer>
+							{this.getPositions()}
 						</div>
 					</MuiThemeProvider>
 				</div>
