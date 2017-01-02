@@ -19,13 +19,12 @@ app.onactivated = function (args) {
     if (args.detail.kind === activation.ActivationKind.launch) {
         if (args.detail.previousExecutionState !== activation.ApplicationExecutionState.terminated) {
             // TODO: This application has been newly launched. Initialize your application here.
-            console.log(app);
         } else {
             // TODO: This application was suspended and then terminated.
             // To create a smooth user experience, restore application state here so that it looks like the app never stopped running.
         }
 
-        ReactDOM.render(<div style={{backgroundColor: '#6DAD62', position: 'absolute', display: 'flex', height: '100%', width: '100%'}}><LoginPage cssColorString={cssColorString}/></div>, document.getElementById('main'));
+        ReactDOM.render(<div style={{backgroundColor: '#6DAD62', position: 'absolute', display: 'flex', height: '100%', width: '100%'}}><LoginPage app={app} cssColorString={cssColorString}/></div>, document.getElementById('main'));
         // ReactDOM.render(<MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}><Sidebar/></MuiThemeProvider>, document.getElementById('main'));
 
         // var allFeatures = [

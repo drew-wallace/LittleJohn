@@ -1,8 +1,8 @@
 'use strict';
 
 class Robinhood{
-    constructor(opts) {
-        this._options = opts || {};
+    constructor(session) {
+        session = session || {};
         this._endpoints = {
             login: 'https://api.robinhood.com/api-token-auth/',
             investment_profile: 'https://api.robinhood.com/user/investment_profile/',
@@ -30,9 +30,8 @@ class Robinhood{
         };
         this._isInit = false;
         this._private = {
-            session: {},
-            account: null,
-            headers: {
+            account: session.account || null,
+            headers: session.headers || {
                 'Accept': '*/*',
                 'Accept-Encoding': 'gzip, deflate',
                 'Accept-Language': 'en;q=1, fr;q=0.9, de;q=0.8, ja;q=0.7, nl;q=0.6, it;q=0.5',
@@ -41,8 +40,11 @@ class Robinhood{
                 'Connection': 'keep-alive',
                 'User-Agent': 'Robinhood/823 (iPhone; iOS 7.1.2; Scale/2.00)'
             },
-            auth_token: null
+            auth_token: session.auth_token || null
         };
+        if(session.auth_token) {
+            this._private.headers.Authorization = 'Token ' + session.auth_token;
+        }
     }
     _setHeaders(request) {
         Object.keys(this._private.headers).forEach(function (key) {
@@ -59,6 +61,9 @@ class Robinhood{
                     return key+"="+params[key]
                 })
                 .join("&")
+    }
+    getSession() {
+        return this._private;
     }
     isLoggedIn() {
         return this._private.auth_token !== null;

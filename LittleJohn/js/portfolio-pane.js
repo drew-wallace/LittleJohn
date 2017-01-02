@@ -2,12 +2,15 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import numeral from 'numeral';
 import moment from 'moment';
-import _ from "lodash";
+import _ from 'lodash';
+import Promise from 'bluebird';
+
+import env from "../env";
 
 import { timeParse, bisector, format, scaleLinear, line, select, extent, drag, mouse } from 'd3';
 
 import {Card, CardActions, CardHeader, CardText} from 'material-ui/Card';
-import {Tabs, Tab} from 'material-ui/Tabs';
+import { Tabs, Tab } from 'material-ui/Tabs';
 import { MuiThemeProvider } from 'material-ui';
 import FlatButton from 'material-ui/FlatButton';
 import Badge from 'material-ui/Badge';
@@ -19,11 +22,11 @@ import Avatar from 'material-ui/Avatar';
 import Hammer from 'react-hammerjs'
 
 import Portfolios from '../data/portfolios';
-import Positions from '../data/positions';
 import Day from '../data/day';
 import Week from '../data/week';
 import Year from '../data/year';
 import AllTime from '../data/5year';
+import Positions from '../data/positions';
 
 import injectTapEventPlugin from 'react-tap-event-plugin';
 // Needed for onTouchTap
@@ -45,92 +48,8 @@ class PortfolioPane extends Component {
 	constructor(props) {
 	    super(props);
 
-		let portfolio = Portfolios.results[0];
-		portfolio.equity = +portfolio.equity;
-		portfolio.extended_hours_equity = +portfolio.extended_hours_equity;
-
-		let afterHoursReturn = portfolio.extended_hours_equity - portfolio.equity;
-		let afterHoursPercentReturn = afterHoursReturn / portfolio.equity;
-		let afterHoursText = `${this.formatCurrency(portfolio.extended_hours_equity)} ${this.formatCurrencyDiff(afterHoursReturn)} (${this.formatPercentDiff(afterHoursPercentReturn)}) After-hours`;
-
+		this.robinhood = this.props.robinhood;
 		this.timeSpan = 'day';
-		let day = Day.equity_historicals;
-		day = day.map(function(d, i){
-            d.xVal = i;
-            // data key: open for day timeSpan, close for all others
-            d.yVal = +d[this.timeSpan == 'day' ? 'adjusted_open_equity' : 'adjusted_close_equity'];
-            return d;
-        }.bind(this));
-
-
-		let week = Week.equity_historicals;
-		if(moment(week[0].begins_at).hour(0).minute(0).second(0).isAfter(moment(portfolio.start_date).hour(0).minute(0).second(0))) {
-			week = week.map(function(d, i){
-				d.xVal = i;
-				// data key: open for day timeSpan, close for all others
-				d.yVal = +d[this.timeSpan == 'day' ? 'adjusted_open_equity' : 'adjusted_close_equity'];
-				return d;
-			}.bind(this));
-		} else {
-			week = _.filter(week, function(d, i){
-				d.xVal = i;
-				d.yVal = +d[this.timeSpan == 'day' ? 'adjusted_open_equity' : 'adjusted_close_equity'];
-				return moment(d.begins_at).hour(0).minute(0).second(0).isAfter(moment(portfolio.start_date).hour(0).minute(0).second(0).subtract(1, 'day'));
-			}.bind(this));
-		}
-
-		let month = [];
-		let quarter = [];
-		let year = [];
-		let yearData = Year.equity_historicals;
-
-		if(moment(yearData[0].begins_at).hour(0).minute(0).second(0).isAfter(moment(portfolio.start_date).hour(0).minute(0).second(0))) {
-			_.each(yearData, function(d, i){
-				d.xVal = i;
-				d.yVal = +d[this.timeSpan == 'day' ? 'adjusted_open_equity' : 'adjusted_close_equity'];
-
-				if(moment(d.begins_at).hour(0).minute(0).second(0).isAfter(moment(_.last(Year.equity_historicals).begins_at).hour(0).minute(0).second(0).subtract(3, 'month'))) {
-					quarter.push(Object.assign({}, d));
-					if(moment(d.begins_at).hour(0).minute(0).second(0).isAfter(moment(_.last(Year.equity_historicals).begins_at).hour(0).minute(0).second(0).subtract(1, 'month'))) {
-						month.push(Object.assign({}, d));
-					}
-				}
-
-				year.push(Object.assign({}, d));
-			}.bind(this));
-		} else {
-			yearData = _.filter(yearData, function(d, i){
-				d.xVal = i;
-				d.yVal = +d[this.timeSpan == 'day' ? 'adjusted_open_equity' : 'adjusted_close_equity'];
-
-				if(moment(d.begins_at).hour(0).minute(0).second(0).isAfter(moment(_.last(Year.equity_historicals).begins_at).hour(0).minute(0).second(0).subtract(3, 'month'))) {
-					quarter.push(Object.assign({}, d));
-					if(moment(d.begins_at).hour(0).minute(0).second(0).isAfter(moment(_.last(Year.equity_historicals).begins_at).hour(0).minute(0).second(0).subtract(1, 'month'))) {
-						month.push(Object.assign({}, d));
-					}
-				}
-
-				year.push(Object.assign({}, d));
-				return moment(d.begins_at).hour(0).minute(0).second(0).isAfter(moment(portfolio.start_date).hour(0).minute(0).second(0).subtract(1, 'month'));
-			}.bind(this));
-		}
-
-		let all = AllTime.equity_historicals;
-		if(moment(all[0].begins_at).hour(0).minute(0).second(0).isAfter(moment(portfolio.start_date).hour(0).minute(0).second(0))) {
-			all = all.map(function(d, i){
-				d.xVal = i;
-				// data key: open for day timeSpan, close for all others
-				d.yVal = +d[this.timeSpan == 'day' ? 'adjusted_open_equity' : 'adjusted_close_equity'];
-				return d;
-			}.bind(this));
-		} else {
-			all = _.filter(all, function(d, i){
-				d.xVal = i;
-				d.yVal = +d[this.timeSpan == 'day' ? 'adjusted_open_equity' : 'adjusted_close_equity'];
-				return moment(d.begins_at).hour(0).minute(0).second(0).isAfter(moment(portfolio.start_date).hour(0).minute(0).second(0).subtract(1, 'month'));
-			}.bind(this));
-		}
-
         this.parseTime = timeParse("%d-%b-%y");
 		this.bisectDate = bisector(function(d) { return d.xVal; }).left;
         this.formatValue = format(",.2f");
@@ -148,16 +67,17 @@ class PortfolioPane extends Component {
 		this.y = y;
 
 		this.state = {
-			portfolio,
-			afterHoursText,
-			title: portfolio.equity,
-			subtitle: afterHoursText,
-			day,
-			week,
-			month,
-			quarter,
-			year,
-			all,
+			portfolio: null,
+			day: null,
+			week: null,
+			month: null,
+			quarter: null,
+			year: null,
+			all: null,
+			afterHoursText: '',
+			title: '$0',
+			subtitle: '',
+			cards: env.cards.results || null,
 			tab: 'day',
 			margin,
 			width,
@@ -227,7 +147,7 @@ class PortfolioPane extends Component {
 		);
 	}
 
-	componentDidMount() {
+	componentDidUpdate() {
 		const overlay = select(ReactDOM.findDOMNode(this.refs.overlay));
 		overlay.call(drag()
 					    .on("start", this._startdrag.bind(this))
@@ -334,22 +254,170 @@ class PortfolioPane extends Component {
 		});
     }
 
+	processPortfolio(data) {
+		let portfolio = data.results[0];
+		portfolio.equity = +portfolio.equity;
+		portfolio.extended_hours_equity = +portfolio.extended_hours_equity;
+
+		let afterHoursReturn = portfolio.extended_hours_equity - portfolio.equity;
+		let afterHoursPercentReturn = afterHoursReturn / portfolio.equity;
+		let afterHoursText = `${this.formatCurrency(portfolio.extended_hours_equity)} ${this.formatCurrencyDiff(afterHoursReturn)} (${this.formatPercentDiff(afterHoursPercentReturn)}) After-hours`;
+
+		return {portfolio, afterHoursText};
+	}
+
+	processDay(data) {
+		let day = data.equity_historicals;
+		day = day.map(function(d, i){
+            d.xVal = i;
+            // data key: open for day timeSpan, close for all others
+            d.yVal = +d[this.timeSpan == 'day' ? 'adjusted_open_equity' : 'adjusted_close_equity'];
+            return d;
+        }.bind(this));
+
+		return day;
+	}
+
+	processWeek(data, portfolio) {
+		let week = data.equity_historicals;
+		if(moment(week[0].begins_at).hour(0).minute(0).second(0).isAfter(moment(portfolio.start_date).hour(0).minute(0).second(0))) {
+			week = week.map(function(d, i){
+				d.xVal = i;
+				// data key: open for day timeSpan, close for all others
+				d.yVal = +d[this.timeSpan == 'day' ? 'adjusted_open_equity' : 'adjusted_close_equity'];
+				return d;
+			}.bind(this));
+		} else {
+			week = _.filter(week, function(d, i){
+				d.xVal = i;
+				d.yVal = +d[this.timeSpan == 'day' ? 'adjusted_open_equity' : 'adjusted_close_equity'];
+				return moment(d.begins_at).hour(0).minute(0).second(0).isAfter(moment(portfolio.start_date).hour(0).minute(0).second(0).subtract(1, 'day'));
+			}.bind(this));
+		}
+
+		return week;
+	}
+
+	processYear(data, portfolio) {
+		let month = [];
+		let quarter = [];
+		let year = [];
+		let yearData = data.equity_historicals;
+
+		if(moment(yearData[0].begins_at).hour(0).minute(0).second(0).isAfter(moment(portfolio.start_date).hour(0).minute(0).second(0))) {
+			_.each(yearData, function(d, i){
+				d.xVal = i;
+				d.yVal = +d[this.timeSpan == 'day' ? 'adjusted_open_equity' : 'adjusted_close_equity'];
+
+				if(moment(d.begins_at).hour(0).minute(0).second(0).isAfter(moment(_.last(yearData).begins_at).hour(0).minute(0).second(0).subtract(3, 'month'))) {
+					quarter.push(Object.assign({}, d));
+					if(moment(d.begins_at).hour(0).minute(0).second(0).isAfter(moment(_.last(yearData).begins_at).hour(0).minute(0).second(0).subtract(1, 'month'))) {
+						month.push(Object.assign({}, d));
+					}
+				}
+
+				year.push(Object.assign({}, d));
+			}.bind(this));
+		} else {
+			yearData = _.filter(yearData, function(d, i){
+				d.xVal = i;
+				d.yVal = +d[this.timeSpan == 'day' ? 'adjusted_open_equity' : 'adjusted_close_equity'];
+
+				if(moment(d.begins_at).hour(0).minute(0).second(0).isAfter(moment(_.last(yearData).begins_at).hour(0).minute(0).second(0).subtract(3, 'month'))) {
+					quarter.push(Object.assign({}, d));
+					if(moment(d.begins_at).hour(0).minute(0).second(0).isAfter(moment(_.last(yearData).begins_at).hour(0).minute(0).second(0).subtract(1, 'month'))) {
+						month.push(Object.assign({}, d));
+					}
+				}
+
+				year.push(Object.assign({}, d));
+				return moment(d.begins_at).hour(0).minute(0).second(0).isAfter(moment(portfolio.start_date).hour(0).minute(0).second(0).subtract(1, 'month'));
+			}.bind(this));
+		}
+
+		return {month, quarter, year};
+	}
+
+	process5Year(data, portfolio) {
+		let all = data.equity_historicals;
+		if(moment(all[0].begins_at).hour(0).minute(0).second(0).isAfter(moment(portfolio.start_date).hour(0).minute(0).second(0))) {
+			all = all.map(function(d, i){
+				d.xVal = i;
+				// data key: open for day timeSpan, close for all others
+				d.yVal = +d[this.timeSpan == 'day' ? 'adjusted_open_equity' : 'adjusted_close_equity'];
+				return d;
+			}.bind(this));
+		} else {
+			all = _.filter(all, function(d, i){
+				d.xVal = i;
+				d.yVal = +d[this.timeSpan == 'day' ? 'adjusted_open_equity' : 'adjusted_close_equity'];
+				return moment(d.begins_at).hour(0).minute(0).second(0).isAfter(moment(portfolio.start_date).hour(0).minute(0).second(0).subtract(1, 'month'));
+			}.bind(this));
+		}
+
+		return all;
+	}
+
 	handleSwipe(e) {
-		let element = ReactDOM.findDOMNode(this.refs.article);
+		let element = ReactDOM.findDOMNode(this.refs[this.state.cards[0].url]);
 		element.style.transform = `translate(${e.deltaX}px,0px)`;
 		element.style.transitionDuration = `0ms`;
 	}
 
 	handleSwipeEnd(e) {
-		let element = ReactDOM.findDOMNode(this.refs.article);
+		let element = ReactDOM.findDOMNode(this.refs[this.state.cards[0].url]);
 		element.style.transitionDuration = `450ms`;
 		element.style.transform =  `translate(${e.deltaX}px,0px)`;
 		if(Math.abs(e.deltaX / this.state.width) >= 0.5) {
 			// pop article off stack
 			// setstate
-			element.parentNode.removeChild(element);
+			// element.parentNode.removeChild(element);
+			const url = this.state.cards[0].url.split('/');
+			const id = url[url.length - 2];
+			this.robinhood.dismissCard(id);
+			this.setState({cards: this.state.cards.slice(1)});
 		} else {
-			ReactDOM.findDOMNode(this.refs.article).style.transform =  `translate(0px,0px)`;
+			ReactDOM.findDOMNode(this.refs[this.state.cards[0].url]).style.transform =  `translate(0px,0px)`;
+		}
+	}
+
+	getCards() {
+		if(!this.state.cards) {
+			this.robinhood.cards().then(function(res) {
+				let cards = res.responseJSON.results.filter(function(card) {
+					return card.show_if_unsupported;
+				});
+				this.setState({cards: res.responseJSON.results});
+			}.bind(this)).catch(function(res) {
+				console.error(res);
+			});
+
+			return (<div>Loading...</div>);
+		} else {
+			let cards = [];
+			this.state.cards.forEach(function(card, index) {
+				cards.push(
+					<Hammer ref={card.url} key={index} onPan={this.handleSwipe.bind(this)} onPanEnd={this.handleSwipeEnd.bind(this)}>
+						<Card style={{width: '100%', position: 'absolute', height: 140, zIndex: this.state.cards.length - index}}>
+							<CardText>
+								<div style={{display: 'flex'}}>
+									<div style={{flex: 1}}><Lightbulb/> <span className="card-title">{card.title}</span></div>
+									<div style={{flex: 0}}>
+										<Badge badgeContent={this.state.cards.length - index} primary={true}/>
+									</div>
+								</div>
+								<p>{card.message}</p>
+								<div>{card.call_to_action}</div>
+							</CardText>
+						</Card>
+					</Hammer>
+				);
+			}.bind(this));
+			return (
+				<div style={{marginBottom: 15, height: 140, position: 'relative'}}>
+					{cards}
+				</div>
+			);
 		}
 	}
 
@@ -409,7 +477,54 @@ class PortfolioPane extends Component {
 	}
 
     render() {
-		if(!this.state.portfolio) {
+		if(!this.state.portfolio && !this.state.day && !this.state.week && !this.state.month && !this.state.quarter && !this.state.year && !this.state.all) {
+			Promise.join(
+				// this.robinhood.portfolios(),
+				Portfolios,
+				// this.robinhood.historicals({span: 'day', interval: '5minute'}),
+				Day,
+				// this.robinhood.historicals({span: 'week', interval: '10minute'}),
+				Week,
+				// this.robinhood.historicals({span: 'year', interval: 'day'}),
+				Year,
+				// this.robinhood.historicals({span: '5year', interval: 'week'}),
+				AllTime,
+				function(portfolioRes, dayRes, weekRes, yearRes, allRes) {
+					// Windows.Storage.ApplicationData.current.localFolder.createFileAsync("portfolios.json", Windows.Storage.CreationCollisionOption.replaceExisting).then(function (sampleFile) {
+					// 	return Windows.Storage.FileIO.writeTextAsync(sampleFile, portfolioRes.responseText);
+					// });
+					// Windows.Storage.ApplicationData.current.localFolder.createFileAsync("day.json", Windows.Storage.CreationCollisionOption.replaceExisting).then(function (sampleFile) {
+					// 	return Windows.Storage.FileIO.writeTextAsync(sampleFile, dayRes.responseText);
+					// });
+					// Windows.Storage.ApplicationData.current.localFolder.createFileAsync("week.json", Windows.Storage.CreationCollisionOption.replaceExisting).then(function (sampleFile) {
+					// 	return Windows.Storage.FileIO.writeTextAsync(sampleFile, weekRes.responseText);
+					// });
+					// Windows.Storage.ApplicationData.current.localFolder.createFileAsync("year.json", Windows.Storage.CreationCollisionOption.replaceExisting).then(function (sampleFile) {
+					// 	return Windows.Storage.FileIO.writeTextAsync(sampleFile, yearRes.responseText);
+					// });
+					// Windows.Storage.ApplicationData.current.localFolder.createFileAsync("5year.json", Windows.Storage.CreationCollisionOption.replaceExisting).then(function (sampleFile) {
+					// 	return Windows.Storage.FileIO.writeTextAsync(sampleFile, allRes.responseText);
+					// });
+					let { portfolio, afterHoursText } = this.processPortfolio(portfolioRes.responseJSON);
+					let day = this.processDay(dayRes.responseJSON);
+					let week = this.processWeek(weekRes.responseJSON, portfolio);
+					let { month, quarter, year } = this.processYear(yearRes.responseJSON, portfolio);
+					let all = this.process5Year(allRes.responseJSON, portfolio);
+					this.setState({
+						portfolio,
+						day,
+						week,
+						month,
+						quarter,
+						year,
+						all,
+						afterHoursText,
+						title: portfolio.equity,
+						subtitle: afterHoursText,
+					});
+				}.bind(this)
+			);
+
 			return (<div>Loading...</div>);
 		} else {
 			this.x = scaleLinear()
@@ -456,21 +571,7 @@ class PortfolioPane extends Component {
 									<FlatButton id="all" style={{flex: 1, minWidth: 0}} onTouchTap={this.handleChange.bind(this)} label="ALL" labelStyle={{color: (this.state.tab == 'all' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'all' ? 'active' : '')}`}/>
 								</CardActions>
 							</Card>
-							<Hammer onPan={this.handleSwipe.bind(this)} onPanEnd={this.handleSwipeEnd.bind(this)}>
-								<Card ref="article" style={{marginBottom: 15}}>
-									<CardText>
-										<div style={{display: 'flex'}}>
-											<div style={{flex: 1}}><Lightbulb/> <span className="card-title">Introduction</span></div>
-											<div style={{flex: 0}}>
-												<Badge badgeContent={4} primary={true}/>
-											</div>
-										</div>
-										<div>Hello</div>
-										<p>Welcome! We've added a new  home for your personalized content and notifications</p>
-										<div>SWIPE TO LEARN MORE</div>
-									</CardText>
-								</Card>
-							</Hammer>
+							{this.getCards()}
 							{this.getPositions()}
 						</div>
 					</MuiThemeProvider>

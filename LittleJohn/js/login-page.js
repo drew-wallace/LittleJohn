@@ -8,8 +8,9 @@ import env from '../env';
 export default class extends Component {
   	constructor(props) {
 		super(props);
-		let sessionState = WinJS.Application.sessionState;
-		this.robinhood = sessionState.robinhood || new Robinhood();
+		this.app = this.props.app;
+		let sessionState = this.app.sessionState;
+		this.robinhood = new Robinhood(env.robinhoodSession || sessionState.robinhoodSession);
 		this.state = {
 			loggedIn: this.robinhood.isLoggedIn()
 		};
@@ -18,11 +19,11 @@ export default class extends Component {
   	render() {
 		if(this.state.loggedIn) {
 			return (
-				<NavPane color={`#${this.props.cssColorString}`}/>
+				<NavPane color={`#${this.props.cssColorString}`} robinhood={this.robinhood}/>
 			);
 		} else {
 			return (
-				<div style={{flex: 1, alignItems: 'center'}}>
+				<div style={{display: 'flex', alignItems: 'center', flexDirection: 'column', width: '100%', flex: 1, margin: 'auto 0'}}>
 					<TextInput placeholder="Username" onChange={(e) => this.username = e.target.value}/>
 					<TextInput placeholder="Password" type="password" onChange={(e) => this.password = e.target.value}/>
 					<Button color={`#${this.props.cssColorString}`} onClick={this.submit.bind(this)}>Login</Button>
@@ -37,8 +38,8 @@ export default class extends Component {
 			const loggedIn = this.robinhood.login(username, password);
 
 			loggedIn.then(function() {
-				let sessionState = WinJS.Application.sessionState;
-				sessionState.robinhood = this.robinhood;
+				let sessionState = this.app.sessionState;
+				sessionState.robinhoodSession = this.robinhood.getSession();
 				this.setState({loggedIn: this.robinhood.isLoggedIn()});
 			}.bind(this)).catch(function(error) {
 				// show some error message for a failed login

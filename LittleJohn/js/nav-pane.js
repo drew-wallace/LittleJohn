@@ -12,8 +12,8 @@ export default class extends Component {
 		defaultIsPaneExpanded: false
   	};
 
-  	constructor() {
-		super();
+  	constructor(props) {
+		super(props);
 		this.state = {
 			selected: 'Portfolio'
 		};
@@ -30,7 +30,6 @@ export default class extends Component {
   	render() {
 		return (
 			<NavPane style={{border: '2px solid red'}} openLength={200} color={this.props.color} theme={this.props.theme} defaultIsPaneExpanded={this.props.defaultIsPaneExpanded}>
-				{/*Parent of parent of this needs to have flex shrink off*/}
 				<NavPaneItem
 					className="scrollable-pane"
 					title="Portfolio"
@@ -43,7 +42,7 @@ export default class extends Component {
 					padding="10px 20px"
 					push={true}
 				>
-					<PortfolioPane/>
+					<PortfolioPane robinhood={this.props.robinhood}/>
 				</NavPaneItem>
 			</NavPane>
 		);

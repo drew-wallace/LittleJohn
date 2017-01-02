@@ -6,6 +6,7 @@
     "watch": "watchify js/main.js -o compiled/bundle.js -t [ babelify --presets [ es2015 react ] --plugins [ transform-class-properties transform-object-rest-spread ] ]"
   },
   "dependencies": {
+    "bluebird": "3.4.7",
     "d3": "4.4.0",
     "lodash": "4.17.3",
     "material-design-lite": "1.2.1",
