@@ -25,14 +25,13 @@ class Robinhood{
             watchlists: 'https://api.robinhood.com/watchlists/',
             positions: 'https://api.robinhood.com/positions/',
             portfolios: 'https://api.robinhood.com/portfolios/',
-            historicals: 'https://api.robinhood.com/portfolios/historicals/'
+            historicals: 'https://api.robinhood.com/portfolios/historicals/',
+            cards: 'https://api.robinhood.com/midlands/notifications/stack/'
         };
         this._isInit = false;
         this._private = {
             session: {},
             account: null,
-            username: this._options.username || '',
-            password: this._options.password || '',
             headers: {
                 'Accept': '*/*',
                 'Accept-Encoding': 'gzip, deflate',
@@ -61,6 +60,9 @@ class Robinhood{
                 })
                 .join("&")
     }
+    isLoggedIn() {
+        return this._private.auth_token !== null;
+    }
     login(username, password) {
         return new Promise(function(resolve, reject) {
             var request = new XMLHttpRequest();
@@ -70,7 +72,7 @@ class Robinhood{
                 true
             );
             this._setHeaders(request);
-            request.send('username=' + (username || this._private.username) + '&password=' + (password || this._private.password));
+            request.send('username=' + username + '&password=' + password);
             request.onload = function () { request.responseJSON = JSON.parse(request.response); resolve(request); }
             request.onerror = function () { reject(request); }
         }.bind(this)).then(function(response){
@@ -291,6 +293,33 @@ class Robinhood{
             request.send();
             request.onload = function () { request.responseJSON = JSON.parse(request.response); resolve(request);}.bind(this);
             request.onerror = function () { reject(request);}.bind(this);
+        }.bind(this));
+    }
+    cards() {
+        return new Promise(function(resolve, reject) {
+            var request = new XMLHttpRequest();
+            request.open(
+                'GET',
+                this._endpoints.cards,
+                true
+            );
+            this._setHeaders(request);
+            request.send();
+            request.onload = function () { request.responseJSON = JSON.parse(request.response); resolve(request);}.bind(this);
+            request.onerror = function () { reject(request);}.bind(this);
+        }.bind(this));
+    }
+    dismissCard(cardId) {
+        return new Promise(function(resolve, reject) {
+            var request = new XMLHttpRequest();
+            request.open(
+                'POST',
+                this._endpoints.cards + cardId + '/dismiss/',
+                true
+            );
+            this._setHeaders(request);
+            request.send();
+            request.onload = function () { request.responseJSON = JSON.parse(request.response); resolve(request);}.bind(this);
         }.bind(this));
     }
 }

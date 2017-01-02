@@ -336,11 +336,13 @@ class PortfolioPane extends Component {
 
 	handleSwipe(e) {
 		let element = ReactDOM.findDOMNode(this.refs.article);
-		element.style.transform =  `translate(${e.deltaX}px,0px)`;
+		element.style.transform = `translate(${e.deltaX}px,0px)`;
+		element.style.transitionDuration = `0ms`;
 	}
 
 	handleSwipeEnd(e) {
 		let element = ReactDOM.findDOMNode(this.refs.article);
+		element.style.transitionDuration = `450ms`;
 		element.style.transform =  `translate(${e.deltaX}px,0px)`;
 		if(Math.abs(e.deltaX / this.state.width) >= 0.5) {
 			// pop article off stack
