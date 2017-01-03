@@ -325,6 +325,7 @@ class Robinhood{
             this._setHeaders(request);
             request.send();
             request.onload = function () { request.responseJSON = JSON.parse(request.response); resolve(request);}.bind(this);
+            request.onerror = function () { reject(request);}.bind(this);
         }.bind(this));
     }
 }

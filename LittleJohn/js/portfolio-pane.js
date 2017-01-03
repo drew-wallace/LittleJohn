@@ -77,7 +77,7 @@ class PortfolioPane extends Component {
 			afterHoursText: '',
 			title: '$0',
 			subtitle: '',
-			cards: env.cards.results || null,
+			cards: /*env.cards.results ||*/ null,
 			tab: 'day',
 			margin,
 			width,
@@ -374,7 +374,9 @@ class PortfolioPane extends Component {
 			// element.parentNode.removeChild(element);
 			const url = this.state.cards[0].url.split('/');
 			const id = url[url.length - 2];
-			this.robinhood.dismissCard(id);
+			this.robinhood.dismissCard(id).then(function(data) {
+				console.log(data);
+			});
 			this.setState({cards: this.state.cards.slice(1)});
 		} else {
 			ReactDOM.findDOMNode(this.refs[this.state.cards[0].url]).style.transform =  `translate(0px,0px)`;
@@ -413,6 +415,13 @@ class PortfolioPane extends Component {
 					</Hammer>
 				);
 			}.bind(this));
+			cards.push(
+				<Card key="last-card" style={{width: '100%', position: 'absolute', height: 140, zIndex: 0}}>
+					<CardText>
+						<div style={{fontSize: 16, textAlign: 'center', paddingTop: '1.6em'}}>You're all caught up!<br/>New cards will be added here as they<br/>become available.</div>
+					</CardText>
+				</Card>
+			);
 			return (
 				<div style={{marginBottom: 15, height: 140, position: 'relative'}}>
 					{cards}
