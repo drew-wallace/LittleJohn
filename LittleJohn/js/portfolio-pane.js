@@ -68,6 +68,7 @@ class PortfolioPane extends Component {
 
 		this.state = {
 			portfolio: null,
+			positions: Positions.responseJSON || null,
 			day: null,
 			week: null,
 			month: null,
@@ -77,7 +78,7 @@ class PortfolioPane extends Component {
 			afterHoursText: '',
 			title: '$0',
 			subtitle: '',
-			cards: /*env.cards.results ||*/ null,
+			cards: env.cards.results || null,
 			tab: 'day',
 			margin,
 			width,
@@ -431,58 +432,95 @@ class PortfolioPane extends Component {
 	}
 
 	getPositions() {
-		let positionList = [];
-		_.each(Positions, function(v, i) {
-			const margin = {top: 0, right: 0, bottom: 0, left: 0};
-			const width = 100 - margin.left - margin.right;
-			const height = 25 - margin.top - margin.bottom;
-			const x = scaleLinear().range([0, width]);
-			const y = scaleLinear().range([height, 0]);
-			const lineD3 = line()
-						.x(function(d) { return x(d.xVal); })
-						.y(function(d) { return y(d.yVal); });
+		if(!this.state.positions) {
+			this.robinhood.positions({nonzero: true}).then(function(positions){
+                var promises = [];
+                var currentPositions = positions.responseJSON.results.forEach(function(position){
+                    promises.push(this.robinhood.instrument(position.instrument).then(function(response){
+                        position.instrument = response.responseJSON;
+                        return response.responseJSON.symbol;
+                    }).then(function(symbol){
+						return Promise.join(
+                        	this.robinhood.quote_data(symbol),
+							this.robinhood.symbolHistoricals(symbol, {span: 'day', interval: '5minute'}),
+							// this.robinhood.symbolHistoricals(symbol, {span: 'week', interval: '10minute'}),
+							// this.robinhood.symbolHistoricals(symbol, {span: 'year', interval: 'day'}),
+							// this.robinhood.symbolHistoricals(symbol, {span: '5year', interval: 'week'}),
+							function(quoteRes, dayRes, weekRes, yearRes, allRes) {
+								position.quote = quoteRes.responseJSON.results[0];
+								position.historicals = {
+									day: dayRes.responseJSON.historicals/*,
+									week: weekRes.responseJSON.historicals,
+									year: yearRes.responseJSON.historicals,
+									all: allRes.responseJSON.historicals*/
+								};
 
-			// untested
-			let data = this.state.day;
-			// let day = v.equity_historicals;
-			// day = day.map(function(d, i){
-			// 	d.xVal = i;
-			// 	// data key: open for day timeSpan, close for all others
-			// 	d.yVal = +d.adjusted_open_equity;
-			// 	return d;
-			// }.bind(this));
+								return position;
+							});
+                    }.bind(this)));
+                }.bind(this));
+                return Promise.all(promises).then(function(positions){
+                    // Windows.Storage.ApplicationData.current.localFolder.createFileAsync("positions.json", Windows.Storage.CreationCollisionOption.replaceExisting).then(function (sampleFile) {
+                    //     return Windows.Storage.FileIO.writeTextAsync(sampleFile, JSON.stringify(positions));
+                    // });
+                    this.setState({positions});
+                }.bind(this));
+            }.bind(this));
 
-			// hard-coding portfolio day amount for now
-			x.domain(extent(data, function(d) { return d.xVal }));
-			y.domain(extent(data, function(d) { return d.yVal; }));
+			return (<div>Loading...</div>)
+		} else {
+			let positionList = [];
+			_.each(this.state.positions, function(v, i) {
+				const margin = {top: 0, right: 0, bottom: 0, left: 0};
+				const width = 100 - margin.left - margin.right;
+				const height = 25 - margin.top - margin.bottom;
+				const x = scaleLinear().range([0, width]);
+				const y = scaleLinear().range([height, 0]);
+				const lineD3 = line()
+							.x(function(d) { return x(d.xVal); })
+							.y(function(d) { return y(d.yVal); });
 
-			positionList.push(
-				<Card style={{marginBottom: 15}} key={i}>
-					<CardText>
-						<div style={{display: 'flex', height: '100%', alignItems: 'center'}}>
-							<div style={{display: 'flex', flexDirection: 'column', flex: 1}}>
-								<div style={{flex: 1}}><span className="card-title">{v.instrument.symbol}</span></div>
+				let day = v.historicals.day;
+				console.log(v.historicals.day);
+				day = day.map(function(d, i){
+					d.xVal = i;
+					// data key: open for day timeSpan, close for all others
+					d.yVal = +d.open_price;
+					return d;
+				}.bind(this));
+
+				// hard-coding portfolio day amount for now
+				x.domain(extent(day, function(d) { return d.xVal }));
+				y.domain(extent(day, function(d) { return d.yVal; }));
+
+				positionList.push(
+					<Card style={{marginBottom: 15}} key={i}>
+						<CardText>
+							<div style={{display: 'flex', height: '100%', alignItems: 'center'}}>
+								<div style={{display: 'flex', flexDirection: 'column', flex: 1}}>
+									<div style={{flex: 1}}><span className="card-title">{v.instrument.symbol}</span></div>
+									<div style={{flex: 1}}>
+										{numeral(v.quantity).format('0,0')} Shares
+									</div>
+								</div>
 								<div style={{flex: 1}}>
-									{v.quantity} Shares
+									<svg className="line-chart-svg" width={width + margin.left + margin.right} height={height + margin.top + margin.bottom}>
+										<g className="line-chart-container-svg" transform={`translate(${margin.left}, ${margin.top})`}>
+											<path className="line" d={lineD3(day)}></path>
+										</g>
+									</svg>
+								</div>
+								<div style={{flex: 0}}>
+									{this.formatCurrency(v.quote.last_trade_price)}
 								</div>
 							</div>
-							<div style={{flex: 1}}>
-								<svg className="line-chart-svg" width={width + margin.left + margin.right} height={height + margin.top + margin.bottom}>
-									<g className="line-chart-container-svg" transform={`translate(${margin.left}, ${margin.top})`}>
-										<path className="line" d={lineD3(data)}></path>
-									</g>
-								</svg>
-							</div>
-							<div style={{flex: 0}}>
-								{this.formatCurrency(v.quote.last_trade_price)}
-							</div>
-						</div>
-					</CardText>
-				</Card>
-			);
-		}.bind(this));
+						</CardText>
+					</Card>
+				);
+			}.bind(this));
 
-		return positionList;
+			return positionList;
+		}
 	}
 
     render() {
@@ -490,13 +528,13 @@ class PortfolioPane extends Component {
 			Promise.join(
 				// this.robinhood.portfolios(),
 				Portfolios,
-				// this.robinhood.historicals({span: 'day', interval: '5minute'}),
+				// this.robinhood.portfolioHistoricals({span: 'day', interval: '5minute'}),
 				Day,
-				// this.robinhood.historicals({span: 'week', interval: '10minute'}),
+				// this.robinhood.portfolioHistoricals({span: 'week', interval: '10minute'}),
 				Week,
-				// this.robinhood.historicals({span: 'year', interval: 'day'}),
+				// this.robinhood.portfolioHistoricals({span: 'year', interval: 'day'}),
 				Year,
-				// this.robinhood.historicals({span: '5year', interval: 'week'}),
+				// this.robinhood.portfolioHistoricals({span: '5year', interval: 'week'}),
 				AllTime,
 				function(portfolioRes, dayRes, weekRes, yearRes, allRes) {
 					// Windows.Storage.ApplicationData.current.localFolder.createFileAsync("portfolios.json", Windows.Storage.CreationCollisionOption.replaceExisting).then(function (sampleFile) {

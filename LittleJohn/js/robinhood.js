@@ -25,8 +25,10 @@ class Robinhood{
             watchlists: 'https://api.robinhood.com/watchlists/',
             positions: 'https://api.robinhood.com/positions/',
             portfolios: 'https://api.robinhood.com/portfolios/',
-            historicals: 'https://api.robinhood.com/portfolios/historicals/',
-            cards: 'https://api.robinhood.com/midlands/notifications/stack/'
+            portfolioHistoricals: 'https://api.robinhood.com/portfolios/historicals/',
+            symbolHistoricals: 'https://api.robinhood.com/quotes/historicals/',
+            cards: 'https://api.robinhood.com/midlands/notifications/stack/',
+            fundamentals: 'https://api.robinhood.com/fundamentals/'
         };
         this._isInit = false;
         this._private = {
@@ -255,6 +257,20 @@ class Robinhood{
         options.transaction = 'sell';
         return this._place_order(options);
     }
+    position(instrumentId) {
+        return new Promise(function(resolve, reject) {
+            var request = new XMLHttpRequest();
+            request.open(
+                'GET',
+                this._endpoints.positions + this._private.account.account_number + '/' + instrumentId,
+                true
+            );
+            this._setHeaders(request);
+            request.send();
+            request.onload = function () { request.responseJSON = JSON.parse(request.response); resolve(request);}.bind(this);
+            request.onerror = function () { reject(request);}.bind(this);
+        }.bind(this));
+    }
     positions(options) {
         options = options || {};
 
@@ -262,7 +278,7 @@ class Robinhood{
             var request = new XMLHttpRequest();
             request.open(
                 'GET',
-                this._endpoints.positions + this._formatParams({ nonzero: options.nonzero || false, cursor: options.cursor || '', ordering: options.ordering || '' }),
+                this._endpoints.accounts + this._private.account.account_number + '/positions' + this._formatParams({ nonzero: options.nonzero || false, cursor: options.cursor || '', ordering: options.ordering || '' }),
                 true
             );
             this._setHeaders(request);
@@ -285,13 +301,28 @@ class Robinhood{
             request.onerror = function () { reject(request);}.bind(this);
         }.bind(this));
     }
-    historicals(options) {
+    portfolioHistoricals(options) {
         options = options || {};
         return new Promise(function(resolve, reject) {
             var request = new XMLHttpRequest();
             request.open(
                 'GET',
-                this._endpoints.historicals + this._private.account.account_number + "/" + this._formatParams({ span: options.span || '', interval: options.interval || '' }),
+                this._endpoints.portfolioHistoricals + this._private.account.account_number + "/" + this._formatParams({ span: options.span || '', interval: options.interval || '' }),
+                true
+            );
+            this._setHeaders(request);
+            request.send();
+            request.onload = function () { request.responseJSON = JSON.parse(request.response); resolve(request);}.bind(this);
+            request.onerror = function () { reject(request);}.bind(this);
+        }.bind(this));
+    }
+    symbolHistoricals(symbol, options) {
+        options = options || {};
+        return new Promise(function(resolve, reject) {
+            var request = new XMLHttpRequest();
+            request.open(
+                'GET',
+                this._endpoints.symbolHistoricals + symbol + '/' + this._formatParams({ span: options.span || '', interval: options.interval || '', bounds: options.bounds || '' }),
                 true
             );
             this._setHeaders(request);
@@ -320,6 +351,20 @@ class Robinhood{
             request.open(
                 'POST',
                 this._endpoints.cards + cardId + '/dismiss/',
+                true
+            );
+            this._setHeaders(request);
+            request.send();
+            request.onload = function () { request.responseJSON = JSON.parse(request.response); resolve(request);}.bind(this);
+            request.onerror = function () { reject(request);}.bind(this);
+        }.bind(this));
+    }
+    fundamentals(symbol) {
+        return new Promise(function(resolve, reject) {
+            var request = new XMLHttpRequest();
+            request.open(
+                'GET',
+                this._endpoints.fundamentals + symbol + '/',
                 true
             );
             this._setHeaders(request);
