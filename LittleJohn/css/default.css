@@ -305,7 +305,7 @@ button.win-splitview-button:after {
 
 .scrollable-pane-content {
     position: absolute;
-    top: 55px;
+    top: 0px;
     bottom: 0;
     height: auto;
     width: 100%;

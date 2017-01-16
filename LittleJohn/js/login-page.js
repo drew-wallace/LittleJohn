@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { TextInput, Button } from 'react-desktop/windows';
 import NavPane from './nav-pane';
+import Sidebar from './sidebar';
 import Robinhood from './robinhood';
 import env from '../env';
 
@@ -18,15 +19,20 @@ export default class extends Component {
 
   	render() {
 		if(this.state.loggedIn) {
+			// return (
+			// 	<NavPane color={`#${this.props.cssColorString}`} robinhood={this.robinhood}/>
+			// );
 			return (
-				<NavPane color={`#${this.props.cssColorString}`} robinhood={this.robinhood}/>
+				<Sidebar cssColorString={`#${this.props.cssColorString}`} robinhood={this.robinhood}/>
 			);
 		} else {
 			return (
-				<div style={{display: 'flex', alignItems: 'center', flexDirection: 'column', width: '100%', flex: 1, margin: 'auto 0'}}>
-					<TextInput placeholder="Username" onChange={(e) => this.username = e.target.value}/>
-					<TextInput placeholder="Password" type="password" onChange={(e) => this.password = e.target.value}/>
-					<Button color={`#${this.props.cssColorString}`} onClick={this.submit.bind(this)}>Login</Button>
+				<div style={{backgroundColor: '#6DAD62', position: 'absolute', display: 'flex', height: '100%', width: '100%'}}>
+					<div style={{display: 'flex', alignItems: 'center', flexDirection: 'column', width: '100%', flex: 1, margin: 'auto 0'}}>
+						<TextInput placeholder="Username" onChange={(e) => this.username = e.target.value}/>
+						<TextInput placeholder="Password" type="password" onChange={(e) => this.password = e.target.value}/>
+						<Button color={`#${this.props.cssColorString}`} onClick={this.submit.bind(this)}>Login</Button>
+					</div>
 				</div>
 			);
 		}

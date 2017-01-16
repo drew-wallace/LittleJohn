@@ -24,8 +24,8 @@ app.onactivated = function (args) {
             // To create a smooth user experience, restore application state here so that it looks like the app never stopped running.
         }
 
-        // ReactDOM.render(<div style={{backgroundColor: '#6DAD62', position: 'absolute', display: 'flex', height: '100%', width: '100%'}}><LoginPage app={app} cssColorString={cssColorString}/></div>, document.getElementById('main'));
-        ReactDOM.render(<Sidebar cssColorString={cssColorString}/>, document.getElementById('main'));
+        ReactDOM.render(<LoginPage app={app} cssColorString={cssColorString}/>, document.getElementById('main'));
+        // ReactDOM.render(<Sidebar cssColorString={cssColorString}/>, document.getElementById('main'));
 
         // var allFeatures = [
         //     {
