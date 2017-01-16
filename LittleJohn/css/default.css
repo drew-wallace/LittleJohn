@@ -302,3 +302,14 @@ button.win-splitview-button:after {
     font-weight: bold;
     font-size: 16px;
 }
+
+.scrollable-pane-content {
+    position: absolute;
+    top: 55px;
+    bottom: 0;
+    height: auto;
+    width: 100%;
+    overflow-y: scroll;
+    -ms-overflow-style: none;
+    touch-action: pan-y;
+}

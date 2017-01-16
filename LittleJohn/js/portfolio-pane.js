@@ -481,46 +481,47 @@ class PortfolioPane extends Component {
 							.y(function(d) { return y(d.yVal); });
 
 				let day = v.historicals.day;
-				console.log(v.historicals.day);
 				day = day.map(function(d, i){
 					d.xVal = i;
-					// data key: open for day timeSpan, close for all others
 					d.yVal = +d.open_price;
 					return d;
 				}.bind(this));
 
-				// hard-coding portfolio day amount for now
-				x.domain(extent(day, function(d) { return d.xVal }));
+				x.domain(extent(day, function(d) { return d.xVal; }));
 				y.domain(extent(day, function(d) { return d.yVal; }));
 
 				positionList.push(
-					<Card style={{marginBottom: 15}} key={i}>
-						<CardText>
-							<div style={{display: 'flex', height: '100%', alignItems: 'center'}}>
-								<div style={{display: 'flex', flexDirection: 'column', flex: 1}}>
-									<div style={{flex: 1}}><span className="card-title">{v.instrument.symbol}</span></div>
-									<div style={{flex: 1}}>
-										{numeral(v.quantity).format('0,0')} Shares
-									</div>
+					<FlatButton onTouchTap={this.showStockOverlay.bind(this)} backgroundColor="#303030" hoverColor="#434343" rippleColor='#bdbdbd' style={{width: '100%', marginBottom: 15, height: 'auto'}}>
+						<div style={{display: 'flex', height: '100%', alignItems: 'center'}}>
+							<div style={{display: 'flex', flexDirection: 'column', flex: '0 1 25%', alignItems: 'center'}}>
+								<div style={{flex: 1}}>
+									<span>{v.instrument.symbol}</span>
 								</div>
 								<div style={{flex: 1}}>
-									<svg className="line-chart-svg" width={width + margin.left + margin.right} height={height + margin.top + margin.bottom}>
-										<g className="line-chart-container-svg" transform={`translate(${margin.left}, ${margin.top})`}>
-											<path className="line" d={lineD3(day)}></path>
-										</g>
-									</svg>
-								</div>
-								<div style={{flex: 0}}>
-									{this.formatCurrency(v.quote.last_trade_price)}
+									<span>{numeral(v.quantity).format('0,0')} Shares</span>
 								</div>
 							</div>
-						</CardText>
-					</Card>
+							<div style={{flex: '0 1 50%'}}>
+								<svg className="line-chart-svg" width={width + margin.left + margin.right} height={height + margin.top + margin.bottom}>
+									<g className="line-chart-container-svg" transform={`translate(${margin.left}, ${margin.top})`}>
+										<path className="line" d={lineD3(day)}></path>
+									</g>
+								</svg>
+							</div>
+							<div style={{flex: '0 1 25%'}}>
+								<span>{this.formatCurrency(v.quote.last_trade_price)}</span>
+							</div>
+						</div>
+					</FlatButton>
 				);
 			}.bind(this));
 
 			return positionList;
 		}
+	}
+
+	showStockOverlay() {
+
 	}
 
     render() {
@@ -585,44 +586,42 @@ class PortfolioPane extends Component {
 				.y(function(d) { return this.y(d.yVal); }.bind(this));
 
 			return (
-				<div>
-					<MuiThemeProvider muiTheme={muiTheme}>
-						<div>
-							<Card style={{marginBottom: 15}}>
-								<CardHeader
-									ref="header"
-									title={this.formatCurrency(this.state.title)}
-									subtitle={this.state.subtitle}
-								/>
-								<CardText>
-									<div id="chart-container">
-										<svg id={`${this.state.tab}-chart`} className="line-chart-svg" width={this.state.width + this.state.margin.left + this.state.margin.right} height={this.state.height + this.state.margin.top + this.state.margin.bottom}>
-											<g className="line-chart-container-svg" transform={`translate(${this.state.margin.left}, ${this.state.margin.top})`}>
-												{this.getPath(this.state.tab)}
+				<MuiThemeProvider muiTheme={muiTheme}>
+					<div>
+						<Card style={{marginBottom: 15}}>
+							<CardHeader
+								ref="header"
+								title={this.formatCurrency(this.state.title)}
+								subtitle={this.state.subtitle}
+							/>
+							<CardText>
+								<div id="chart-container">
+									<svg id={`${this.state.tab}-chart`} className="line-chart-svg" width={this.state.width + this.state.margin.left + this.state.margin.right} height={this.state.height + this.state.margin.top + this.state.margin.bottom}>
+										<g className="line-chart-container-svg" transform={`translate(${this.state.margin.left}, ${this.state.margin.top})`}>
+											{this.getPath(this.state.tab)}
 
-												<g ref="focus" height={this.state.height} transform="translate(0,0)" style={{display: 'none'}}>
-													<line x1='0' y1='0' x2='0' y2={this.state.height} stroke="white" strokeWidth="2.5px" className="verticalLine"></line>
-												</g>
-
-												<rect ref="overlay" width={this.state.width} height={this.state.height} style={{fill: 'transparent'}}></rect>
+											<g ref="focus" height={this.state.height} transform="translate(0,0)" style={{display: 'none'}}>
+												<line x1='0' y1='0' x2='0' y2={this.state.height} stroke="white" strokeWidth="2.5px" className="verticalLine"></line>
 											</g>
-										</svg>
-									</div>
-								</CardText>
-								<CardActions style={{display: 'flex'}}>
-									<FlatButton id="day" style={{flex: 1, minWidth: 0}} onTouchTap={this.handleChange.bind(this)} label="1D" labelStyle={{color: (this.state.tab == 'day' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'day' ? 'active' : '')}`}/>
-									<FlatButton id="week" style={{flex: 1, minWidth: 0}} onTouchTap={this.handleChange.bind(this)} label="1W" labelStyle={{color: (this.state.tab == 'week' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'week' ? 'active' : '')}`}/>
-									<FlatButton id="month" style={{flex: 1, minWidth: 0}} onTouchTap={this.handleChange.bind(this)} label="1M" labelStyle={{color: (this.state.tab == 'month' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'month' ? 'active' : '')}`}/>
-									<FlatButton id="quarter" style={{flex: 1, minWidth: 0}} onTouchTap={this.handleChange.bind(this)} label="3W" labelStyle={{color: (this.state.tab == 'quarter' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'quarter' ? 'active' : '')}`}/>
-									<FlatButton id="year" style={{flex: 1, minWidth: 0}} onTouchTap={this.handleChange.bind(this)} label="1Y" labelStyle={{color: (this.state.tab == 'year' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'year' ? 'active' : '')}`}/>
-									<FlatButton id="all" style={{flex: 1, minWidth: 0}} onTouchTap={this.handleChange.bind(this)} label="ALL" labelStyle={{color: (this.state.tab == 'all' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'all' ? 'active' : '')}`}/>
-								</CardActions>
-							</Card>
-							{this.getCards()}
-							{this.getPositions()}
-						</div>
-					</MuiThemeProvider>
-				</div>
+
+											<rect ref="overlay" width={this.state.width} height={this.state.height} style={{fill: 'transparent'}}></rect>
+										</g>
+									</svg>
+								</div>
+							</CardText>
+							<CardActions style={{display: 'flex'}}>
+								<FlatButton id="day" style={{flex: 1, minWidth: 0}} onTouchTap={this.handleChange.bind(this)} label="1D" labelStyle={{color: (this.state.tab == 'day' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'day' ? 'active' : '')}`}/>
+								<FlatButton id="week" style={{flex: 1, minWidth: 0}} onTouchTap={this.handleChange.bind(this)} label="1W" labelStyle={{color: (this.state.tab == 'week' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'week' ? 'active' : '')}`}/>
+								<FlatButton id="month" style={{flex: 1, minWidth: 0}} onTouchTap={this.handleChange.bind(this)} label="1M" labelStyle={{color: (this.state.tab == 'month' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'month' ? 'active' : '')}`}/>
+								<FlatButton id="quarter" style={{flex: 1, minWidth: 0}} onTouchTap={this.handleChange.bind(this)} label="3W" labelStyle={{color: (this.state.tab == 'quarter' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'quarter' ? 'active' : '')}`}/>
+								<FlatButton id="year" style={{flex: 1, minWidth: 0}} onTouchTap={this.handleChange.bind(this)} label="1Y" labelStyle={{color: (this.state.tab == 'year' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'year' ? 'active' : '')}`}/>
+								<FlatButton id="all" style={{flex: 1, minWidth: 0}} onTouchTap={this.handleChange.bind(this)} label="ALL" labelStyle={{color: (this.state.tab == 'all' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'all' ? 'active' : '')}`}/>
+							</CardActions>
+						</Card>
+						{this.getCards()}
+						{this.getPositions()}
+					</div>
+				</MuiThemeProvider>
 			);
 		}
     }

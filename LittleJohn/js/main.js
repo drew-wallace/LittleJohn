@@ -3,7 +3,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import LoginPage from './login-page';
-// import Sidebar from './sidebar';
+import Sidebar from './sidebar';
 import rgbHex from 'rgb-hex';
 import env from '../env.js';
 
@@ -24,8 +24,8 @@ app.onactivated = function (args) {
             // To create a smooth user experience, restore application state here so that it looks like the app never stopped running.
         }
 
-        ReactDOM.render(<div style={{backgroundColor: '#6DAD62', position: 'absolute', display: 'flex', height: '100%', width: '100%'}}><LoginPage app={app} cssColorString={cssColorString}/></div>, document.getElementById('main'));
-        // ReactDOM.render(<MuiThemeProvider muiTheme={getMuiTheme(darkBaseTheme)}><Sidebar/></MuiThemeProvider>, document.getElementById('main'));
+        // ReactDOM.render(<div style={{backgroundColor: '#6DAD62', position: 'absolute', display: 'flex', height: '100%', width: '100%'}}><LoginPage app={app} cssColorString={cssColorString}/></div>, document.getElementById('main'));
+        ReactDOM.render(<Sidebar cssColorString={cssColorString}/>, document.getElementById('main'));
 
         // var allFeatures = [
         //     {
