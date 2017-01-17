@@ -4,7 +4,10 @@ import PorfolioPane from './portfolio-pane';
 import { MuiThemeProvider, Drawer, AppBar, MenuItem} from 'material-ui'
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
-
+import injectTapEventPlugin from 'react-tap-event-plugin';
+// Needed for onTouchTap
+// http://stackoverflow.com/a/34015469/988941
+injectTapEventPlugin();
 
 class Menu extends Component {
 

@@ -1,152 +1,182 @@
-'use strict';
+import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
+import numeral from 'numeral';
+import moment from 'moment';
+import _ from 'lodash';
+import { bisector, scaleLinear, line, select, extent, drag, mouse } from 'd3';
 
-class D3LineChart{
-    constructor(containerElement, elementForWidth) {
-        this.containerElement = containerElement;
-        this.elementForWidth = elementForWidth;
-        // this.margin = {top: 20, right: 20, bottom: 30, left: 50};
-        this.margin = {top: 0, right: 0, bottom: 0, left: 0};
-        this.width = 683 - this.margin.left - this.margin.right;
-        this.height = 500 - this.margin.top - this.margin.bottom;
+import {Card, CardActions, CardHeader, CardText} from 'material-ui/Card';
+import FlatButton from 'material-ui/FlatButton';
 
-        this.parseTime = d3.timeParse("%d-%b-%y");
-        this.bisectDate = d3.bisector(function(d) { return d.xVal; }).left;
-        this.formatValue = d3.format(",.2f");
-        this.formatCurrency = function(d) { return "$" + this.formatValue(d); };
-        this.formatPercent = function(d) { return this.formatValue(d * 100) + '%'; };
-        this.formatTime = function(d) {
-            var hours = d.getHours(),
-                minutes = d.getMinutes();
+class RobinhoodChart extends Component {
+    constructor(props) {
+        super(props);
 
-            if(hours > 12) hours -= 12;
-            if(hours < 10) hours = '0' + hours;
-            if(minutes < 10) minutes = '0' + minutes;
-            return hours + ':' + minutes + ' EDT'
+        const margin = this.props.margin;
+		const width = 700 - margin.left - margin.right;
+		const height = 500 - margin.top - margin.bottom;
+
+        this.x = scaleLinear().range([0, width]);
+		this.y = scaleLinear().range([height, 0]);
+		this.lineD3 = line()
+						.x((d) => this.x(d.xVal))
+						.y((d) => this.y(d.yVal));
+
+        this.bisectDate = bisector(function(d) { return d.xVal; }).left;
+
+        this.state = {
+            title: this.props.title,
+            subtitle: this.props.subtitle,
+            data: this.props.getChartData('day'),
+            tab: 'day',
+            margin,
+            width,
+            height
         };
-
-        this.x = d3.scaleLinear()
-            .range([0, this.width]);
-
-        this.y = d3.scaleLinear()
-            .range([this.height, 0]);
-
-        this.line = d3.line()
-            .x(function(d) { return this.x(d.xVal); }.bind(this))
-            .y(function(d) { return this.y(d.yVal); }.bind(this));
-
-        this.svg = d3.select(containerElement)
-            .append("svg")
-            .attr('class', 'line-chart-svg')
-            .attr("width", this.width + this.margin.left + this.margin.right)
-            .attr("height", this.height + this.margin.top + this.margin.bottom)
-
-        this.svgContainer = this.svg.append("g")
-            .attr('class', 'line-chart-container-svg')
-            .attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
     }
-    setup(data, yKey, highlightedEquityValueElement, highlightedEquityChangeValueElement, afterHoursElement) {
-        this.highlightedEquityValueElement = highlightedEquityValueElement;
-        this.highlightedEquityChangeValueElement = highlightedEquityChangeValueElement;
-        this.afterHoursElement = afterHoursElement;
-        this.data = data.map(function(d, i){
-            d.xVal = i;
-            d.yVal = +d[yKey];
-            // open for day, close for all else
-            return d;
-        });
 
-        this.x.domain(d3.extent(this.data, function(d) { return d.xVal; }));
-        this.y.domain(d3.extent(this.data, function(d) { return d.yVal; }));
-
-        this.xAxis = this.svgContainer.append("g")
-            .attr("class", "axis axis--x hide")
-            .attr("transform", "translate(0," + this.height + ")")
-            .call(d3.axisBottom(this.x));
-
-        this.yAxis = this.svgContainer.append("g")
-            .attr("class", "axis axis--y hide")
-            .call(d3.axisLeft(this.y));
-        this.yAxisTitle = this.yAxis.append("text")
-            .attr("class", "axis-title")
-            .attr("transform", "rotate(-90)")
-            .attr("y", 6)
-            .attr("dy", ".71em")
-            .attr("fill", "#FFF")
-            .style("text-anchor", "end")
-            .text("Price ($)");
-
-        this.mainLine = this.svgContainer.append("path")
-            .datum(this.data)
-            .attr("class", "line")
-            .attr("d", this.line);
-
-        this.focus = this.svgContainer.append("g")
-            .attr("height", this.height)
-            .attr("class", "focus")
-            .style("display", "none");
-
-        this.verticalLine = this.focus.append("line")
-            .attr('x1', 0)
-            .attr('y1', 0)
-            .attr('x2', 0)
-            .attr('y2', this.height)
-            .attr("stroke", "white")
-            .attr("stroke-width", "2.5px")
-            .attr('class', 'verticalLine');
-
-        this.overlay = this.svgContainer.append("rect")
-            .attr("class", "overlay")
-            .attr("width", this.width)
-            .attr("height", this.height)
-            .style("fill", "transparent")
-            .on("mouseout", function() { this.focus.style("display", "none"); }.bind(this))
-            .call(d3.drag()
-                .on("start", this._startdrag.bind(this))
-                .on("drag", this._dragging.bind(this))
-                .on("end", this._enddrag.bind(this))
-                .container(function() { return this; })
-            );
+    formatCurrency(d) {
+        return numeral(d).format('$0,0.00');
     }
-    _startdrag() {
-        this.focus.style("display", null);
-        document.getElementById(this.afterHoursElement).style.visibility = "hidden";
-        this.overlay.on("mouseover", function() { this.focus.style("display", null); }.bind(this));
-        document.getElementById(this.highlightedEquityValueElement).originalValue = document.getElementById(this.highlightedEquityValueElement).innerText;
-        document.getElementById(this.highlightedEquityChangeValueElement).originalValue = document.getElementById(this.highlightedEquityChangeValueElement).innerText;
+
+    formatCurrencyDiff(d) {
+		return numeral(d).format('+$0,0.00');
+	}
+
+	formatPercentDiff(d) {
+		return numeral(d).format('+0.00%');
+	}
+
+    formatTime(d) {
+		let hours = d.getHours();
+		let minutes = d.getMinutes();
+
+		if(hours > 12) hours -= 12;
+		if(hours < 10) hours = '0' + hours;
+		if(minutes < 10) minutes = '0' + minutes;
+
+		switch(this.state.tab) {
+			case 'day':
+				return `${hours}:${minutes} EDT`;
+			case 'week':
+				return `${hours}:${minutes} EDT ${moment(d).format('MMM D')}`;
+			case 'month':
+				return `${moment(d).format('MMM D YYYY')}`;
+			case 'quarter':
+				return `${moment(d).format('MMM D YYYY')}`;
+			case 'year':
+				return `${moment(d).format('MMM D YYYY')}`;
+			case 'all':
+				return `${moment(d).format('MMM D YYYY')}`;
+		}
+	}
+
+    changeTab(tab) {
+        const data = this.props.getChartData(tab);
+		this.setState({tab, data});
+	}
+
+	onResize() {
+        const chartContainer = ReactDOM.findDOMNode(this.refs.chart_container);
+
+        if(chartContainer) {
+            const chart = ReactDOM.findDOMNode(this.refs.chart);
+			let position = chart.style.position;
+
+            chart.style.position = 'absolute';
+			const width = chartContainer.offsetWidth - this.state.margin.left - this.state.margin.right;
+			const height = (chartContainer.offsetWidth * 0.5) - this.state.margin.top - this.state.margin.bottom;
+			chart.style.position = position;
+
+            if(this.state.width != width || this.state.height != height) {
+                this.x = scaleLinear()
+                    .range([0, width]);
+                this.y = scaleLinear()
+                    .range([height, 0]);
+                this.lineD3 = line()
+                    .x(function(d) { return this.x(d.xVal); }.bind(this))
+                    .y(function(d) { return this.y(d.yVal); }.bind(this));
+
+                this.setState({width, height});
+            }
+		}
+	}
+
+    setupDragAndResize() {
+        const overlay = select(ReactDOM.findDOMNode(this.refs.overlay));
+		overlay.call(drag()
+					    .on("start", this._startdrag.bind(this))
+					    .on("drag", this._dragging.bind(this))
+					    .on("end", this._enddrag.bind(this))
+					    .container(function() { return this; }));
+
+		this.onResizeThrottled = _.throttle(this.onResize.bind(this), 10);
+		window.addEventListener("resize", this.onResizeThrottled);
     }
+
+    componentDidMount() {
+		this.onResize();
+		this.setupDragAndResize();
+	}
+
+	componentWillUnmount() {
+		window.removeEventListener("resize", this.onResizeThrottled);
+	}
+
+    componentWillUpdate(nextProps, nextState) {
+        if(!this.state.dragging) {
+            this.x.domain(extent(nextState.data, function(d) { return d.xVal; }));
+            this.y.domain(extent(nextState.data, function(d) { return d.yVal; }));
+        }
+    }
+
+	_startdrag() {
+    	select(ReactDOM.findDOMNode(this.refs.focus))
+			.style('display', null);
+
+		const startingEquity = +this.state.data[0].adjusted_open_equity;
+		const endingEquity = this.props.title;
+		const netReturn = endingEquity - startingEquity;
+		const netPercentReturn = netReturn / startingEquity;
+		const equityChangeText = `${this.formatCurrencyDiff(netReturn)} (${this.formatPercentDiff(netPercentReturn)}) 04:00 PM EDT`;
+
+		this.setState({
+			title: startingEquity,
+			subtitle: equityChangeText,
+            dragging: true
+		});
+    }
+
     _dragging(ignoreThis, elmIndex, elms) {
-        // -$7.41 (-3.11%) 10:55 AM EDT
-        var x0 = this.x.invert(d3.mouse(elms[elmIndex])[0]),
-            i = this.bisectDate(this.data, x0, 1);
+    	// -$7.41 (-3.11%) 10:55 AM EDT
 
-        if(i >= this.data.length) return false;
+    	const x0 = this.x.invert(mouse(elms[elmIndex])[0]);
+        const i = this.bisectDate(this.state.data, x0, 1);
 
-        var d0 = this.data[i - 1],
-            d1 = this.data[i],
-            d = x0 - d0.xVal > d1.xVal - x0 ? d1 : d0;
+		if(i >= this.state.data.length) return false;
 
-        document.getElementById(this.highlightedEquityValueElement).innerText = this.formatCurrency(d.yVal);
+		const d0 = this.state.data[i - 1];
+        const d1 = this.state.data[i];
+        const d = x0 - d0.xVal > d1.xVal - x0 ? d1 : d0;
 
-        var netReturn = d.yVal - this.data[0].yVal,
-            netPercentReturn = netReturn / this.data[0].yVal,
-            sign = (netReturn >= 0 ? '+' : '-'),
-            equityChangeText = sign + this.formatCurrency(Math.abs(netReturn)) + ' (' + sign + this.formatPercent(Math.abs(netPercentReturn)) + ') ' + this.formatTime(new Date(d.begins_at));
+		const netReturn = d.yVal - this.state.data[0].yVal;
+        const netPercentReturn = netReturn / this.state.data[0].yVal;
+        // TODO: fix this +/- dollar format
+        const equityChangeText = `${this.formatCurrencyDiff(Math.abs(netReturn))} (${this.formatPercentDiff(Math.abs(netPercentReturn))}) ${this.formatTime(new Date(d.begins_at))}`;
 
-        document.getElementById(this.highlightedEquityChangeValueElement).innerText = equityChangeText;
 
-        var xPos = d3.mouse(elms[elmIndex])[0];
-        this.focus.attr("transform", function () {
-            return "translate(" + xPos + ",0)";
-        });
+        const xPos = mouse(elms[elmIndex])[0];
 
-        var pathLength = this.mainLine.node().getTotalLength();
-        var thisX = xPos;
-        var beginning = thisX,
-            end = pathLength,
-            target, pos;
+		const pathLength = ReactDOM.findDOMNode(this.refs.mainLine).getTotalLength();
+        const thisX = xPos;
+        let beginning = thisX;
+        let end = pathLength;
+        let target;
+        let pos;
+
         while (true) {
             target = Math.floor((beginning + end) / 2);
-            pos = this.mainLine.node().getPointAtLength(target);
+			pos = ReactDOM.findDOMNode(this.refs.mainLine).getPointAtLength(target);
             if ((target === end || target === beginning) && pos.x !== thisX) {
                 break;
             }
@@ -154,57 +184,63 @@ class D3LineChart{
             else if (pos.x < thisX) beginning = target;
             else break; //position found
         }
+
+		select(ReactDOM.findDOMNode(this.refs.header))
+			.select("div span:nth-child(1)")
+			.text(this.formatCurrency(d.yVal));
+		select(ReactDOM.findDOMNode(this.refs.header))
+			.select("div span:nth-child(2)")
+			.text(equityChangeText);
+
+		select(ReactDOM.findDOMNode(this.refs.focus))
+			.attr('transform', `translate(${xPos},0)`);
     }
+
     _enddrag() {
-        this.focus.style("display", "none");
-        document.getElementById(this.afterHoursElement).style.visibility = null;
-        this.overlay.on("mouseover", function() { this.focus.style("display", "none"); }.bind(this));
-        document.getElementById(this.highlightedEquityValueElement).innerText = document.getElementById(this.highlightedEquityValueElement).originalValue;
-        document.getElementById(this.highlightedEquityChangeValueElement).innerText = document.getElementById(this.highlightedEquityChangeValueElement).originalValue;
+		select(ReactDOM.findDOMNode(this.refs.focus))
+			.style('display', 'none');
+
+		this.setState({
+			title: this.props.title,
+			subtitle: this.props.subtitle,
+            dragging: false
+		});
     }
-    redrawChart() {
-        //get dimensions based on window size
-        this.width = document.querySelector(this.elementForWidth).offsetWidth - this.margin.left - this.margin.right;
-        this.height = (document.querySelector(this.elementForWidth).offsetWidth * 0.75) - this.margin.top - this.margin.bottom;
 
-        this.x = d3.scaleLinear()
-            .range([0, this.width]);
+    render() {
+        return (
+            <Card style={{marginBottom: 15}}>
+                <CardHeader
+                    ref="header"
+                    title={this.formatCurrency(this.state.title)}
+                    subtitle={this.state.subtitle}
+                />
+                <CardText>
+                    <div ref="chart_container">
+                        <svg ref="chart" className="line-chart-svg" width={this.state.width + this.state.margin.left + this.state.margin.right} height={this.state.height + this.state.margin.top + this.state.margin.bottom}>
+                            <g className="line-chart-container-svg" transform={`translate(${this.state.margin.left}, ${this.state.margin.top})`}>
+                                <path ref="mainLine" className="line" d={this.lineD3(this.state.data)}></path>
 
-        this.y = d3.scaleLinear()
-            .range([this.height, 0]);
+                                <g ref="focus" height={this.state.height} transform="translate(0,0)" style={{display: 'none'}}>
+                                    <line x1='0' y1='0' x2='0' y2={this.state.height} stroke="white" strokeWidth="2.5px" className="verticalLine"></line>
+                                </g>
 
-        this.line = d3.line()
-            .x(function(d) { return this.x(d.xVal); }.bind(this))
-            .y(function(d) { return this.y(d.yVal); }.bind(this));
-
-        this.svg
-            .attr("width", this.width + this.margin.left + this.margin.right)
-            .attr("height", this.height + this.margin.top + this.margin.bottom);
-
-        this.svgContainer
-            .attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
-
-        this.x.domain(d3.extent(this.data, function(d) { return d.xVal; }));
-        this.y.domain(d3.extent(this.data, function(d) { return d.yVal; }));
-
-        this.xAxis
-            .attr("transform", "translate(0," + this.height + ")")
-            .call(d3.axisBottom(this.x));
-
-        this.yAxis
-            .call(d3.axisLeft(this.y));
-
-        this.mainLine
-            .attr("d", this.line);
-
-        this.focus
-            .attr("height", this.height);
-
-        this.verticalLine
-            .attr('y2', this.height);
-
-        this.overlay
-            .attr("width", this.width)
-            .attr("height", this.height);
+                                <rect ref="overlay" width={this.state.width} height={this.state.height} style={{fill: 'transparent'}}></rect>
+                            </g>
+                        </svg>
+                    </div>
+                </CardText>
+                <CardActions style={{display: 'flex'}}>
+                    <FlatButton style={{flex: 1, minWidth: 0}} onTouchTap={() => this.changeTab('day')} label="1D" labelStyle={{color: (this.state.tab == 'day' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'day' ? 'active' : '')}`}/>
+                    <FlatButton style={{flex: 1, minWidth: 0}} onTouchTap={() => this.changeTab('week')} label="1W" labelStyle={{color: (this.state.tab == 'week' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'week' ? 'active' : '')}`}/>
+                    <FlatButton style={{flex: 1, minWidth: 0}} onTouchTap={() => this.changeTab('month')} label="1M" labelStyle={{color: (this.state.tab == 'month' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'month' ? 'active' : '')}`}/>
+                    <FlatButton style={{flex: 1, minWidth: 0}} onTouchTap={() => this.changeTab('quarter')} label="3W" labelStyle={{color: (this.state.tab == 'quarter' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'quarter' ? 'active' : '')}`}/>
+                    <FlatButton style={{flex: 1, minWidth: 0}} onTouchTap={() => this.changeTab('year')} label="1Y" labelStyle={{color: (this.state.tab == 'year' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'year' ? 'active' : '')}`}/>
+                    <FlatButton style={{flex: 1, minWidth: 0}} onTouchTap={() => this.changeTab('all')} label="ALL" labelStyle={{color: (this.state.tab == 'all' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'all' ? 'active' : '')}`}/>
+                </CardActions>
+            </Card>
+        );
     }
-}
+};
+
+export default RobinhoodChart;
