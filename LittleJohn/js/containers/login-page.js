@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { TextInput, Button } from 'react-desktop/windows';
-import NavPane from './nav-pane';
-import Sidebar from './sidebar';
-import Robinhood from './robinhood';
-import env from '../env';
+import AppLayout from './app-layout';
+import Robinhood from '../robinhood';
+import env from '../../env';
 
 export default class extends Component {
   	constructor(props) {
@@ -19,11 +18,8 @@ export default class extends Component {
 
   	render() {
 		if(this.state.loggedIn) {
-			// return (
-			// 	<NavPane color={`#${this.props.cssColorString}`} robinhood={this.robinhood}/>
-			// );
 			return (
-				<Sidebar cssColorString={`#${this.props.cssColorString}`} robinhood={this.robinhood}/>
+				<AppLayout cssColorString={`#${this.props.cssColorString}`} robinhood={this.robinhood}/>
 			);
 		} else {
 			return (
@@ -39,17 +35,17 @@ export default class extends Component {
   	}
 
 	submit(){
-			const username = env.username || this.username;
-			const password = env.password || this.password;
-			const loggedIn = this.robinhood.login(username, password);
+		const username = env.username || this.username;
+		const password = env.password || this.password;
+		const loggedIn = this.robinhood.login(username, password);
 
-			loggedIn.then(function() {
-				let sessionState = this.app.sessionState;
-				sessionState.robinhoodSession = this.robinhood.getSession();
-				this.setState({loggedIn: this.robinhood.isLoggedIn()});
-			}.bind(this)).catch(function(error) {
-				// show some error message for a failed login
-				console.error(error);
-			}.bind(this));
+		loggedIn.then(function() {
+			let sessionState = this.app.sessionState;
+			sessionState.robinhoodSession = this.robinhood.getSession();
+			this.setState({loggedIn: this.robinhood.isLoggedIn()});
+		}.bind(this)).catch(function(error) {
+			// show some error message for a failed login
+			console.error(error);
+		}.bind(this));
 	}
 }

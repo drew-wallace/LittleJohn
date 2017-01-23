@@ -9,7 +9,7 @@ import injectTapEventPlugin from 'react-tap-event-plugin';
 // http://stackoverflow.com/a/34015469/988941
 injectTapEventPlugin();
 
-class Menu extends Component {
+class AppLayout extends Component {
 
 	constructor(props){
 		super(props);
@@ -98,8 +98,4 @@ class Menu extends Component {
     }
 }
 
-// Header.childContextTypes = {
-// 	muiTheme: React.PropTypes.object.isRequired,
-// };
-
-export default Menu;
+export default AppLayout;
