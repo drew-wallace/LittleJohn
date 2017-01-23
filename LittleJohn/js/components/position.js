@@ -3,16 +3,14 @@ import numeral from 'numeral';
 import _ from 'lodash';
 import { scaleLinear, line, extent } from 'd3';
 
+import {formatCurrency} from '../lib/formaters';
+
 import {Card, CardActions, CardHeader, CardText} from 'material-ui/Card';
 import FlatButton from 'material-ui/FlatButton';
 
 class RobinhoodPosition extends Component {
     constructor(props) {
         super(props);
-    }
-
-    formatCurrency(d) {
-        return numeral(d).format('$0,0.00');
     }
 
     render() {
@@ -56,7 +54,7 @@ class RobinhoodPosition extends Component {
                         </svg>
                     </div>
                     <div style={{flex: '0 1 25%'}}>
-                        <span>{this.formatCurrency(quote.last_trade_price)}</span>
+                        <span>{formatCurrency(quote.last_trade_price)}</span>
                     </div>
                 </div>
             </FlatButton>

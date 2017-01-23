@@ -5,6 +5,8 @@ import moment from 'moment';
 import _ from 'lodash';
 import { bisector, scaleLinear, line, select, extent, drag, mouse } from 'd3';
 
+import {formatCurrency, formatCurrencyDiff, formatPercentDiff} from '../lib/formaters';
+
 import {Card, CardActions, CardHeader, CardText} from 'material-ui/Card';
 import FlatButton from 'material-ui/FlatButton';
 
@@ -27,25 +29,13 @@ class RobinhoodChart extends Component {
         this.state = {
             title: this.props.title,
             subtitle: this.props.subtitle,
-            data: this.props.getChartData('day'),
+            data: this.props.data.day,
             tab: 'day',
             margin,
             width,
             height
         };
     }
-
-    formatCurrency(d) {
-        return numeral(d).format('$0,0.00');
-    }
-
-    formatCurrencyDiff(d) {
-		return numeral(d).format('+$0,0.00');
-	}
-
-	formatPercentDiff(d) {
-		return numeral(d).format('+0.00%');
-	}
 
     formatTime(d) {
 		let hours = d.getHours();
@@ -72,8 +62,7 @@ class RobinhoodChart extends Component {
 	}
 
     changeTab(tab) {
-        const data = this.props.getChartData(tab);
-		this.setState({tab, data});
+		this.setState({tab, data: this.props.data[tab]});
 	}
 
 	onResize() {
@@ -138,7 +127,7 @@ class RobinhoodChart extends Component {
 		const endingEquity = this.props.title;
 		const netReturn = endingEquity - startingEquity;
 		const netPercentReturn = netReturn / startingEquity;
-		const equityChangeText = `${this.formatCurrencyDiff(netReturn)} (${this.formatPercentDiff(netPercentReturn)}) 04:00 PM EDT`;
+		const equityChangeText = `${formatCurrencyDiff(netReturn)} (${formatPercentDiff(netPercentReturn)}) 04:00 PM EDT`;
 
 		this.setState({
 			title: startingEquity,
@@ -161,8 +150,7 @@ class RobinhoodChart extends Component {
 
 		const netReturn = d.yVal - this.state.data[0].yVal;
         const netPercentReturn = netReturn / this.state.data[0].yVal;
-        // TODO: fix this +/- dollar format
-        const equityChangeText = `${this.formatCurrencyDiff(Math.abs(netReturn))} (${this.formatPercentDiff(Math.abs(netPercentReturn))}) ${this.formatTime(new Date(d.begins_at))}`;
+        const equityChangeText = `${formatCurrencyDiff(netReturn)} (${formatPercentDiff(netPercentReturn)}) ${this.formatTime(new Date(d.begins_at))}`;
 
 
         const xPos = mouse(elms[elmIndex])[0];
@@ -187,7 +175,7 @@ class RobinhoodChart extends Component {
 
 		select(ReactDOM.findDOMNode(this.refs.header))
 			.select("div span:nth-child(1)")
-			.text(this.formatCurrency(d.yVal));
+			.text(formatCurrency(d.yVal));
 		select(ReactDOM.findDOMNode(this.refs.header))
 			.select("div span:nth-child(2)")
 			.text(equityChangeText);
@@ -212,7 +200,7 @@ class RobinhoodChart extends Component {
             <Card style={{marginBottom: 15}}>
                 <CardHeader
                     ref="header"
-                    title={this.formatCurrency(this.state.title)}
+                    title={formatCurrency(this.state.title)}
                     subtitle={this.state.subtitle}
                 />
                 <CardText>

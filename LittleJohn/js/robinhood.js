@@ -1,8 +1,7 @@
 'use strict';
 
 class Robinhood{
-    constructor(session) {
-        session = session || {};
+    constructor(session={}) {
         this._endpoints = {
             login: 'https://api.robinhood.com/api-token-auth/',
             investment_profile: 'https://api.robinhood.com/user/investment_profile/',

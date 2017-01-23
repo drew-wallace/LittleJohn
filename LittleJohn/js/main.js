@@ -7,9 +7,17 @@ import { createStore } from 'redux';
 import rgbHex from 'rgb-hex';
 
 import LittleJohnApp from './reducers';
+import Robinhood from './robinhood';
+import processPortfolio from './lib/process-portfolio';
+
 import LoginPage from './containers/login-page';
 
 import env from "../env";
+import Portfolios from '../data/portfolios';
+import Day from '../data/day';
+import Week from '../data/week';
+import Year from '../data/year';
+import AllTime from '../data/5year';
 import Positions from '../data/positions';
 
 let app = WinJS.Application;
@@ -19,9 +27,17 @@ const uiSettings = new Windows.UI.ViewManagement.UISettings();
 const rgba = uiSettings.getColorValue(Windows.UI.ViewManagement.UIColorType.accent);
 const cssColorString = rgbHex(rgba.r, rgba.g, rgba.b);
 
+let portfolio = processPortfolio(Portfolios, Day, Week, Year, AllTime);
+
+let sessionState = app.sessionState;
+
 const initialState = {
+    title: 'Portfolio',
+    menu: false,
+    portfolio: portfolio || [],
     cards: env.cards.results || [],
-    positions: Positions.responseJSON || []
+    positions: Positions.responseJSON || [],
+    robinhood: new Robinhood(env.robinhoodSession || sessionState.robinhoodSession)
 };
 let store = createStore(LittleJohnApp, initialState);
 

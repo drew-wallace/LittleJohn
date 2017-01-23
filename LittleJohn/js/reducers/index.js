@@ -1,6 +1,6 @@
 ﻿import { combineReducers } from 'redux';
 import auth from './auth';
-import api from './api';
+import robinhood from './robinhood';
 import menu from './menu';
 import title from './title';
 import pane from './pane';
@@ -10,7 +10,7 @@ import positions from './positions';
 
 const LittleJohnApp = combineReducers({
     auth,
-    api,
+    robinhood,
     menu,
     title,
     pane,

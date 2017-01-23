@@ -1,15 +1,10 @@
 ﻿const title = (state = {}, action) => {
+    console.log(state);
     switch (action.type) {
         case 'CHANGE_TITLE':
-            return Object.assign({}, state, {
-                title: action.text
-            });
-        case 'CHANGE_EQUITY_TITLE':
-            return Object.assign({}, state, {
-                equityTitle: action.text
-            });
+            return action.text;
         default:
-            return state;
+            return '';
     }
 }
 

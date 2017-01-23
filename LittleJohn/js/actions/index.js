@@ -8,20 +8,16 @@ export const logout = () => {
         type: 'LOGOUT'
     };
 }
-export const attachApi = (robinhood) => {
+export const attachRobinhood = (robinhood) => {
     return {
-        type: 'ATTACH_API',
+        type: 'ATTACH_ROBINHOOD',
         robinhood
     };
 }
-export const openMenu = () => {
+export const toggleMenu = (open) => {
     return {
-        type: 'OPEN_MENU'
-    };
-}
-export const closeMenu = () => {
-    return {
-        type: 'CLOSE_MENU'
+        type: 'TOGGLE_MENU',
+        open
     };
 }
 export const changeTitle = (text) => {

@@ -1,6 +1,6 @@
-﻿const api = (state = {}, action) => {
+﻿const robinhood = (state = {}, action) => {
     switch (action.type) {
-        case 'ATTACH_API':
+        case 'ATTACH_ROBINHOOD':
             return Object.assign({}, state, {
                 robinhood: action.robinhood
             });
@@ -9,4 +9,4 @@
     }
 }
 
-export default api;
+export default robinhood;
