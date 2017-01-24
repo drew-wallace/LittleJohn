@@ -7,8 +7,9 @@ import { createStore } from 'redux';
 import rgbHex from 'rgb-hex';
 
 import LittleJohnApp from './reducers';
-import Robinhood from './robinhood';
+import Robinhood from './lib/robinhood';
 import processPortfolio from './lib/process-portfolio';
+import { formatCurrency } from './lib/formaters';
 
 import LoginPage from './containers/login-page';
 
@@ -33,6 +34,7 @@ let sessionState = app.sessionState;
 
 const initialState = {
     title: 'Portfolio',
+    fixedTitle: formatCurrency(portfolio.equity),
     menu: false,
     portfolio: portfolio || [],
     cards: env.cards.results || [],
@@ -40,7 +42,6 @@ const initialState = {
     robinhood: new Robinhood(env.robinhoodSession || sessionState.robinhoodSession)
 };
 let store = createStore(LittleJohnApp, initialState);
-
 
 app.onactivated = function (args) {
     if (args.detail.kind === activation.ActivationKind.launch) {

@@ -19,7 +19,7 @@ export default class extends Component {
   	render() {
 		if(this.state.loggedIn) {
 			return (
-				<AppLayout cssColorString={`#${this.props.cssColorString}`} robinhood={this.robinhood}/>
+				<AppLayout/>
 			);
 		} else {
 			return (

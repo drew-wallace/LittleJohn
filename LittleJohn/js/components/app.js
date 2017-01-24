@@ -14,6 +14,7 @@ class AppLayout extends Component {
 
 	constructor(props){
 		super(props);
+		console.log(props);
 		// darkBaseTheme.palette.primary1Color = `#${this.props.cssColorString}`;
 		// darkBaseTheme.palette.primary2Color = `#${this.props.cssColorString}`;
 		darkBaseTheme.palette.primary1Color = '#6DAD62';
@@ -30,6 +31,11 @@ class AppLayout extends Component {
 	changeTitle(title) {
 		this.props.toggleMenu(false);
 		this.props.changeTitle(title);
+		if(title == 'Portfolio') {
+			this.props.changeFixedTitle(this.props.portfolio.equity)
+		} else {
+			this.props.changeFixedTitle(title);
+		}
 	}
 
 	handleClose() {
@@ -37,6 +43,22 @@ class AppLayout extends Component {
 	}
 
     render() {
+		let titleBar = (
+			<div style={{height: 55}}></div>
+		);
+
+		if(this.props.title == 'Portfolio') {
+			titleBar = (
+				<AppBar
+					title={this.props.title}
+					onLeftIconButtonTouchTap={this.handleToggle.bind(this)}
+					style={{height: 130, paddingTop: 75, marginTop: -75}}
+					iconStyleLeft={{marginBottom: 8, alignSelf: 'center'}}
+					titleStyle={{alignSelf: 'center'}}
+				/>
+			);
+		}
+
         return (
 			<MuiThemeProvider muiTheme={this.muiTheme}>
 	            <div>
@@ -72,20 +94,14 @@ class AppLayout extends Component {
 		            	<MenuItem onTouchTap={() => this.changeTitle('Help')}>Help</MenuItem>
 		            </Drawer>
 					<AppBar
-							title={this.props.title}
-							onLeftIconButtonTouchTap={this.handleToggle.bind(this)}
-							style={{height: 55}}
-							iconStyleLeft={{marginBottom: 8, alignSelf: 'center'}}
-							titleStyle={{alignSelf: 'center'}}
-						/>
+						title={this.props.fixedTitle}
+						onLeftIconButtonTouchTap={this.handleToggle.bind(this)}
+						style={{height: 55}}
+						iconStyleLeft={{marginBottom: 8, alignSelf: 'center'}}
+						titleStyle={{alignSelf: 'center'}}
+					/>
 					<div ref="test" onTouchMove={(e) => {console.log("TEST"); e.preventDefault();}} className="scrollable-pane-content">
-						<AppBar
-							title={this.props.title}
-							onLeftIconButtonTouchTap={this.handleToggle.bind(this)}
-							style={{height: 130, paddingTop: 75, marginTop: -75}}
-							iconStyleLeft={{marginBottom: 8, alignSelf: 'center'}}
-							titleStyle={{alignSelf: 'center'}}
-						/>
+						{titleBar}
 						<PorfolioPane robinhood={this.props.robinhood}/>
 					</div>
 	            </div>

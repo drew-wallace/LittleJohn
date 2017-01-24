@@ -3,7 +3,7 @@
         case 'TOGGLE_MENU':
             return action.open;
         default:
-            return false;
+            return state;
     }
 }
 

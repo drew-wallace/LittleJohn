@@ -26,6 +26,12 @@ export const changeTitle = (text) => {
         text
     };
 }
+export const changeFixedTitle = (text) => {
+    return {
+        type: 'CHANGE_FIXED_TITLE',
+        text
+    };
+}
 export const changeEquityTitle = (text) => {
     return {
         type: 'CHANGE_EQUITY_TITLE',
