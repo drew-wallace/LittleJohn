@@ -4,7 +4,10 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { createStore } from 'redux';
-import rgbHex from 'rgb-hex';
+import _ from 'lodash';
+// import rgbHex from 'rgb-hex';
+
+import styles from './styles';
 
 import LittleJohnApp from './reducers';
 import Robinhood from './lib/robinhood';
@@ -24,13 +27,13 @@ import Positions from '../data/positions';
 let app = WinJS.Application;
 const activation = Windows.ApplicationModel.Activation;
 
-const uiSettings = new Windows.UI.ViewManagement.UISettings();
-const rgba = uiSettings.getColorValue(Windows.UI.ViewManagement.UIColorType.accent);
-const cssColorString = rgbHex(rgba.r, rgba.g, rgba.b);
+// const uiSettings = new Windows.UI.ViewManagement.UISettings();
+// const rgba = uiSettings.getColorValue(Windows.UI.ViewManagement.UIColorType.accent);
+// const cssColorString = rgbHex(rgba.r, rgba.g, rgba.b);
 
 let portfolio = processPortfolio(Portfolios, Day, Week, Year, AllTime);
 
-let sessionState = app.sessionState;
+const { positivePrimaryColor, negativePrimaryColor } = styles;
 
 const initialState = {
     title: 'Portfolio',
@@ -39,7 +42,8 @@ const initialState = {
     portfolio: portfolio || [],
     cards: env.cards.results || [],
     positions: Positions.responseJSON || [],
-    robinhood: new Robinhood(env.robinhoodSession || sessionState.robinhoodSession)
+    robinhood: new Robinhood(env.robinhoodSession),
+    primaryColor: (_.last(portfolio.historicals.day).adjusted_open_equity >= portfolio.historicals.day[0].adjusted_open_equity ? positivePrimaryColor : negativePrimaryColor)
 };
 let store = createStore(LittleJohnApp, initialState);
 
@@ -55,7 +59,7 @@ app.onactivated = function (args) {
 
         ReactDOM.render(
             <Provider store={store}>
-                <LoginPage app={app} cssColorString={cssColorString}/>
+                <LoginPage />
             </Provider>,
             document.getElementById('main')
         );
@@ -66,6 +70,9 @@ app.oncheckpoint = function (args) {
     // TODO: This application is about to be suspended. Save any state that needs to persist across suspensions here.
     // You might use the WinJS.Application.sessionState object, which is automatically saved and restored across suspension.
     // If you need to complete an asynchronous operation before your application is suspended, call args.setPromise().
+
+    const state = store.getState();
+    app.sessionState = {...state};
 };
 
 app.start();

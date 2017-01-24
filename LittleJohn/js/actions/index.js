@@ -74,3 +74,11 @@ export const addPosition = (position) => {
         position
     };
 }
+
+export const changePrimaryColor = (color) => {
+    console.log(color);
+    return {
+        type: 'CHANGE_PRIMARY_COLOR',
+        color
+    };
+}

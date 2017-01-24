@@ -16,6 +16,8 @@ class PortfolioPane extends Component {
 	}
 
     render() {
+		let changePrimaryColor = this.props.changePrimaryColor;
+		let primaryColor = this.props.primaryColor;
 		let portfolioSubtitle = this.props.portfolio.subtitle;
 		let {equity, historicals} = this.props.portfolio;
 		let {day, week, month, quarter, year, all} = historicals;
@@ -27,6 +29,7 @@ class PortfolioPane extends Component {
 					subtitle={portfolioSubtitle}
 					margin={{top: 0, right: 0, bottom: 0, left: 0}}
 					data={{day, week, quarter, month, year, all}}
+					changePrimaryColor={changePrimaryColor}
 				/>
 				<RobinhoodCards/>
 				<RobinhoodPositions/>

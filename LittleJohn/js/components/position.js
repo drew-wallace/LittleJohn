@@ -4,9 +4,12 @@ import _ from 'lodash';
 import { scaleLinear, line, extent } from 'd3';
 
 import {formatCurrency} from '../lib/formaters';
+import styles from '../styles';
 
 import {Card, CardActions, CardHeader, CardText} from 'material-ui/Card';
 import FlatButton from 'material-ui/FlatButton';
+
+const { positivePrimaryColor, negativePrimaryColor } = styles;
 
 class RobinhoodPosition extends Component {
     constructor(props) {
@@ -47,9 +50,9 @@ class RobinhoodPosition extends Component {
                         </div>
                     </div>
                     <div style={{flex: '0 1 50%'}}>
-                        <svg className="line-chart-svg" width={width + margin.left + margin.right} height={height + margin.top + margin.bottom}>
-                            <g className="line-chart-container-svg" transform={`translate(${margin.left}, ${margin.top})`}>
-                                <path className="line" d={lineD3(data)}></path>
+                        <svg width={width + margin.left + margin.right} height={height + margin.top + margin.bottom}>
+                            <g transform={`translate(${margin.left}, ${margin.top})`}>
+                                <path fill="none" stroke={(+_.last(data).adjusted_open_equity >= +data[0].adjusted_open_equity ? positivePrimaryColor : negativePrimaryColor)} strokeWidth="2.5px" d={lineD3(data)}></path>
                             </g>
                         </svg>
                     </div>

@@ -1,5 +1,6 @@
 ﻿import { combineReducers } from 'redux';
-import auth from './auth';
+
+import primaryColor from './primary-color';
 import robinhood from './robinhood';
 import menu from './menu';
 import title from './title';
@@ -10,7 +11,7 @@ import cards from './cards';
 import positions from './positions';
 
 const LittleJohnApp = combineReducers({
-    auth,
+    primaryColor,
     robinhood,
     menu,
     title,
@@ -18,7 +19,7 @@ const LittleJohnApp = combineReducers({
     pane,
     portfolio,
     cards,
-    positions,
-})
+    positions
+});
 
 export default LittleJohnApp

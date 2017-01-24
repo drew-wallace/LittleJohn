@@ -5,10 +5,14 @@ import moment from 'moment';
 import _ from 'lodash';
 import { bisector, scaleLinear, line, select, extent, drag, mouse } from 'd3';
 
+import styles from '../styles';
+
 import {formatCurrency, formatCurrencyDiff, formatPercentDiff} from '../lib/formaters';
 
 import {Card, CardActions, CardHeader, CardText} from 'material-ui/Card';
 import FlatButton from 'material-ui/FlatButton';
+
+const { positivePrimaryColor, negativePrimaryColor } = styles;
 
 class RobinhoodChart extends Component {
     constructor(props) {
@@ -31,6 +35,7 @@ class RobinhoodChart extends Component {
             subtitle: this.props.subtitle,
             data: this.props.data.day,
             tab: 'day',
+            primaryColor: (+_.last(this.props.data.day).adjusted_open_equity >= +this.props.data.day[0].adjusted_open_equity ? positivePrimaryColor : negativePrimaryColor),
             margin,
             width,
             height
@@ -62,7 +67,13 @@ class RobinhoodChart extends Component {
 	}
 
     changeTab(tab) {
-		this.setState({tab, data: this.props.data[tab]});
+        const equityKey = (tab == 'day' ? 'adjusted_open_equity' : 'adjusted_close_equity');
+        this.props.changePrimaryColor(+_.last(this.props.data[tab])[equityKey] >= +this.props.data[tab][0][equityKey] ? positivePrimaryColor : negativePrimaryColor)
+		this.setState({
+            tab,
+            data: this.props.data[tab],
+            primaryColor: (+_.last(this.props.data[tab])[equityKey] >= +this.props.data[tab][0][equityKey] ? positivePrimaryColor : negativePrimaryColor)
+        });
 	}
 
 	onResize() {
@@ -205,12 +216,12 @@ class RobinhoodChart extends Component {
                 />
                 <CardText>
                     <div ref="chart_container">
-                        <svg ref="chart" className="line-chart-svg" width={this.state.width + this.state.margin.left + this.state.margin.right} height={this.state.height + this.state.margin.top + this.state.margin.bottom}>
-                            <g className="line-chart-container-svg" transform={`translate(${this.state.margin.left}, ${this.state.margin.top})`}>
-                                <path ref="mainLine" className="line" d={this.lineD3(this.state.data)}></path>
+                        <svg ref="chart" width={this.state.width + this.state.margin.left + this.state.margin.right} height={this.state.height + this.state.margin.top + this.state.margin.bottom}>
+                            <g transform={`translate(${this.state.margin.left}, ${this.state.margin.top})`}>
+                                <path ref="mainLine" fill="none" stroke={this.state.primaryColor} strokeWidth="2.5px" d={this.lineD3(this.state.data)}></path>
 
                                 <g ref="focus" height={this.state.height} transform="translate(0,0)" style={{display: 'none'}}>
-                                    <line x1='0' y1='0' x2='0' y2={this.state.height} stroke="white" strokeWidth="2.5px" className="verticalLine"></line>
+                                    <line x1='0' y1='0' x2='0' y2={this.state.height} stroke="white" strokeWidth="2.5px"></line>
                                 </g>
 
                                 <rect ref="overlay" width={this.state.width} height={this.state.height} style={{fill: 'transparent'}}></rect>
@@ -219,12 +230,12 @@ class RobinhoodChart extends Component {
                     </div>
                 </CardText>
                 <CardActions style={{display: 'flex'}}>
-                    <FlatButton style={{flex: 1, minWidth: 0}} onTouchTap={() => this.changeTab('day')} label="1D" labelStyle={{color: (this.state.tab == 'day' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'day' ? 'active' : '')}`}/>
-                    <FlatButton style={{flex: 1, minWidth: 0}} onTouchTap={() => this.changeTab('week')} label="1W" labelStyle={{color: (this.state.tab == 'week' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'week' ? 'active' : '')}`}/>
-                    <FlatButton style={{flex: 1, minWidth: 0}} onTouchTap={() => this.changeTab('month')} label="1M" labelStyle={{color: (this.state.tab == 'month' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'month' ? 'active' : '')}`}/>
-                    <FlatButton style={{flex: 1, minWidth: 0}} onTouchTap={() => this.changeTab('quarter')} label="3W" labelStyle={{color: (this.state.tab == 'quarter' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'quarter' ? 'active' : '')}`}/>
-                    <FlatButton style={{flex: 1, minWidth: 0}} onTouchTap={() => this.changeTab('year')} label="1Y" labelStyle={{color: (this.state.tab == 'year' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'year' ? 'active' : '')}`}/>
-                    <FlatButton style={{flex: 1, minWidth: 0}} onTouchTap={() => this.changeTab('all')} label="ALL" labelStyle={{color: (this.state.tab == 'all' ? 'white' : '#6DAD62')}} className={`chart-button ${(this.state.tab == 'all' ? 'active' : '')}`}/>
+                    <FlatButton style={{flex: 1, minWidth: 0}} onTouchTap={() => this.changeTab('day')} label="1D" labelStyle={{color: (this.state.tab == 'day' ? 'white' : this.state.primaryColor)}} className={`chart-button ${(this.state.tab == 'day' ? 'active' : '')}`}/>
+                    <FlatButton style={{flex: 1, minWidth: 0}} onTouchTap={() => this.changeTab('week')} label="1W" labelStyle={{color: (this.state.tab == 'week' ? 'white' : this.state.primaryColor)}} className={`chart-button ${(this.state.tab == 'week' ? 'active' : '')}`}/>
+                    <FlatButton style={{flex: 1, minWidth: 0}} onTouchTap={() => this.changeTab('month')} label="1M" labelStyle={{color: (this.state.tab == 'month' ? 'white' : this.state.primaryColor)}} className={`chart-button ${(this.state.tab == 'month' ? 'active' : '')}`}/>
+                    <FlatButton style={{flex: 1, minWidth: 0}} onTouchTap={() => this.changeTab('quarter')} label="3M" labelStyle={{color: (this.state.tab == 'quarter' ? 'white' : this.state.primaryColor)}} className={`chart-button ${(this.state.tab == 'quarter' ? 'active' : '')}`}/>
+                    <FlatButton style={{flex: 1, minWidth: 0}} onTouchTap={() => this.changeTab('year')} label="1Y" labelStyle={{color: (this.state.tab == 'year' ? 'white' : this.state.primaryColor)}} className={`chart-button ${(this.state.tab == 'year' ? 'active' : '')}`}/>
+                    <FlatButton style={{flex: 1, minWidth: 0}} onTouchTap={() => this.changeTab('all')} label="ALL" labelStyle={{color: (this.state.tab == 'all' ? 'white' : this.state.primaryColor)}} className={`chart-button ${(this.state.tab == 'all' ? 'active' : '')}`}/>
                 </CardActions>
             </Card>
         );

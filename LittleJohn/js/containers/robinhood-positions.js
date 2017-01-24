@@ -6,7 +6,8 @@ import Positions from '../components/positions';
 
 const mapStateToProps = (state) => {
     return {
-        positions: state.positions
+        positions: state.positions,
+        primaryColor: state.primaryColor
     }
 }
 

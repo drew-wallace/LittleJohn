@@ -2,19 +2,23 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 
+import { changePrimaryColor } from '../actions';
+
 import Portfolio from '../components/portfolio';
 
 const mapStateToProps = (state) => {
     return {
-        portfolio: state.portfolio
+        portfolio: state.portfolio,
+        primaryColor: state.primaryColor
     }
 }
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        // dismissCard: (e, elm, url) => {
-        //     dispatch(dismissCard(url));
-        // }
+        changePrimaryColor: (color) => {
+            console.log(color);
+            dispatch(changePrimaryColor(color));
+        }
     }
 }
 
