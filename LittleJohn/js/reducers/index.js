@@ -9,6 +9,7 @@ import pane from './pane';
 import portfolio from './portfolio';
 import cards from './cards';
 import positions from './positions';
+import login from './login';
 
 const LittleJohnApp = combineReducers({
     primaryColor,
@@ -19,7 +20,8 @@ const LittleJohnApp = combineReducers({
     pane,
     portfolio,
     cards,
-    positions
+    positions,
+    login
 });
 
 export default LittleJohnApp

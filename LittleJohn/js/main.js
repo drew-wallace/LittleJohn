@@ -34,6 +34,7 @@ const activation = Windows.ApplicationModel.Activation;
 let portfolio = processPortfolio(Portfolios, Day, Week, Year, AllTime);
 
 const { positivePrimaryColor, negativePrimaryColor } = styles;
+const robinhood = new Robinhood(env.robinhoodSession);
 
 const initialState = {
     title: 'Portfolio',
@@ -42,7 +43,8 @@ const initialState = {
     portfolio: portfolio || [],
     cards: env.cards.results || [],
     positions: Positions.responseJSON || [],
-    robinhood: new Robinhood(env.robinhoodSession),
+    robinhood,
+    login: robinhood.isLoggedIn(),
     primaryColor: (_.last(portfolio.historicals.day).adjusted_open_equity >= portfolio.historicals.day[0].adjusted_open_equity ? positivePrimaryColor : negativePrimaryColor)
 };
 let store = createStore(LittleJohnApp, initialState);
