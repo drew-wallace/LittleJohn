@@ -19,21 +19,25 @@ class LoginPage extends Component {
 		super(props);
 	}
 
-  	render() {
+	configureTheme() {
 		darkBaseTheme.palette.primary1Color = this.props.primaryColor;
 		darkBaseTheme.palette.primary2Color = this.props.primaryColor;
 
 		const muiTheme = getMuiTheme(darkBaseTheme);
 
+		return muiTheme;
+	}
+
+  	render() {
 		if(this.props.robinhood.isLoggedIn()) {
 			return (
-				<MuiThemeProvider muiTheme={muiTheme}>
+				<MuiThemeProvider muiTheme={this.configureTheme()}>
 					<AppLayout/>
             	</MuiThemeProvider>
 			);
 		} else {
 			return (
-				<MuiThemeProvider muiTheme={muiTheme}>
+				<MuiThemeProvider muiTheme={this.configureTheme()}>
 					<div style={{position: 'absolute', display: 'flex', height: '100%', width: '100%'}}>
 						<div style={{display: 'flex', alignItems: 'center', flexDirection: 'column', width: '100%', flex: 1, margin: 'auto 0'}}>
 							<TextField

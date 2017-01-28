@@ -12,7 +12,8 @@ const mapStateToProps = (state) => {
 		fixedTitle: state.fixedTitle,
 		menu: state.menu,
 		robinhood: state.robinhood,
-		portfolio: state.portfolio
+		portfolio: state.portfolio,
+		primaryColor: state.primaryColor
     }
 }
 

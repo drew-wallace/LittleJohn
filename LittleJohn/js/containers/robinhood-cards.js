@@ -10,7 +10,8 @@ const mapStateToProps = (state) => {
     return {
         cards: state.cards,
         width: state.width,
-        robinhood: state.robinhood
+        robinhood: state.robinhood,
+        primaryColor: state.primaryColor
     }
 }
 

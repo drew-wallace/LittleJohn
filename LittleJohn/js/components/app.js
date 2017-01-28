@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import { Drawer, AppBar, MenuItem} from 'material-ui'
+import { Drawer, AppBar, MenuItem} from 'material-ui';
 
 import PorfolioPane from '../containers/portfolio-pane';
 
