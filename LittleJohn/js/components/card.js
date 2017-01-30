@@ -13,31 +13,37 @@ class RobinhoodCard extends Component {
 
     handleSwipe(e, elm) {
         let element = ReactDOM.findDOMNode(elm);
-        element.style.transform = `translate(${e.deltaX}px,0px)`;
         element.style.transitionDuration = `0ms`;
+        element.style.transform = `translate(${e.deltaX}px,0px)`;
     }
     handleSwipeEnd(e, elm) {
-        let {url, width, dismissCard, robinhood} = this.props;
+        let {url, dismissCard, robinhood} = this.props;
         let element = ReactDOM.findDOMNode(elm);
+        const width = element.offsetWidth;
         element.style.transitionDuration = `450ms`;
         element.style.transform =  `translate(${e.deltaX}px,0px)`;
         if(Math.abs(e.deltaX / width) >= 0.5) {
-            url = url.split('/');
-            const id = url[url.length - 2];
+            let id = url.split('/');
+            id = id[id.length - 2];
             robinhood.dismissCard(id).then(function(data) {
                 dismissCard(url);
+                element.style.transitionDuration = `0ms`;
+                element.style.transform = `translate(0px,0px)`;
+            }).catch(function(err) {
+                element.style.transform = `translate(0px,0px)`;
+                console.error(err.responseJSON);
             });
         } else {
-            element.style.transform =  `translate(0px,0px)`;
+            element.style.transform = `translate(0px,0px)`;
         }
     }
 
     render() {
-        let {index, url, title, message, call_to_action, width, robinhood, dismissCard, numberOfCards} = this.props;
+        let {index, url, title, message, call_to_action, robinhood, numberOfCards} = this.props;
 
         return (
-            <Hammer ref={url} onPan={(e) => this.handleSwipe(e, this.refs[url])} onPanEnd={(e) => this.handleSwipeEnd(e, this.refs[url])}>
-                <Card style={{width: '100%', position: 'absolute', height: 140, zIndex: numberOfCards - index}}>
+            <Hammer onPan={(e) => this.handleSwipe(e, this.refs[url])} onPanEnd={(e) => this.handleSwipeEnd(e, this.refs[url])}>
+                <Card ref={url} style={{width: '100%', position: 'absolute', height: 140, zIndex: numberOfCards - index}}>
                     <CardText>
                         <div style={{display: 'flex'}}>
                             <div style={{flex: 1}}><Lightbulb/> <span className="card-title">{title}</span></div>

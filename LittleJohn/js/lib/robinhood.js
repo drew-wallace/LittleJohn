@@ -79,7 +79,14 @@ class Robinhood{
             );
             this._setHeaders(request);
             request.send('username=' + username + '&password=' + password);
-            request.onload = function () { request.responseJSON = JSON.parse(request.response); resolve(request); }
+            request.onload = function () {
+                request.responseJSON = JSON.parse(request.response);
+                if (request.status == 200) {
+                    resolve(request);
+                } else {
+                    reject(request);
+                }
+            }
             request.onerror = function () { reject(request); }
         }.bind(this)).then(function(response){
             var body = response.responseJSON;
@@ -99,7 +106,14 @@ class Robinhood{
                 );
                 this._setHeaders(request);
                 request.send();
-                request.onload = function () { request.responseJSON = JSON.parse(request.response); resolve(request); }
+                request.onload = function () {
+                    request.responseJSON = JSON.parse(request.response);
+                    if (request.status == 200) {
+                        resolve(request);
+                    } else {
+                        reject(request);
+                    }
+                }
                 request.onerror = function () { reject(request); }
             }.bind(this));
         }.bind(this)).then(function(response){
@@ -122,7 +136,14 @@ class Robinhood{
             );
             this._setHeaders(request);
             request.send();
-            request.onload = function () { request.responseJSON = JSON.parse(request.response); resolve(request);}.bind(this);
+            request.onload = function () {
+                request.responseJSON = JSON.parse(request.response);
+                if (request.status == 200) {
+                    resolve(request);
+                } else {
+                    reject(request);
+                }
+            }.bind(this);
             request.onerror = function () { reject(request);}.bind(this);
         }.bind(this));
     }
@@ -136,7 +157,14 @@ class Robinhood{
             );
             this._setHeaders(request);
             request.send();
-            request.onload = function () { request.responseJSON = JSON.parse(request.response); resolve(request);}.bind(this);
+            request.onload = function () {
+                request.responseJSON = JSON.parse(request.response);
+                if (request.status == 200) {
+                    resolve(request);
+                } else {
+                    reject(request);
+                }
+            }.bind(this);
             request.onerror = function () { reject(request);}.bind(this);
         }.bind(this));
     }
@@ -150,7 +178,14 @@ class Robinhood{
             );
             this._setHeaders(request);
             request.send();
-            request.onload = function () { request.responseJSON = JSON.parse(request.response); resolve(request);}.bind(this);
+            request.onload = function () {
+                request.responseJSON = JSON.parse(request.response);
+                if (request.status == 200) {
+                    resolve(request);
+                } else {
+                    reject(request);
+                }
+            }.bind(this);
             request.onerror = function () { reject(request);}.bind(this);
         }.bind(this));
     }
@@ -164,7 +199,14 @@ class Robinhood{
             );
             this._setHeaders(request);
             request.send();
-            request.onload = function () { request.responseJSON = JSON.parse(request.response); resolve(request);}.bind(this);
+            request.onload = function () {
+                request.responseJSON = JSON.parse(request.response);
+                if (request.status == 200) {
+                    resolve(request);
+                } else {
+                    reject(request);
+                }
+            }.bind(this);
             request.onerror = function () { reject(request);}.bind(this);
         }.bind(this));
     }
@@ -178,7 +220,14 @@ class Robinhood{
             );
             this._setHeaders(request);
             request.send();
-            request.onload = function () { request.responseJSON = JSON.parse(request.response); resolve(request);}.bind(this);
+            request.onload = function () {
+                request.responseJSON = JSON.parse(request.response);
+                if (request.status == 200) {
+                    resolve(request);
+                } else {
+                    reject(request);
+                }
+            }.bind(this);
             request.onerror = function () { reject(request);}.bind(this);
         }.bind(this));
     }
@@ -192,7 +241,14 @@ class Robinhood{
             );
             this._setHeaders(request);
             request.send();
-            request.onload = function () { request.responseJSON = JSON.parse(request.response); resolve(request);}.bind(this);
+            request.onload = function () {
+                request.responseJSON = JSON.parse(request.response);
+                if (request.status == 200) {
+                    resolve(request);
+                } else {
+                    reject(request);
+                }
+            }.bind(this);
             request.onerror = function () { reject(request);}.bind(this);
         }.bind(this));
     }
@@ -206,7 +262,14 @@ class Robinhood{
             );
             this._setHeaders(request);
             request.send();
-            request.onload = function () { request.responseJSON = JSON.parse(request.response); resolve(request);}.bind(this);
+            request.onload = function () {
+                request.responseJSON = JSON.parse(request.response);
+                if (request.status == 200) {
+                    resolve(request);
+                } else {
+                    reject(request);
+                }
+            }.bind(this);
             request.onerror = function () { reject(request);}.bind(this);
         }.bind(this));
     }
@@ -220,7 +283,14 @@ class Robinhood{
             );
             this._setHeaders(request);
             request.send();
-            request.onload = function () { request.responseJSON = JSON.parse(request.response); resolve(request);}.bind(this);
+            request.onload = function () {
+                request.responseJSON = JSON.parse(request.response);
+                if (request.status == 200) {
+                    resolve(request);
+                } else {
+                    reject(request);
+                }
+            }.bind(this);
             request.onerror = function () { reject(request);}.bind(this);
         }.bind(this));
     }
@@ -245,7 +315,14 @@ class Robinhood{
                     trigger: options.trigger || 'immediate',
                     type: options.type || 'market'
                 }, true));
-            request.onload = function () { request.responseJSON = JSON.parse(request.response); resolve(request);}.bind(this);
+            request.onload = function () {
+                request.responseJSON = JSON.parse(request.response);
+                if (request.status == 200) {
+                    resolve(request);
+                } else {
+                    reject(request);
+                }
+            }.bind(this);
         }.bind(this));
     }
     place_buy_order(options) {
@@ -266,7 +343,14 @@ class Robinhood{
             );
             this._setHeaders(request);
             request.send();
-            request.onload = function () { request.responseJSON = JSON.parse(request.response); resolve(request);}.bind(this);
+            request.onload = function () {
+                request.responseJSON = JSON.parse(request.response);
+                if (request.status == 200) {
+                    resolve(request);
+                } else {
+                    reject(request);
+                }
+            }.bind(this);
             request.onerror = function () { reject(request);}.bind(this);
         }.bind(this));
     }
@@ -282,7 +366,14 @@ class Robinhood{
             );
             this._setHeaders(request);
             request.send();
-            request.onload = function () { request.responseJSON = JSON.parse(request.response); resolve(request);}.bind(this);
+            request.onload = function () {
+                request.responseJSON = JSON.parse(request.response);
+                if (request.status == 200) {
+                    resolve(request);
+                } else {
+                    reject(request);
+                }
+            }.bind(this);
             request.onerror = function () { reject(request);}.bind(this);
         }.bind(this));
     }
@@ -296,7 +387,14 @@ class Robinhood{
             );
             this._setHeaders(request);
             request.send();
-            request.onload = function () { request.responseJSON = JSON.parse(request.response); resolve(request);}.bind(this);
+            request.onload = function () {
+                request.responseJSON = JSON.parse(request.response);
+                if (request.status == 200) {
+                    resolve(request);
+                } else {
+                    reject(request);
+                }
+            }.bind(this);
             request.onerror = function () { reject(request);}.bind(this);
         }.bind(this));
     }
@@ -311,7 +409,14 @@ class Robinhood{
             );
             this._setHeaders(request);
             request.send();
-            request.onload = function () { request.responseJSON = JSON.parse(request.response); resolve(request);}.bind(this);
+            request.onload = function () {
+                request.responseJSON = JSON.parse(request.response);
+                if (request.status == 200) {
+                    resolve(request);
+                } else {
+                    reject(request);
+                }
+            }.bind(this);
             request.onerror = function () { reject(request);}.bind(this);
         }.bind(this));
     }
@@ -326,7 +431,14 @@ class Robinhood{
             );
             this._setHeaders(request);
             request.send();
-            request.onload = function () { request.responseJSON = JSON.parse(request.response); resolve(request);}.bind(this);
+            request.onload = function () {
+                request.responseJSON = JSON.parse(request.response);
+                if (request.status == 200) {
+                    resolve(request);
+                } else {
+                    reject(request);
+                }
+            }.bind(this);
             request.onerror = function () { reject(request);}.bind(this);
         }.bind(this));
     }
@@ -340,7 +452,14 @@ class Robinhood{
             );
             this._setHeaders(request);
             request.send();
-            request.onload = function () { request.responseJSON = JSON.parse(request.response); resolve(request);}.bind(this);
+            request.onload = function () {
+                request.responseJSON = JSON.parse(request.response);
+                if (request.status == 200) {
+                    resolve(request);
+                } else {
+                    reject(request);
+                }
+            }.bind(this);
             request.onerror = function () { reject(request);}.bind(this);
         }.bind(this));
     }
@@ -354,7 +473,14 @@ class Robinhood{
             );
             this._setHeaders(request);
             request.send();
-            request.onload = function () { request.responseJSON = JSON.parse(request.response); resolve(request);}.bind(this);
+            request.onload = function () {
+                request.responseJSON = JSON.parse(request.response);
+                if (request.status == 200) {
+                    resolve(request);
+                } else {
+                    reject(request);
+                }
+            }.bind(this);
             request.onerror = function () { reject(request);}.bind(this);
         }.bind(this));
     }
@@ -368,7 +494,14 @@ class Robinhood{
             );
             this._setHeaders(request);
             request.send();
-            request.onload = function () { request.responseJSON = JSON.parse(request.response); resolve(request);}.bind(this);
+            request.onload = function () {
+                request.responseJSON = JSON.parse(request.response);
+                if (request.status == 200) {
+                    resolve(request);
+                } else {
+                    reject(request);
+                }
+            }.bind(this);
             request.onerror = function () { reject(request);}.bind(this);
         }.bind(this));
     }

@@ -2,14 +2,13 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 
-import { addCard, dismissCard } from '../actions';
+import { dismissCard, fetchCardsIfNeeded } from '../actions';
 
 import Cards from '../components/cards';
 
 const mapStateToProps = (state) => {
     return {
         cards: state.cards,
-        width: state.width,
         robinhood: state.robinhood,
         primaryColor: state.primaryColor
     }
@@ -17,8 +16,11 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        dismissCard: (e, elm, url) => {
+        dismissCard: (url) => {
             dispatch(dismissCard(url));
+        },
+        fetchCardsIfNeeded: () => {
+            dispatch(fetchCardsIfNeeded());
         }
     }
 }

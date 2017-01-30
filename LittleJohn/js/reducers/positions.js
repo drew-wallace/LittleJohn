@@ -1,21 +1,25 @@
-﻿const position = (state = {}, action) => {
+﻿const positions = (state = {}, action) => {
     switch (action.type) {
-        case 'ADD_POSITION':
-            return action.position;
+        case 'INVALIDATE_POSITIONS':
+            return Object.assign({}, state, {
+                didInvalidate: true
+            });
+        case 'REQUEST_POSITIONS':
+            return Object.assign({}, state, {
+                isFetching: true,
+                didInvalidate: false
+            });
+        case 'RECEIVE_POSITIONS':
+            return Object.assign({}, state, {
+                isFetching: false,
+                didInvalidate: false,
+                lastUpdated: action.receivedAt,
+                items: [
+                    ...action.positions
+                ]
+            });
         default:
-            return state;
-    }
-}
-
-const positions = (state = {}, action) => {
-    switch (action.type) {
-        case 'ADD_POSITION':
-            return [
-                ...state,
-                position(undefined, action)
-            ];
-        default:
-            return state;
+            return state
     }
 }
 

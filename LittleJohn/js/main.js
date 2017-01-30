@@ -3,26 +3,21 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
-import { createStore } from 'redux';
+import { createStore, applyMiddleware } from 'redux';
+import thunkMiddleware from 'redux-thunk';
+import createLogger from 'redux-logger'
 import _ from 'lodash';
 // import rgbHex from 'rgb-hex';
-
-import styles from './styles';
 
 import LittleJohnApp from './reducers';
 import Robinhood from './lib/robinhood';
 import processPortfolio from './lib/process-portfolio';
-import { formatCurrency } from './lib/formaters';
 
 import LoginPage from './containers/login-page';
 
 import env from "../env";
-import Portfolios from '../data/portfolios';
-import Day from '../data/day';
-import Week from '../data/week';
-import Year from '../data/year';
-import AllTime from '../data/5year';
-import Positions from '../data/positions';
+
+import styles from './styles';
 
 let app = WinJS.Application;
 const activation = Windows.ApplicationModel.Activation;
@@ -31,21 +26,25 @@ const activation = Windows.ApplicationModel.Activation;
 // const rgba = uiSettings.getColorValue(Windows.UI.ViewManagement.UIColorType.accent);
 // const cssColorString = rgbHex(rgba.r, rgba.g, rgba.b);
 
-let portfolio = processPortfolio(Portfolios, Day, Week, Year, AllTime);
-
-const { positivePrimaryColor, negativePrimaryColor } = styles;
+const { positivePrimaryColor } = styles;
 
 const initialState = {
     title: 'Portfolio',
-    fixedTitle: formatCurrency(portfolio.equity),
+    fixedTitle: '$0.00',
     menu: false,
-    portfolio: portfolio || [],
-    cards: env.cards.results || [],
-    positions: Positions.responseJSON || [],
+    portfolio: {},
+    cards: {},
+    positions: {},
     robinhood: new Robinhood(env.robinhoodSession),
-    primaryColor: (_.last(portfolio.historicals.day).adjusted_open_equity >= portfolio.historicals.day[0].adjusted_open_equity ? positivePrimaryColor : negativePrimaryColor)
+    primaryColor: positivePrimaryColor
 };
-let store = createStore(LittleJohnApp, initialState);
+const loggerMiddleware = createLogger();
+let store = createStore(LittleJohnApp, initialState,
+    applyMiddleware(
+        thunkMiddleware/*,
+        loggerMiddleware*/
+    )
+);
 
 app.onactivated = function (args) {
     if (args.detail.kind === activation.ActivationKind.launch) {

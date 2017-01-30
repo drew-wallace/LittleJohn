@@ -1,6 +1,8 @@
 import React, { Component, PropTypes } from 'react';
 import numeral from 'numeral';
 
+import CircularProgress from 'material-ui/CircularProgress';
+
 import RobinhoodChart from './chart';
 import RobinhoodCards from '../containers/robinhood-cards';
 import RobinhoodPositions from '../containers/robinhood-positions';
@@ -8,33 +10,36 @@ import RobinhoodPositions from '../containers/robinhood-positions';
 class PortfolioPane extends Component {
 	constructor(props) {
 	    super(props);
-
-		this.state = {
-			title: '$0',
-			subtitle: ''
-	    };
 	}
 
     render() {
-		let changePrimaryColor = this.props.changePrimaryColor;
-		let primaryColor = this.props.primaryColor;
-		let portfolioSubtitle = this.props.portfolio.subtitle;
-		let {equity, historicals} = this.props.portfolio;
-		let {day, week, month, quarter, year, all} = historicals;
+		if(this.props.portfolio.lastUpdated) {
+			let changePrimaryColor = this.props.changePrimaryColor;
+			let primaryColor = this.props.primaryColor;
+			let {equity, historicals, subtitle} = this.props.portfolio;
+			let {day, week, month, quarter, year, all} = historicals;
 
-		return (
-			<div>
-				<RobinhoodChart
-					title={equity}
-					subtitle={portfolioSubtitle}
-					margin={{top: 0, right: 0, bottom: 0, left: 0}}
-					data={{day, week, quarter, month, year, all}}
-					changePrimaryColor={changePrimaryColor}
-				/>
-				<RobinhoodCards/>
-				<RobinhoodPositions/>
-			</div>
-		);
+			return (
+				<div>
+					<RobinhoodChart
+						title={equity}
+						subtitle={subtitle}
+						margin={{top: 0, right: 0, bottom: 0, left: 0}}
+						data={{day, week, quarter, month, year, all}}
+						changePrimaryColor={changePrimaryColor}
+					/>
+					<RobinhoodCards/>
+					<RobinhoodPositions/>
+				</div>
+			);
+		} else {
+			this.props.fetchPortfolioIfNeeded();
+			return (
+				<div style={{display: 'flex', width: '100%', height: '100%', alignItems: 'center', marginTop: -75}}>
+					<CircularProgress size={80} thickness={5} style={{marginLeft: 'auto', marginRight: 'auto'}}/>
+				</div>
+			);
+		}
 	}
 }
 

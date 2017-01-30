@@ -1,11 +1,23 @@
-﻿const portfolio = (state = {}, action) => {
+﻿function portfolio(state = { isFetching: false, didInvalidate: false }, action) {
     switch (action.type) {
-        case 'ADD_PORTFOLIO':
+        case 'INVALIDATE_PORTFOLIO':
             return Object.assign({}, state, {
-                portfolio: action.portfolio
+                didInvalidate: true
+            });
+        case 'REQUEST_PORTFOLIO':
+            return Object.assign({}, state, {
+                isFetching: true,
+                didInvalidate: false
+            });
+        case 'RECEIVE_PORTFOLIO':
+            return Object.assign({}, state, {
+                isFetching: false,
+                didInvalidate: false,
+                lastUpdated: action.receivedAt,
+                ...action.portfolio
             });
         default:
-            return state;
+            return state
     }
 }
 
