@@ -27,6 +27,7 @@ const activation = Windows.ApplicationModel.Activation;
 // const cssColorString = rgbHex(rgba.r, rgba.g, rgba.b);
 
 const { positivePrimaryColor } = styles;
+const robinhood = new Robinhood(env.robinhoodSession);
 
 const initialState = {
     title: 'Portfolio',
@@ -35,7 +36,8 @@ const initialState = {
     portfolio: {},
     cards: {},
     positions: {},
-    robinhood: new Robinhood(env.robinhoodSession),
+    robinhood,
+    login: robinhood.isLoggedIn(),
     primaryColor: positivePrimaryColor
 };
 const loggerMiddleware = createLogger();

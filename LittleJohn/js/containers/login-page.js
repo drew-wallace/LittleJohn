@@ -8,7 +8,8 @@ import Login from '../components/login';
 const mapStateToProps = (state) => {
     return {
 		robinhood: state.robinhood,
-        primaryColor: state.primaryColor
+        primaryColor: state.primaryColor,
+        login: state.login
     }
 }
 
