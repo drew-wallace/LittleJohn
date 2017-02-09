@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 
 import Positions from '../components/positions';
 
-import { fetchPositionsIfNeeded } from '../actions';
+import { fetchPositionsIfNeeded, changeCurrentPane } from '../actions';
 
 const mapStateToProps = (state) => {
     return {
@@ -15,8 +15,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        showStockOverlay: (symbol) => {
-            console.log('showStockOverlay:', symbol);
+        changeCurrentPane: (symbol) => {
+            dispatch(changeCurrentPane(symbol));
         },
         fetchPositionsIfNeeded: () => {
             dispatch(fetchPositionsIfNeeded());

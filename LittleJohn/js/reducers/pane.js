@@ -8,6 +8,10 @@
             return Object.assign({}, state, {
                 paneSubtitle: action.text
             });
+        case 'CHANGE_CURRENT_PANE':
+            return Object.assign({}, state, {
+                currentPane: state.stocks[action.symbol].instrument.name
+            })
         default:
             return state;
     }

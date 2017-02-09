@@ -4,7 +4,7 @@ import CircularProgress from 'material-ui/CircularProgress';
 
 import RobinhoodPosition from './position';
 
-const RobinhoodPositions = ({ positions, showStockOverlay, fetchPositionsIfNeeded }) => {
+const RobinhoodPositions = ({ positions, changeCurrentPane, fetchPositionsIfNeeded }) => {
     if(positions.lastUpdated) {
         return (
             <div>
@@ -12,7 +12,7 @@ const RobinhoodPositions = ({ positions, showStockOverlay, fetchPositionsIfNeede
                     <RobinhoodPosition
                         key={i}
                         {...position}
-                        showStockOverlay={showStockOverlay}
+                        changeCurrentPane={changeCurrentPane}
                     />
                 )}
             </div>

@@ -101,6 +101,20 @@ export const changePrimaryColor = (color) => {
     };
 }
 
+export const updateStocks = (stocks) => {
+    return {
+        type: 'UPDATE_STOCKS',
+        stocks
+    }
+}
+
+export const changeCurrentPane = (symbol) => {
+    return {
+        type: 'CHANGE_CURRENT_PANE',
+        symbol
+    }
+}
+
 export const invalidatePortfolio = (portfolio) => {
   return {
     type: 'INVALIDATE_PORTFOLIO',
@@ -327,10 +341,14 @@ function fetchPositions(state) {
         //         // Windows.Storage.ApplicationData.current.localFolder.createFileAsync("positions.json", Windows.Storage.CreationCollisionOption.replaceExisting).then(function (sampleFile) {
         //         //     return Windows.Storage.FileIO.writeTextAsync(sampleFile, JSON.stringify(positions));
         //         // });
+        //         positions = _.mapKeys(stock => stock.instrument.symbol);
         //         dispatch(receivePositions(positions));
+        //         dispatch(updateStocks(positions));
         //     });
         // });
+        Positions.responseJSON = _.mapKeys(stock => stock.instrument.symbol);
         dispatch(receivePositions(Positions.responseJSON));
+        dispatch(updateStocks(Positions.responseJSON));
     }
 }
 
