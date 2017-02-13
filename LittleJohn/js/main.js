@@ -35,10 +35,12 @@ const initialState = {
         floatingTitle: 'Portfolio',
         isStock: false,
         isPosition: false,
-        isWatchlist: false
+        isWatchlist: false,
     },
     menu: false,
-    portfolio: {},
+    portfolio: {
+        displayedValue: 'price'
+    },
     cards: {},
     positions: {},
     robinhood,

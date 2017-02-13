@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 
-import { Drawer, AppBar, MenuItem } from 'material-ui';
+import { Drawer, AppBar, MenuItem, IconButton, IconMenu, RadioButtonGroup, RadioButton } from 'material-ui';
 import ArrowBack from 'material-ui/svg-icons/navigation/arrow-back';
 import AddCircleOutline from 'material-ui/svg-icons/content/add-circle-outline';
 import RemoveCircleOutline from 'material-ui/svg-icons/content/remove-circle-outline';
+import MoreVert from 'material-ui/svg-icons/navigation/more-vert';
+import Search from 'material-ui/svg-icons/action/search';
 
 import PorfolioPane from '../containers/portfolio-pane';
 
@@ -11,6 +13,9 @@ class AppLayout extends Component {
 
 	constructor(props){
 		super(props);
+		this.state = {
+			moreOpen: false
+		}
 	}
 
 	handleToggle() {
@@ -34,38 +39,103 @@ class AppLayout extends Component {
 		this.props.undoTitle();
 	}
 
+	handleDisplayedValue() {
+		console.log('Need to call a function to change watch list and position values');
+		this.setState({
+			moreOpen: false
+		});
+	}
+
+	toggleMoreMenu() {
+		this.setState({
+			moreOpen: !this.state.moreOpen
+		});
+	}
+
     render() {
-		let titleBar = (
-			<div style={{height: 55}}></div>
-		);
-
-		if(this.props.title.present.floatingTitle == 'Portfolio') {
-			titleBar = (
-				<AppBar
-					title={this.props.title.present.floatingTitle}
-					onLeftIconButtonTouchTap={this.handleToggle.bind(this)}
-					style={{height: 130, paddingTop: 75, marginTop: -75}}
-					iconStyleLeft={{marginBottom: 8, alignSelf: 'center'}}
-					titleStyle={{alignSelf: 'center'}}
-				/>
-			);
-		}
-
 		let iconElementLeft = null;
 		let iconElementRight = null;
 		let onLeftIconButtonTouchTap = this.handleToggle.bind(this);
 
 		if(this.props.title.present.hasBackButton) {
-			iconElementLeft = (<ArrowBack/>);
+			iconElementLeft = (
+				<IconButton>
+					<ArrowBack/>
+				</IconButton>
+			);
 			onLeftIconButtonTouchTap = this.handleBack.bind(this);
 		}
 
 		if(this.props.title.present.isStock) {
 			if(this.props.title.present.isWatchList) {
-				iconElementRight = (<AddCircleOutline/>);
+				iconElementRight = (
+					<IconButton>
+						<AddCircleOutline/>
+					</IconButton>
+				);
 			} else {
-				iconElementRight = (<RemoveCircleOutline/>);
+				iconElementRight = (
+					<IconButton>
+						<RemoveCircleOutline/>
+					</IconButton>
+				);
 			}
+		}
+
+		let titleBar = (
+			<div style={{height: 55}}></div>
+		);
+
+		if(this.props.title.present.floatingTitle == 'Portfolio') {
+			iconElementRight = (
+				<div style={{display: 'flex'}}>
+					<IconButton onTouchTap={() => console.log('Searching here')} style={{flex: 1}}>
+						<Search/>
+					</IconButton>
+					<IconMenu
+						onTouchTap={() => this.toggleMoreMenu()}
+						iconButtonElement={<IconButton><MoreVert/></IconButton>}
+						open={this.state.moreOpen}
+						useLayerForClickAway={true}
+						anchorOrigin={{horizontal: 'right', vertical: 'top'}}
+						targetOrigin={{horizontal: 'right', vertical: 'top'}}
+						listStyle={{paddingLeft: 8, width: 165}}
+						style={{flex: 1}}
+					>
+						<RadioButtonGroup name="stockValueDisplay" labelPosition="left" defaultSelected={'price'}>
+							<RadioButton
+								value="price"
+								label="Last Price"
+								style={{paddingTop: 8, paddingBottom: 8}}
+								onTouchTap={() => this.handleDisplayedValue('price')}
+							/>
+							<RadioButton
+								value="equity"
+								label="Equity"
+								style={{paddingTop: 8, paddingBottom: 8}}
+								onTouchTap={() => this.handleDisplayedValue('equity')}
+							/>
+							<RadioButton
+								value="percent"
+								label="Percent Change"
+								style={{paddingTop: 8, paddingBottom: 8}}
+								onTouchTap={() => this.handleDisplayedValue('percent')}
+							/>
+						</RadioButtonGroup>
+					</IconMenu>
+				</div>
+			);
+			titleBar = (
+				<AppBar
+					title={this.props.title.present.floatingTitle}
+					titleStyle={{alignSelf: 'center'}}
+					onLeftIconButtonTouchTap={this.handleToggle.bind(this)}
+					iconStyleLeft={{marginBottom: 8, alignSelf: 'center'}}
+					iconElementRight={iconElementRight}
+					iconStyleRight={{marginBottom: 8, alignSelf: 'center'}}
+					style={{height: 130, paddingTop: 75, marginTop: -75}}
+				/>
+			);
 		}
 
         return (
