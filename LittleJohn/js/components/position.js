@@ -17,7 +17,7 @@ class RobinhoodPosition extends Component {
     }
 
     render() {
-        let { historicals, instrument, quantity, quote, changeCurrentPane } = this.props;
+        let { historicals, instrument, quantity, quote, changeTitle } = this.props;
 
         const margin = {top: 0, right: 0, bottom: 0, left: 0};
         const width = 100 - margin.left - margin.right;
@@ -39,7 +39,7 @@ class RobinhoodPosition extends Component {
         y.domain(extent(data, function(d) { return d.yVal; }));
 
         return (
-            <FlatButton onTouchTap={() => changeCurrentPane(instrument.symbol)} backgroundColor="#303030" hoverColor="#434343" rippleColor='#bdbdbd' style={{width: '100%', marginBottom: 15, height: 'auto'}}>
+            <FlatButton onTouchTap={() => changeTitle(instrument.name)} backgroundColor="#303030" hoverColor="#434343" rippleColor='#bdbdbd' style={{width: '100%', marginBottom: 15, height: 'auto'}}>
                 <div style={{display: 'flex', height: '100%', alignItems: 'center'}}>
                     <div style={{display: 'flex', flexDirection: 'column', flex: '0 1 25%', alignItems: 'center'}}>
                         <div style={{flex: 1}}>

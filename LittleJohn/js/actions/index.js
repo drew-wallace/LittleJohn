@@ -39,16 +39,24 @@ export const toggleMenu = (open) => {
         open
     };
 }
-export const changeTitle = (text) => {
+export const changeTitle = (fixedTitle, floatingTitle, isStock=false, isPosition=false, isWatchlist=false) => {
     return {
         type: 'CHANGE_TITLE',
-        text
+        fixedTitle,
+        floatingTitle,
+        isStock,
+        isPosition,
+        isWatchlist
     };
 }
-export const changeFixedTitle = (text) => {
+export const undoTitle = () => {
     return {
-        type: 'CHANGE_FIXED_TITLE',
-        text
+        type: 'UNDO_TITLE'
+    };
+}
+export const redoTitle = () => {
+    return {
+        type: 'REDO_TITLE'
     };
 }
 export const changeEquityTitle = (text) => {
@@ -105,13 +113,6 @@ export const updateStocks = (stocks) => {
     return {
         type: 'UPDATE_STOCKS',
         stocks
-    }
-}
-
-export const changeCurrentPane = (symbol) => {
-    return {
-        type: 'CHANGE_CURRENT_PANE',
-        symbol
     }
 }
 
@@ -173,7 +174,7 @@ function fetchPortfolio(state) {
 				// 	return Windows.Storage.FileIO.writeTextAsync(sampleFile, allRes.responseText);
 				// });
 				const portfolio = processPortfolio(portfolioRes, dayRes, weekRes, yearRes, allRes);
-                dispatch(changeFixedTitle(formatCurrency(portfolio.equity)));
+                dispatch(changeTitle(formatCurrency(portfolio.equity), 'Portfolio'));
                 dispatch(changePrimaryColor((_.last(portfolio.historicals.day).adjusted_open_equity >= portfolio.historicals.day[0].adjusted_open_equity ? positivePrimaryColor : negativePrimaryColor)));
                 dispatch(receivePortfolio(portfolio));
 			}
@@ -341,12 +342,12 @@ function fetchPositions(state) {
         //         // Windows.Storage.ApplicationData.current.localFolder.createFileAsync("positions.json", Windows.Storage.CreationCollisionOption.replaceExisting).then(function (sampleFile) {
         //         //     return Windows.Storage.FileIO.writeTextAsync(sampleFile, JSON.stringify(positions));
         //         // });
-        //         positions = _.mapKeys(stock => stock.instrument.symbol);
+        //         positions = _.mapKeys(positions, stock => stock.instrument.symbol);
         //         dispatch(receivePositions(positions));
         //         dispatch(updateStocks(positions));
         //     });
         // });
-        Positions.responseJSON = _.mapKeys(stock => stock.instrument.symbol);
+        Positions.responseJSON = _.mapKeys(Positions.responseJSON, stock => stock.instrument.symbol);
         dispatch(receivePositions(Positions.responseJSON));
         dispatch(updateStocks(Positions.responseJSON));
     }

@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 
 import Positions from '../components/positions';
 
-import { fetchPositionsIfNeeded, changeCurrentPane } from '../actions';
+import { fetchPositionsIfNeeded, changeTitle } from '../actions';
 
 const mapStateToProps = (state) => {
     return {
@@ -15,9 +15,9 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        changeCurrentPane: (symbol) => {
-            dispatch(changeCurrentPane(symbol));
-        },
+        changeTitle: (fixedTitle) => {
+			dispatch(changeTitle(fixedTitle, '', false, true));
+		},
         fetchPositionsIfNeeded: () => {
             dispatch(fetchPositionsIfNeeded());
         }

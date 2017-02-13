@@ -30,8 +30,13 @@ const { positivePrimaryColor } = styles;
 const robinhood = new Robinhood(env.robinhoodSession);
 
 const initialState = {
-    title: 'Portfolio',
-    fixedTitle: '$0.00',
+    title: {
+        fixedTitle: '$0.00',
+        floatingTitle: 'Portfolio',
+        isStock: false,
+        isPosition: false,
+        isWatchlist: false
+    },
     menu: false,
     portfolio: {},
     cards: {},

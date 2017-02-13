@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 
-import { Drawer, AppBar, MenuItem} from 'material-ui';
+import { Drawer, AppBar, MenuItem } from 'material-ui';
+import ArrowBack from 'material-ui/svg-icons/navigation/arrow-back';
+import AddCircleOutline from 'material-ui/svg-icons/content/add-circle-outline';
+import RemoveCircleOutline from 'material-ui/svg-icons/content/remove-circle-outline';
 
 import PorfolioPane from '../containers/portfolio-pane';
 
@@ -16,11 +19,10 @@ class AppLayout extends Component {
 
 	changeTitle(title) {
 		this.props.toggleMenu(false);
-		this.props.changeTitle(title);
 		if(title == 'Portfolio') {
-			this.props.changeFixedTitle(this.props.portfolio.equity)
+			this.props.changeTitle(this.props.portfolio.equity, title);
 		} else {
-			this.props.changeFixedTitle(title);
+			this.props.changeTitle(title, '');
 		}
 	}
 
@@ -28,21 +30,42 @@ class AppLayout extends Component {
 		this.props.toggleMenu(false);
 	}
 
+	handleBack() {
+		this.props.undoTitle();
+	}
+
     render() {
 		let titleBar = (
 			<div style={{height: 55}}></div>
 		);
 
-		if(this.props.title == 'Portfolio') {
+		if(this.props.title.present.floatingTitle == 'Portfolio') {
 			titleBar = (
 				<AppBar
-					title={this.props.title}
+					title={this.props.title.present.floatingTitle}
 					onLeftIconButtonTouchTap={this.handleToggle.bind(this)}
 					style={{height: 130, paddingTop: 75, marginTop: -75}}
 					iconStyleLeft={{marginBottom: 8, alignSelf: 'center'}}
 					titleStyle={{alignSelf: 'center'}}
 				/>
 			);
+		}
+
+		let iconElementLeft = null;
+		let iconElementRight = null;
+		let onLeftIconButtonTouchTap = this.handleToggle.bind(this);
+
+		if(this.props.title.present.hasBackButton) {
+			iconElementLeft = (<ArrowBack/>);
+			onLeftIconButtonTouchTap = this.handleBack.bind(this);
+		}
+
+		if(this.props.title.present.isStock) {
+			if(this.props.title.present.isWatchList) {
+				iconElementRight = (<AddCircleOutline/>);
+			} else {
+				iconElementRight = (<RemoveCircleOutline/>);
+			}
 		}
 
         return (
@@ -79,11 +102,14 @@ class AppLayout extends Component {
 					<MenuItem onTouchTap={() => this.changeTitle('Help')}>Help</MenuItem>
 				</Drawer>
 				<AppBar
-					title={this.props.fixedTitle}
-					onLeftIconButtonTouchTap={this.handleToggle.bind(this)}
-					style={{height: 55}}
-					iconStyleLeft={{marginBottom: 8, alignSelf: 'center'}}
+					title={this.props.title.present.fixedTitle}
 					titleStyle={{alignSelf: 'center'}}
+					iconElementLeft={iconElementLeft}
+					iconStyleLeft={{marginBottom: 8, alignSelf: 'center'}}
+					onLeftIconButtonTouchTap={onLeftIconButtonTouchTap}
+					iconElementRight={iconElementRight}
+					iconStyleRight={{marginBottom: 8, alignSelf: 'center'}}
+					style={{height: 55}}
 				/>
 				<div className="scrollable-pane-content">
 					{titleBar}

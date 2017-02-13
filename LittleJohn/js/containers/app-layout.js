@@ -2,14 +2,13 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 
-import { toggleMenu, closeMenu, changeTitle, changeFixedTitle } from '../actions'
+import { toggleMenu, closeMenu, changeTitle, undoTitle, redoTitle } from '../actions';
 
 import App from '../components/app';
 
 const mapStateToProps = (state) => {
     return {
 		title: state.title,
-		fixedTitle: state.fixedTitle,
 		menu: state.menu,
 		robinhood: state.robinhood,
 		portfolio: state.portfolio,
@@ -19,15 +18,10 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        toggleMenu: (open) => {
-            dispatch(toggleMenu(open));
-        },
-		changeTitle: (text) => {
-			dispatch(changeTitle(text));
-		},
-		changeFixedTitle: (text) => {
-			dispatch(changeFixedTitle(text));
-		}
+        toggleMenu: (open) => dispatch(toggleMenu(open)),
+		changeTitle: (fixedTitle, floatingTitle) => dispatch(changeTitle(fixedTitle, floatingTitle, false, false, false)),
+		undoTitle: () => dispatch(undoTitle()),
+		redoTitle: () => dispatch(redoTitle())
     }
 }
 

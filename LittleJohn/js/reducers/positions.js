@@ -14,9 +14,8 @@
                 isFetching: false,
                 didInvalidate: false,
                 lastUpdated: action.receivedAt,
-                items: [
-                    ...action.positions
-                ]
+                items: action.positions
+
             });
         default:
             return state

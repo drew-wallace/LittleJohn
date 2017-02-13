@@ -4,7 +4,6 @@ import primaryColor from './primary-color';
 import robinhood from './robinhood';
 import menu from './menu';
 import title from './title';
-import fixedTitle from './fixed-title';
 import pane from './pane';
 import portfolio from './portfolio';
 import cards from './cards';
@@ -17,7 +16,6 @@ const LittleJohnApp = combineReducers({
     robinhood,
     menu,
     title,
-    fixedTitle,
     pane,
     portfolio,
     cards,

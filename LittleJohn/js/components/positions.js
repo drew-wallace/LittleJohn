@@ -1,18 +1,19 @@
+import _ from 'lodash';
 import React, { Component, PropTypes } from 'react';
 
 import CircularProgress from 'material-ui/CircularProgress';
 
 import RobinhoodPosition from './position';
 
-const RobinhoodPositions = ({ positions, changeCurrentPane, fetchPositionsIfNeeded }) => {
+const RobinhoodPositions = ({ positions, changeTitle, fetchPositionsIfNeeded }) => {
     if(positions.lastUpdated) {
         return (
             <div>
-                {(positions.items || []).map((position, i) =>
+                {_.map((_.values(positions.items) || []), (position, i) =>
                     <RobinhoodPosition
                         key={i}
                         {...position}
-                        changeCurrentPane={changeCurrentPane}
+                        changeTitle={changeTitle}
                     />
                 )}
             </div>
