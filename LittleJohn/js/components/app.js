@@ -39,16 +39,16 @@ class AppLayout extends Component {
 		this.props.undoTitle();
 	}
 
-	handleDisplayedValue() {
-		console.log('Need to call a function to change watch list and position values');
+	handleDisplayedValue(value) {
+		this.props.changeDisplayedValue(value);
 		this.setState({
 			moreOpen: false
 		});
 	}
 
-	toggleMoreMenu() {
+	toggleMoreMenu(open) {
 		this.setState({
-			moreOpen: !this.state.moreOpen
+			moreOpen: open
 		});
 	}
 
@@ -93,33 +93,36 @@ class AppLayout extends Component {
 						<Search/>
 					</IconButton>
 					<IconMenu
-						onTouchTap={() => this.toggleMoreMenu()}
 						iconButtonElement={<IconButton><MoreVert/></IconButton>}
 						open={this.state.moreOpen}
 						useLayerForClickAway={true}
+						onRequestChange={(open) => this.toggleMoreMenu(open)}
 						anchorOrigin={{horizontal: 'right', vertical: 'top'}}
 						targetOrigin={{horizontal: 'right', vertical: 'top'}}
 						listStyle={{paddingLeft: 8, width: 165}}
 						style={{flex: 1}}
 					>
-						<RadioButtonGroup name="stockValueDisplay" labelPosition="left" defaultSelected={'price'}>
+						<RadioButtonGroup
+							name="stockValueDisplay"
+							labelPosition="left"
+							defaultSelected="price"
+							valueSelected={this.props.settings.displayedValue}
+							onChange={(e, value) => this.handleDisplayedValue(value)}
+						>
 							<RadioButton
 								value="price"
 								label="Last Price"
 								style={{paddingTop: 8, paddingBottom: 8}}
-								onTouchTap={() => this.handleDisplayedValue('price')}
 							/>
 							<RadioButton
 								value="equity"
 								label="Equity"
 								style={{paddingTop: 8, paddingBottom: 8}}
-								onTouchTap={() => this.handleDisplayedValue('equity')}
 							/>
 							<RadioButton
 								value="percent"
 								label="Percent Change"
 								style={{paddingTop: 8, paddingBottom: 8}}
-								onTouchTap={() => this.handleDisplayedValue('percent')}
 							/>
 						</RadioButtonGroup>
 					</IconMenu>

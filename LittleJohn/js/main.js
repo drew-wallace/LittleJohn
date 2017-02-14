@@ -38,9 +38,10 @@ const initialState = {
         isWatchlist: false,
     },
     menu: false,
-    portfolio: {
-        displayedValue: 'price'
+    settings: {
+        displayedValue: 'price',
     },
+    portfolio: {},
     cards: {},
     positions: {},
     robinhood,

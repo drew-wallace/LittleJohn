@@ -49,6 +49,12 @@ export const changeTitle = (fixedTitle, floatingTitle, isStock=false, isPosition
         isWatchlist
     };
 }
+export const changeDisplayedValue = (value) => {
+    return {
+        type: 'CHANGE_DISPLAYED_VALUE',
+        value
+    };
+}
 export const undoTitle = () => {
     return {
         type: 'UNDO_TITLE'
@@ -173,7 +179,7 @@ function fetchPortfolio(state) {
 				// Windows.Storage.ApplicationData.current.localFolder.createFileAsync("5year.json", Windows.Storage.CreationCollisionOption.replaceExisting).then(function (sampleFile) {
 				// 	return Windows.Storage.FileIO.writeTextAsync(sampleFile, allRes.responseText);
 				// });
-				const portfolio = processPortfolio(portfolioRes, dayRes, weekRes, yearRes, allRes);
+                const portfolio = processPortfolio(portfolioRes, dayRes, weekRes, yearRes, allRes);
                 dispatch(changeTitle(formatCurrency(portfolio.equity), 'Portfolio'));
                 dispatch(changePrimaryColor((_.last(portfolio.historicals.day).adjusted_open_equity >= portfolio.historicals.day[0].adjusted_open_equity ? positivePrimaryColor : negativePrimaryColor)));
                 dispatch(receivePortfolio(portfolio));
