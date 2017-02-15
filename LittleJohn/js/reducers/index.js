@@ -9,6 +9,7 @@ import pane from './pane';
 import portfolio from './portfolio';
 import cards from './cards';
 import positions from './positions';
+import watchlist from './watchlist';
 import login from './login';
 import stocks from './stocks';
 
@@ -22,6 +23,7 @@ const LittleJohnApp = combineReducers({
     portfolio,
     cards,
     positions,
+    watchlist,
     login,
     stocks
 });

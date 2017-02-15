@@ -31,11 +31,15 @@ const robinhood = new Robinhood(env.robinhoodSession);
 
 const initialState = {
     title: {
-        fixedTitle: '$0.00',
-        floatingTitle: 'Portfolio',
-        isStock: false,
-        isPosition: false,
-        isWatchlist: false,
+        past: [],
+        present: {
+            fixedTitle: '$0.00',
+            floatingTitle: 'Portfolio',
+            isStock: false,
+            isPosition: false,
+            isWatchlist: false,
+        },
+        future: []
     },
     menu: false,
     settings: {
@@ -44,6 +48,7 @@ const initialState = {
     portfolio: {},
     cards: {},
     positions: {},
+    watchlist: {},
     robinhood,
     login: robinhood.isLoggedIn(),
     primaryColor: positivePrimaryColor

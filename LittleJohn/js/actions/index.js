@@ -14,6 +14,7 @@ import Week from '../../data/week';
 import Year from '../../data/year';
 import AllTime from '../../data/5year';
 import Positions from '../../data/positions';
+import Watchlist from '../../data/watchlist';
 
 const { positivePrimaryColor, negativePrimaryColor } = styles;
 
@@ -385,6 +386,109 @@ export function fetchPositionsIfNeeded() {
         if (shouldFetchPositions(state)) {
             // Dispatch a thunk from thunk!
             return dispatch(fetchPositions(state));
+        } else {
+            // Let the calling code know there's nothing to wait for.
+            return Promise.resolve()
+        }
+    };
+}
+
+export const invalidateWatchlist = (watchlist) => {
+  return {
+    type: 'INVALIDATE_WATCHLIST',
+    watchlist
+  }
+}
+
+function requestWatchlist() {
+    return {
+        type: 'REQUEST_WATCHLIST'
+    };
+}
+
+function receiveWatchlist(watchlist) {
+    return {
+        type: 'RECEIVE_WATCHLIST',
+        watchlist,
+        receivedAt: Date.now()
+    };
+}
+
+function fetchWatchlist(state) {
+    return dispatch => {
+        dispatch(requestWatchlist());
+
+        // let robinhood = state.robinhood;
+
+        // robinhood.watchlists('Default').then(function(watchlist){
+        //     var promises = [];
+        //     var currentWatchlist = watchlist.responseJSON.results.forEach(function(stock){
+        //         promises.push(robinhood.instrument(stock.instrument).then(function(response){
+        //             stock.instrument = response.responseJSON;
+        //             return response.responseJSON.symbol;
+        //         }).then(function(symbol){
+        //             if(!state.stocks[symbol]) {
+        //                 return Promise.join(
+        //                     robinhood.quote_data(symbol),
+        //                     robinhood.symbolHistoricals(symbol, {span: 'day', interval: '5minute'}),
+        //                     robinhood.symbolHistoricals(symbol, {span: 'week', interval: '10minute'}),
+        //                     robinhood.symbolHistoricals(symbol, {span: 'year', interval: 'day'}),
+        //                     robinhood.symbolHistoricals(symbol, {span: '5year', interval: 'week'}),
+        //                     function(quoteRes, dayRes, weekRes, yearRes, allRes) {
+        //                         stock.quote = quoteRes.responseJSON.results[0];
+        //                         stock.historicals = {
+        //                             day: dayRes.responseJSON.historicals,
+        //                             week: weekRes.responseJSON.historicals,
+        //                             year: yearRes.responseJSON.historicals,
+        //                             all: allRes.responseJSON.historicals
+        //                         };
+
+        //                         return stock;
+        //                     });
+        //             }
+        //         }));
+        //     });
+        //     return Promise.all(promises).then(function(watchlist){
+        //         // Windows.Storage.ApplicationData.current.localFolder.createFileAsync("watchlist.json", Windows.Storage.CreationCollisionOption.replaceExisting).then(function (sampleFile) {
+        //         //     return Windows.Storage.FileIO.writeTextAsync(sampleFile, JSON.stringify(watchlist));
+        //         // });
+        //         watchlist = _.filter(watchlist, stock => _.get(stock, 'instrument.symbol'));
+        //         watchlist = _.mapKeys(watchlist, stock => _.get(stock, 'instrument.symbol'));
+        //         dispatch(receiveWatchlist(watchlist));
+        //         dispatch(updateStocks(watchlist));
+        //     });
+        // });
+        dispatch(receiveWatchlist(Watchlist.responseJSON));
+        dispatch(updateStocks(Watchlist.responseJSON));
+    }
+}
+
+function shouldFetchWatchlist(state) {
+    const watchlist = state.watchlist;
+
+    if (_.isEmpty(watchlist)) {
+        return true;
+    } else if (watchlist.isFetching) {
+        return false;
+    } else {
+        return watchlist.didInvalidate;
+    }
+}
+
+export function fetchWatchlistIfNeeded() {
+
+    // Note that the function also receives getState()
+    // which lets you choose what to dispatch next.
+
+    // This is useful for avoiding a network request if
+    // a cached value is already available.
+
+    return (dispatch, getState) => {
+        const state = getState();
+
+        if (shouldFetchWatchlist(state)) {
+            // Dispatch a thunk from thunk!
+            return dispatch(fetchWatchlist(state));
         } else {
             // Let the calling code know there's nothing to wait for.
             return Promise.resolve()

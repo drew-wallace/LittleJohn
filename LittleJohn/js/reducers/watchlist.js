@@ -1,24 +1,24 @@
-﻿const positions = (state = {}, action) => {
+﻿const watchlist = (state = {}, action) => {
     switch (action.type) {
-        case 'INVALIDATE_POSITIONS':
+        case 'INVALIDATE_WATCHLIST':
             return Object.assign({}, state, {
                 didInvalidate: true
             });
-        case 'REQUEST_POSITIONS':
+        case 'REQUEST_WATCHLIST':
             return Object.assign({}, state, {
                 isFetching: true,
                 didInvalidate: false
             });
-        case 'RECEIVE_POSITIONS':
+        case 'RECEIVE_WATCHLIST':
             return Object.assign({}, state, {
                 isFetching: false,
                 didInvalidate: false,
                 lastUpdated: action.receivedAt,
-                items: action.positions
+                items: action.watchlist
             });
         default:
             return state
     }
 }
 
-export default positions;
+export default watchlist;

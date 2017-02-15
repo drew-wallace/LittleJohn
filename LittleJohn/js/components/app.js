@@ -8,6 +8,7 @@ import MoreVert from 'material-ui/svg-icons/navigation/more-vert';
 import Search from 'material-ui/svg-icons/action/search';
 
 import PorfolioPane from '../containers/portfolio-pane';
+import PositionPane from '../containers/position-pane';
 
 class AppLayout extends Component {
 
@@ -56,6 +57,7 @@ class AppLayout extends Component {
 		let iconElementLeft = null;
 		let iconElementRight = null;
 		let onLeftIconButtonTouchTap = this.handleToggle.bind(this);
+		let pane = (<div>If you're seeing this, I messed something up...</div>)
 
 		if(this.props.title.present.hasBackButton) {
 			iconElementLeft = (
@@ -86,59 +88,70 @@ class AppLayout extends Component {
 			<div style={{height: 55}}></div>
 		);
 
-		if(this.props.title.present.floatingTitle == 'Portfolio') {
-			iconElementRight = (
-				<div style={{display: 'flex'}}>
-					<IconButton onTouchTap={() => console.log('Searching here')} style={{flex: 1}}>
-						<Search/>
-					</IconButton>
-					<IconMenu
-						iconButtonElement={<IconButton><MoreVert/></IconButton>}
-						open={this.state.moreOpen}
-						useLayerForClickAway={true}
-						onRequestChange={(open) => this.toggleMoreMenu(open)}
-						anchorOrigin={{horizontal: 'right', vertical: 'top'}}
-						targetOrigin={{horizontal: 'right', vertical: 'top'}}
-						listStyle={{paddingLeft: 8, width: 165}}
-						style={{flex: 1}}
-					>
-						<RadioButtonGroup
-							name="stockValueDisplay"
-							labelPosition="left"
-							defaultSelected="price"
-							valueSelected={this.props.settings.displayedValue}
-							onChange={(e, value) => this.handleDisplayedValue(value)}
+		switch(this.props.title.present.floatingTitle) {
+			case 'Portfolio':
+				iconElementRight = (
+					<div style={{display: 'flex'}}>
+						<IconButton onTouchTap={() => console.log('Searching here')} style={{flex: 1}}>
+							<Search/>
+						</IconButton>
+						<IconMenu
+							iconButtonElement={<IconButton><MoreVert/></IconButton>}
+							open={this.state.moreOpen}
+							useLayerForClickAway={true}
+							onRequestChange={(open) => this.toggleMoreMenu(open)}
+							anchorOrigin={{horizontal: 'right', vertical: 'top'}}
+							targetOrigin={{horizontal: 'right', vertical: 'top'}}
+							listStyle={{paddingLeft: 8, width: 165}}
+							style={{flex: 1}}
 						>
-							<RadioButton
-								value="price"
-								label="Last Price"
-								style={{paddingTop: 8, paddingBottom: 8}}
-							/>
-							<RadioButton
-								value="equity"
-								label="Equity"
-								style={{paddingTop: 8, paddingBottom: 8}}
-							/>
-							<RadioButton
-								value="percent"
-								label="Percent Change"
-								style={{paddingTop: 8, paddingBottom: 8}}
-							/>
-						</RadioButtonGroup>
-					</IconMenu>
-				</div>
-			);
-			titleBar = (
-				<AppBar
-					title={this.props.title.present.floatingTitle}
-					titleStyle={{alignSelf: 'center'}}
-					onLeftIconButtonTouchTap={this.handleToggle.bind(this)}
-					iconStyleLeft={{marginBottom: 8, alignSelf: 'center'}}
-					iconElementRight={iconElementRight}
-					iconStyleRight={{marginBottom: 8, alignSelf: 'center'}}
-					style={{height: 130, paddingTop: 75, marginTop: -75}}
-				/>
-			);
+							<RadioButtonGroup
+								name="stockValueDisplay"
+								labelPosition="left"
+								defaultSelected="price"
+								valueSelected={this.props.settings.displayedValue}
+								onChange={(e, value) => this.handleDisplayedValue(value)}
+							>
+								<RadioButton
+									value="price"
+									label="Last Price"
+									style={{paddingTop: 8, paddingBottom: 8}}
+								/>
+								<RadioButton
+									value="equity"
+									label="Equity"
+									style={{paddingTop: 8, paddingBottom: 8}}
+								/>
+								<RadioButton
+									value="percent"
+									label="Percent Change"
+									style={{paddingTop: 8, paddingBottom: 8}}
+								/>
+							</RadioButtonGroup>
+						</IconMenu>
+					</div>
+				);
+				titleBar = (
+					<AppBar
+						title={this.props.title.present.floatingTitle}
+						titleStyle={{alignSelf: 'center'}}
+						onLeftIconButtonTouchTap={this.handleToggle.bind(this)}
+						iconStyleLeft={{marginBottom: 8, alignSelf: 'center'}}
+						iconElementRight={iconElementRight}
+						iconStyleRight={{marginBottom: 8, alignSelf: 'center'}}
+						style={{height: 130, paddingTop: 75, marginTop: -75}}
+					/>
+				);
+				pane = (<PorfolioPane/>);
+				break;
+		}
+
+		if(this.props.title.present.isStock) {
+
+		} else if(this.props.title.present.isPosition) {
+			pane = (<PositionPane/>)
+		} else if(this.props.title.present.isWatchList) {
+
 		}
 
         return (
@@ -186,7 +199,7 @@ class AppLayout extends Component {
 				/>
 				<div className="scrollable-pane-content">
 					{titleBar}
-					<PorfolioPane robinhood={this.props.robinhood}/>
+					{pane}
 				</div>
 			</div>
         );

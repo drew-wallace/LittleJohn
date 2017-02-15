@@ -6,6 +6,7 @@ import CircularProgress from 'material-ui/CircularProgress';
 import RobinhoodChart from './chart';
 import RobinhoodCards from '../containers/robinhood-cards';
 import RobinhoodPositions from '../containers/robinhood-positions';
+import RobinhoodWatchlist from '../containers/robinhood-watchlist';
 
 class PortfolioPane extends Component {
 	constructor(props) {
@@ -30,6 +31,8 @@ class PortfolioPane extends Component {
 					/>
 					<RobinhoodCards/>
 					<RobinhoodPositions/>
+					<div style={{marginBottom: 15}}><span>Watchlist</span></div>
+					<RobinhoodWatchlist/>
 				</div>
 			);
 		} else {

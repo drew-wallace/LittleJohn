@@ -505,6 +505,27 @@ class Robinhood{
             request.onerror = function () { reject(request);}.bind(this);
         }.bind(this));
     }
+    watchlists(watchlist) {
+        return new Promise(function(resolve, reject) {
+            var request = new XMLHttpRequest();
+            request.open(
+                'GET',
+                this._endpoints.watchlists + watchlist,
+                true
+            );
+            this._setHeaders(request);
+            request.send();
+            request.onload = function () {
+                request.responseJSON = JSON.parse(request.response);
+                if (request.status == 200) {
+                    resolve(request);
+                } else {
+                    reject(request);
+                }
+            }.bind(this);
+            request.onerror = function () { reject(request);}.bind(this);
+        }.bind(this));
+    }
 }
 
 export default Robinhood;
