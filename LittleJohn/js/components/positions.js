@@ -5,14 +5,15 @@ import CircularProgress from 'material-ui/CircularProgress';
 
 import RobinhoodPosition from './position';
 
-const RobinhoodPositions = ({ positions, changeTitle, fetchPositionsIfNeeded }) => {
+const RobinhoodPositions = ({ positions, settings, changeTitle, fetchPositionsIfNeeded }) => {
     if(positions.lastUpdated) {
         return (
             <div>
                 {_.map((_.values(positions.items) || []), (position, i) =>
                     <RobinhoodPosition
                         key={i}
-                        {...position}
+                        position={position}
+                        settings={settings}
                         changeTitle={changeTitle}
                     />
                 )}

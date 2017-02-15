@@ -16,8 +16,23 @@ class RobinhoodPosition extends Component {
         super(props);
     }
 
+    getDisplayedValue() {
+        const displayedValue = this.props.settings.displayedValue;
+        const { quantity, quote } = this.props.position;
+
+        switch(displayedValue) {
+            case 'price':
+                return formatCurrency(quote.last_trade_price);
+            case 'equity':
+                return formatCurrency(quote.last_trade_price * quantity)
+            case 'percent':
+                return formatCurrency(quote.last_trade_price * quote.previous_close)
+        }
+    }
+
     render() {
-        let { historicals, instrument, quantity, quote, changeTitle } = this.props;
+        const changeTitle = this.props.changeTitle;
+        let { historicals, instrument, quantity, quote } = this.props.position;
 
         const margin = {top: 0, right: 0, bottom: 0, left: 0};
         const width = 100 - margin.left - margin.right;
@@ -57,7 +72,7 @@ class RobinhoodPosition extends Component {
                         </svg>
                     </div>
                     <div style={{flex: '0 1 25%'}}>
-                        <span>{formatCurrency(quote.last_trade_price)}</span>
+                        <span>{this.getDisplayedValue()}</span>
                     </div>
                 </div>
             </FlatButton>

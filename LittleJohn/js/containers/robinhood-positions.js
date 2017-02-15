@@ -9,7 +9,8 @@ import { fetchPositionsIfNeeded, changeTitle } from '../actions';
 const mapStateToProps = (state) => {
     return {
         positions: state.positions,
-        primaryColor: state.primaryColor
+        primaryColor: state.primaryColor,
+        settings: state.settings
     }
 }
 
