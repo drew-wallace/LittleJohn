@@ -33,13 +33,13 @@ class Robinhood{
         this._private = {
             account: session.account || null,
             headers: session.headers || {
-                'Accept': '*/*',
+                'Accept': 'application/json'/*,
                 'Accept-Encoding': 'gzip, deflate',
                 'Accept-Language': 'en;q=1, fr;q=0.9, de;q=0.8, ja;q=0.7, nl;q=0.6, it;q=0.5',
                 'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
-                'X-Robinhood-API-Version': '1.70.0',
+                'X-Robinhood-API-Version': '1.128.1',
                 'Connection': 'keep-alive',
-                'User-Agent': 'Robinhood/823 (iPhone; iOS 7.1.2; Scale/2.00)'
+                'User-Agent': 'Robinhood/823 (iPhone; iOS 7.1.2; Scale/2.00)'*/
             },
             auth_token: session.auth_token || null
         };

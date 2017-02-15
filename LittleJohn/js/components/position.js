@@ -3,7 +3,7 @@ import numeral from 'numeral';
 import _ from 'lodash';
 import { scaleLinear, line, extent } from 'd3';
 
-import {formatCurrency} from '../lib/formaters';
+import { formatCurrency, formatPercent } from '../lib/formaters';
 import styles from '../styles';
 
 import {Card, CardActions, CardHeader, CardText} from 'material-ui/Card';
@@ -24,9 +24,9 @@ class RobinhoodPosition extends Component {
             case 'price':
                 return formatCurrency(quote.last_trade_price);
             case 'equity':
-                return formatCurrency(quote.last_trade_price * quantity)
+                return formatCurrency(quote.last_trade_price * quantity);
             case 'percent':
-                return formatCurrency(quote.last_trade_price * quote.previous_close)
+                return formatPercent((quote.last_trade_price * quote.previous_close) - 1);
         }
     }
 
