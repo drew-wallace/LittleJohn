@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 
 import { dismissCard, fetchCardsIfNeeded } from '../actions';
 
-import Cards from '../components/cards';
+import CardStackComponent from '../components/card-stack';
 
 const mapStateToProps = (state) => {
     return {
@@ -25,9 +25,9 @@ const mapDispatchToProps = (dispatch) => {
     }
 }
 
-const RobinhoodCards = connect(
+const CardStackContainer = connect(
     mapStateToProps,
     mapDispatchToProps
-)(Cards);
+)(CardStackComponent);
 
-export default RobinhoodCards;
+export default CardStackContainer;

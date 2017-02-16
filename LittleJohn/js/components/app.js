@@ -9,9 +9,9 @@ import RemoveCircleOutline from 'material-ui/svg-icons/content/remove-circle-out
 import MoreVert from 'material-ui/svg-icons/navigation/more-vert';
 import Search from 'material-ui/svg-icons/action/search';
 
-import PorfolioPane from '../containers/portfolio-pane';
-import PositionPane from '../containers/position-pane';
-import WatchlistPane from '../containers/watchlist-pane';
+import PorfolioPaneContainer from '../containers/portfolio-pane';
+import PositionPaneContainer from '../containers/position-pane';
+import WatchlistPaneContainer from '../containers/watchlist-pane';
 
 import styles from '../styles';
 
@@ -158,7 +158,7 @@ class AppLayout extends Component {
 						style={{height: 130, paddingTop: 75, marginTop: -75}}
 					/>
 				);
-				pane = (<PorfolioPane/>);
+				pane = (<PorfolioPaneContainer/>);
 				break;
 		}
 
@@ -166,7 +166,7 @@ class AppLayout extends Component {
 
 		} else if(this.props.title.present.isPosition) {
 			const watchlistItems = _.extend({}, this.props.watchlist.items, this.props.positions.items);
-			pane = (<PositionPane/>);
+			pane = (<PositionPaneContainer/>);
 			watchlistBar = (
 				<div style={{display: 'flex', zIndex: 1100, backgroundColor: this.props.primaryColor, position: 'relative'}}>
 					<Tabs
@@ -192,7 +192,7 @@ class AppLayout extends Component {
 			);
 		} else if(this.props.title.present.isWatchlist) {
 			const watchlistItems = _.extend({}, this.props.watchlist.items, this.props.positions.items);
-			pane = (<WatchlistPane/>);
+			pane = (<WatchlistPaneContainer/>);
 			watchlistBar = (
 				<div style={{display: 'flex', zIndex: 1100, backgroundColor: this.props.primaryColor, position: 'relative'}}>
 					<Tabs

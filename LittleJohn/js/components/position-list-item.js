@@ -11,20 +11,20 @@ import FlatButton from 'material-ui/FlatButton';
 
 const { positivePrimaryColor, negativePrimaryColor } = styles;
 
-class RobinhoodStock extends Component {
+class PositionListItemComponent extends Component {
     constructor(props) {
         super(props);
     }
 
     getDisplayedValue() {
         const displayedValue = this.props.settings.displayedValue;
-        const { quantity, quote } = this.props.stock;
+        const { quantity, quote } = this.props.position;
 
         switch(displayedValue) {
             case 'price':
                 return formatCurrency(quote.last_trade_price);
             case 'equity':
-                return formatCurrency(quote.last_trade_price * quantity);
+                return formatCurrency(quote.last_trade_price * +quantity);
             case 'percent':
                 return formatPercent((quote.last_trade_price * quote.previous_close) - 1);
         }
@@ -32,7 +32,7 @@ class RobinhoodStock extends Component {
 
     render() {
         const changeTitle = this.props.changeTitle;
-        let { historicals, instrument, quantity, quote } = this.props.stock;
+        let { historicals, instrument, quantity, quote } = this.props.position;
 
         const margin = {top: 0, right: 0, bottom: 0, left: 0};
         const width = 100 - margin.left - margin.right;
@@ -61,7 +61,7 @@ class RobinhoodStock extends Component {
                             <span>{instrument.symbol}</span>
                         </div>
                         <div style={{flex: 1}}>
-                            <span>Watchlist</span>
+                            <span>{numeral(quantity).format('0,0')} Shares</span>
                         </div>
                     </div>
                     <div style={{flex: '0 1 50%'}}>
@@ -80,7 +80,7 @@ class RobinhoodStock extends Component {
     }
 };
 
-// RobinhoodStock.propTypes = {
+// PositionListItemComponent.propTypes = {
 //     todos: PropTypes.arrayOf(PropTypes.shape({
 //         id: PropTypes.number.isRequired,
 //         completed: PropTypes.bool.isRequired,
@@ -89,4 +89,4 @@ class RobinhoodStock extends Component {
 //     onTodoClick: PropTypes.func.isRequired
 // }
 
-export default RobinhoodStock;
+export default PositionListItemComponent;

@@ -3,14 +3,14 @@ import React, { Component, PropTypes } from 'react';
 
 import CircularProgress from 'material-ui/CircularProgress';
 
-import RobinhoodPosition from './position';
+import PositionListItemComponent from './position-list-item';
 
-const RobinhoodPositions = ({ positions, settings, changeTitle, fetchPositionsIfNeeded }) => {
+const PositionListComponent = ({ positions, settings, changeTitle, fetchPositionsIfNeeded }) => {
     if(positions.lastUpdated) {
         return (
             <div>
                 {_.map((_.values(positions.items) || []), (position, i) =>
-                    <RobinhoodPosition
+                    <PositionListItemComponent
                         key={i}
                         position={position}
                         settings={settings}
@@ -32,7 +32,7 @@ const RobinhoodPositions = ({ positions, settings, changeTitle, fetchPositionsIf
 }
 
 
-// RobinhoodPositions.propTypes = {
+// PositionListComponent.propTypes = {
 //     todos: PropTypes.arrayOf(PropTypes.shape({
 //         id: PropTypes.number.isRequired,
 //         completed: PropTypes.bool.isRequired,
@@ -41,4 +41,4 @@ const RobinhoodPositions = ({ positions, settings, changeTitle, fetchPositionsIf
 //     onTodoClick: PropTypes.func.isRequired
 // }
 
-export default RobinhoodPositions;
+export default PositionListComponent;

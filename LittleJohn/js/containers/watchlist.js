@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 
-import Watchlist from '../components/watchlist';
+import WatchlistComponent from '../components/watchlist';
 
 import { fetchWatchlistIfNeeded, changeTitle } from '../actions';
 
@@ -25,9 +25,9 @@ const mapDispatchToProps = (dispatch) => {
     }
 }
 
-const RobinhoodWatchlist = connect(
+const WatchlistContainer = connect(
     mapStateToProps,
     mapDispatchToProps
-)(Watchlist);
+)(WatchlistComponent);
 
-export default RobinhoodWatchlist;
+export default WatchlistContainer;

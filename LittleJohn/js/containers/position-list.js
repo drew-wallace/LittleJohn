@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 
-import Positions from '../components/positions';
+import PositionListComponent from '../components/position-list';
 
 import { fetchPositionsIfNeeded, changeTitle } from '../actions';
 
@@ -25,9 +25,9 @@ const mapDispatchToProps = (dispatch) => {
     }
 }
 
-const RobinhoodPositions = connect(
+const PositionsListContainer = connect(
     mapStateToProps,
     mapDispatchToProps
-)(Positions);
+)(PositionListComponent);
 
-export default RobinhoodPositions;
+export default PositionsListContainer;

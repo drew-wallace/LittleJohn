@@ -3,14 +3,14 @@ import React, { Component, PropTypes } from 'react';
 
 import CircularProgress from 'material-ui/CircularProgress';
 
-import RobinhoodStock from './stock';
+import WatchlistItemComponent from './watchlist-item';
 
-const RobinhoodWatchlist = ({ watchlist, settings, changeTitle, fetchWatchlistIfNeeded }) => {
+const WatchlistComponent = ({ watchlist, settings, changeTitle, fetchWatchlistIfNeeded }) => {
     if(watchlist.lastUpdated) {
         return (
             <div>
                 {_.map((_.values(watchlist.items) || []), (stock, i) =>
-                    <RobinhoodStock
+                    <WatchlistItemComponent
                         key={i}
                         stock={stock}
                         settings={settings}
@@ -32,7 +32,7 @@ const RobinhoodWatchlist = ({ watchlist, settings, changeTitle, fetchWatchlistIf
 }
 
 
-// RobinhoodWatchlist.propTypes = {
+// WatchlistComponent.propTypes = {
 //     todos: PropTypes.arrayOf(PropTypes.shape({
 //         id: PropTypes.number.isRequired,
 //         completed: PropTypes.bool.isRequired,
@@ -41,4 +41,4 @@ const RobinhoodWatchlist = ({ watchlist, settings, changeTitle, fetchWatchlistIf
 //     onTodoClick: PropTypes.func.isRequired
 // }
 
-export default RobinhoodWatchlist;
+export default WatchlistComponent;

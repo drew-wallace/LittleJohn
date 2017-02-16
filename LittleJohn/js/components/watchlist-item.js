@@ -11,14 +11,14 @@ import FlatButton from 'material-ui/FlatButton';
 
 const { positivePrimaryColor, negativePrimaryColor } = styles;
 
-class RobinhoodPosition extends Component {
+class WatchlistItemComponent extends Component {
     constructor(props) {
         super(props);
     }
 
     getDisplayedValue() {
         const displayedValue = this.props.settings.displayedValue;
-        const { quantity, quote } = this.props.position;
+        const { quantity, quote } = this.props.stock;
 
         switch(displayedValue) {
             case 'price':
@@ -32,7 +32,7 @@ class RobinhoodPosition extends Component {
 
     render() {
         const changeTitle = this.props.changeTitle;
-        let { historicals, instrument, quantity, quote } = this.props.position;
+        let { historicals, instrument, quantity, quote } = this.props.stock;
 
         const margin = {top: 0, right: 0, bottom: 0, left: 0};
         const width = 100 - margin.left - margin.right;
@@ -61,7 +61,7 @@ class RobinhoodPosition extends Component {
                             <span>{instrument.symbol}</span>
                         </div>
                         <div style={{flex: 1}}>
-                            <span>{numeral(quantity).format('0,0')} Shares</span>
+                            <span>Watchlist</span>
                         </div>
                     </div>
                     <div style={{flex: '0 1 50%'}}>
@@ -80,7 +80,7 @@ class RobinhoodPosition extends Component {
     }
 };
 
-// RobinhoodPosition.propTypes = {
+// WatchlistItemComponent.propTypes = {
 //     todos: PropTypes.arrayOf(PropTypes.shape({
 //         id: PropTypes.number.isRequired,
 //         completed: PropTypes.bool.isRequired,
@@ -89,4 +89,4 @@ class RobinhoodPosition extends Component {
 //     onTodoClick: PropTypes.func.isRequired
 // }
 
-export default RobinhoodPosition;
+export default WatchlistItemComponent;

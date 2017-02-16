@@ -1,14 +1,15 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
+import _ from 'lodash';
 
-import { changePrimaryColor, fetchPortfolioIfNeeded } from '../actions';
+import { changePrimaryColor } from '../actions';
 
-import Portfolio from '../components/portfolio';
+import PositionPaneComponent from '../components/position-pane';
 
 const mapStateToProps = (state) => {
     return {
-        portfolio: state.portfolio,
+        position: _.find(state.positions.items, {instrument: {name: state.title.present.fixedTitle}}),
         primaryColor: state.primaryColor
     }
 }
@@ -17,16 +18,13 @@ const mapDispatchToProps = (dispatch) => {
     return {
         changePrimaryColor: (color) => {
             dispatch(changePrimaryColor(color));
-        },
-        // fetchPortfolioIfNeeded: () => {
-        //     dispatch(fetchPortfolioIfNeeded());
-        // }
+        }
     }
 }
 
-const PositionPane = connect(
+const PositionPaneContainer = connect(
     mapStateToProps,
     mapDispatchToProps
-)(Portfolio);
+)(PositionPaneComponent);
 
-export default PositionPane;
+export default PositionPaneContainer;

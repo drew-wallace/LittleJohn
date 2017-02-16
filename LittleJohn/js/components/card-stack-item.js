@@ -6,7 +6,7 @@ import {Card, CardText} from 'material-ui/Card';
 import Lightbulb from 'material-ui/svg-icons/action/lightbulb-outline';
 import Badge from 'material-ui/Badge';
 
-class RobinhoodCard extends Component {
+class CardStackItemComponent extends Component {
     constructor(props) {
         super(props);
     }
@@ -69,4 +69,4 @@ class RobinhoodCard extends Component {
 //     onTodoClick: PropTypes.func.isRequired
 // }
 
-export default RobinhoodCard;
+export default CardStackItemComponent;

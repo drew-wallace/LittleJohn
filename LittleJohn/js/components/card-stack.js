@@ -1,15 +1,15 @@
 import React, { Component, PropTypes } from 'react';
-import RobinhoodCard from './card';
+import CardStackItemComponent from './card-stack-item';
 
 import {Card, CardText} from 'material-ui/Card';
 import CircularProgress from 'material-ui/CircularProgress';
 
-const RobinhoodCards = ({ cards, width, robinhood, dismissCard, fetchCardsIfNeeded }) => {
+const CardStackComponent = ({ cards, width, robinhood, dismissCard, fetchCardsIfNeeded }) => {
     if(cards.lastUpdated) {
         return (
             <div style={{height: 140, marginBottom: 15}}>
                 {(cards.items || []).map((card, i) =>
-                    <RobinhoodCard
+                    <CardStackItemComponent
                         key={i}
                         index={i}
                         {...card}
@@ -42,7 +42,7 @@ const RobinhoodCards = ({ cards, width, robinhood, dismissCard, fetchCardsIfNeed
     }
 };
 
-// RobinhoodCards.propTypes = {
+// CardStackComponent.propTypes = {
 //     todos: PropTypes.arrayOf(PropTypes.shape({
 //         id: PropTypes.number.isRequired,
 //         completed: PropTypes.bool.isRequired,
@@ -51,4 +51,4 @@ const RobinhoodCards = ({ cards, width, robinhood, dismissCard, fetchCardsIfNeed
 //     onTodoClick: PropTypes.func.isRequired
 // }
 
-export default RobinhoodCards;
+export default CardStackComponent;

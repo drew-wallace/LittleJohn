@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 
 import { changePrimaryColor, fetchPortfolioIfNeeded } from '../actions';
 
-import Portfolio from '../components/portfolio';
+import PortfolioPaneComponent from '../components/portfolio-pane';
 
 const mapStateToProps = (state) => {
     return {
@@ -27,6 +27,6 @@ const mapDispatchToProps = (dispatch) => {
 const PortfolioPane = connect(
     mapStateToProps,
     mapDispatchToProps
-)(Portfolio);
+)(PortfolioPaneComponent);
 
 export default PortfolioPane;

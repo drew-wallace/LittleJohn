@@ -3,12 +3,12 @@ import numeral from 'numeral';
 
 import CircularProgress from 'material-ui/CircularProgress';
 
-import RobinhoodChart from './chart';
-import RobinhoodCards from '../containers/robinhood-cards';
-import RobinhoodPositions from '../containers/robinhood-positions';
-import RobinhoodWatchlist from '../containers/robinhood-watchlist';
+import RobinhoodChartComponent from './robinhood-chart';
+import CardStackContainer from '../containers/card-stack';
+import PositionListContainer from '../containers/position-list';
+import WatchlistContainer from '../containers/watchlist';
 
-class PortfolioPane extends Component {
+class PortfolioPaneComponent extends Component {
 	constructor(props) {
 	    super(props);
 	}
@@ -22,17 +22,17 @@ class PortfolioPane extends Component {
 
 			return (
 				<div>
-					<RobinhoodChart
+					<RobinhoodChartComponent
 						title={equity}
 						subtitle={subtitle}
 						margin={{top: 0, right: 0, bottom: 0, left: 0}}
 						data={{day, week, quarter, month, year, all}}
 						changePrimaryColor={changePrimaryColor}
 					/>
-					<RobinhoodCards/>
-					<RobinhoodPositions/>
-					<div style={{marginBottom: 15}}><span>Watchlist</span></div>
-					<RobinhoodWatchlist/>
+					<CardStackContainer/>
+					<PositionListContainer/>
+					<div style={{marginBottom: 15}}><span>WatchlistContainer</span></div>
+					<WatchlistContainer/>
 				</div>
 			);
 		} else {
@@ -55,4 +55,4 @@ class PortfolioPane extends Component {
 //     onTodoClick: PropTypes.func.isRequired
 // }
 
-export default PortfolioPane;
+export default PortfolioPaneComponent;

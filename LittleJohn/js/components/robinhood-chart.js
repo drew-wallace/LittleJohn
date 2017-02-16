@@ -7,7 +7,7 @@ import { bisector, scaleLinear, line, select, extent, drag, mouse } from 'd3';
 
 import styles from '../styles';
 
-import {formatCurrency, formatCurrencyDiff, formatPercentDiff} from '../lib/formaters';
+import {formatCurrency, formatCurrencyDiff, formatPercentDiff, formatTime} from '../lib/formaters';
 
 import {Card, CardActions, CardHeader, CardText} from 'material-ui/Card';
 import FlatButton from 'material-ui/FlatButton';
@@ -32,7 +32,7 @@ class RobinhoodChart extends Component {
 
         this.state = {
             title: this.props.title,
-            subtitle: this.props.subtitle,
+            subtitle: this.props.subtitle/* || `${formatCurrencyDiff(netReturn)} (${formatPercentDiff(netPercentReturn)}) ${formatTime(d.begins_at, this.state.tab)}`*/,
             data: this.props.data.day,
             tab: 'day',
             primaryColor: (+_.last(this.props.data.day).adjusted_open_equity >= +this.props.data.day[0].adjusted_open_equity ? positivePrimaryColor : negativePrimaryColor),
@@ -41,30 +41,6 @@ class RobinhoodChart extends Component {
             height
         };
     }
-
-    formatTime(d) {
-		let hours = d.getHours();
-		let minutes = d.getMinutes();
-
-		if(hours > 12) hours -= 12;
-		if(hours < 10) hours = '0' + hours;
-		if(minutes < 10) minutes = '0' + minutes;
-
-		switch(this.state.tab) {
-			case 'day':
-				return `${hours}:${minutes} EDT`;
-			case 'week':
-				return `${hours}:${minutes} EDT ${moment(d).format('MMM D')}`;
-			case 'month':
-				return `${moment(d).format('MMM D YYYY')}`;
-			case 'quarter':
-				return `${moment(d).format('MMM D YYYY')}`;
-			case 'year':
-				return `${moment(d).format('MMM D YYYY')}`;
-			case 'all':
-				return `${moment(d).format('MMM D YYYY')}`;
-		}
-	}
 
     changeTab(tab) {
         const equityKey = (tab == 'day' ? 'adjusted_open_equity' : 'adjusted_close_equity');
@@ -161,7 +137,7 @@ class RobinhoodChart extends Component {
 
 		const netReturn = d.yVal - this.state.data[0].yVal;
         const netPercentReturn = netReturn / this.state.data[0].yVal;
-        const equityChangeText = `${formatCurrencyDiff(netReturn)} (${formatPercentDiff(netPercentReturn)}) ${this.formatTime(new Date(d.begins_at))}`;
+        const equityChangeText = `${formatCurrencyDiff(netReturn)} (${formatPercentDiff(netPercentReturn)}) ${formatTime(d.begins_at, this.state.tab)}`;
 
 
         const xPos = mouse(elms[elmIndex])[0];
