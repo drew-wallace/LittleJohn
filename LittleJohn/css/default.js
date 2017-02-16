@@ -27,5 +27,8 @@ export default StyleSheet.create({
     'borderBottomStyle': 'solid !important',
     'borderRadius': '0px !important',
     'color': 'white !important'
+  },
+  'watchlist-buttonactive': {
+    'color': 'white !important'
   }
 });

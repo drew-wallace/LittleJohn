@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import _ from 'lodash';
 
 import { Drawer, AppBar, MenuItem, IconButton, IconMenu, RadioButtonGroup, RadioButton, FlatButton } from 'material-ui';
+import {Tabs, Tab} from 'material-ui/Tabs';
 import ArrowBack from 'material-ui/svg-icons/navigation/arrow-back';
 import AddCircleOutline from 'material-ui/svg-icons/content/add-circle-outline';
 import RemoveCircleOutline from 'material-ui/svg-icons/content/remove-circle-outline';
@@ -164,38 +165,52 @@ class AppLayout extends Component {
 		if(this.props.title.present.isStock) {
 
 		} else if(this.props.title.present.isPosition) {
+			const watchlistItems = _.extend({}, this.props.watchlist.items, this.props.positions.items);
 			pane = (<PositionPane/>);
 			watchlistBar = (
 				<div style={{display: 'flex', zIndex: 1100, backgroundColor: this.props.primaryColor, position: 'relative'}}>
-				{_.map(_.extend({}, this.props.watchlist.items, this.props.positions.items), (stock, i) => (
-					<FlatButton
-						key={i}
-						onTouchTap={() => this.changeTab(stock.instrument.name, +stock.quantity > 0, stock.historicals.day)}
-						label={stock.instrument.symbol}
-						labelStyle={{color: 'white'}}
-						className={`chart-button ${(this.props.title.present.fixedTitle == stock.instrument.name ? 'active' : '')}`}
-						style={{flex: 1, minWidth: 0}}
-					/>
-				))}
+					<Tabs
+						value={this.props.title.present.fixedTitle}
+						style={{width: '100%'}}
+						inkBarStyle={{backgroundColor: 'white'}}
+					>
+						{_.map(watchlistItems, (stock, i) => (
+							<Tab
+								key={i}
+								value={stock.instrument.name}
+								onActive={() => this.changeTab(stock.instrument.name, +stock.quantity > 0, stock.historicals.day)}
+								label={stock.instrument.symbol}
+								className={`watchlist-button ${(this.props.title.present.fixedTitle == stock.instrument.name ? 'active' : '')}`}
+							/>
+						))}
+					</Tabs>
+
 				</div>
 			);
 			titleBar = (
 				<div style={{height: 91}}></div>
 			);
 		} else if(this.props.title.present.isWatchlist) {
+			const watchlistItems = _.extend({}, this.props.watchlist.items, this.props.positions.items);
 			pane = (<WatchlistPane/>);
 			watchlistBar = (
 				<div style={{display: 'flex', zIndex: 1100, backgroundColor: this.props.primaryColor, position: 'relative'}}>
-				{_.map(_.extend({}, this.props.watchlist.items, this.props.positions.items), (stock, i) => (
-					<FlatButton
-						key={i}
-						onTouchTap={() => this.changeTab(stock.instrument.name, +stock.quantity > 0, stock.historicals.day)}
-						label={stock.instrument.symbol}
-						labelStyle={{color: 'white'}}
-						className={`chart-button ${(this.props.title.present.fixedTitle == stock.instrument.name ? 'active' : '')}`}
-						style={{flex: 1, minWidth: 0}}
-					/>
-				))}
+					<Tabs
+						value={this.props.title.present.fixedTitle}
+						style={{width: '100%'}}
+						inkBarStyle={{backgroundColor: 'white'}}
+					>
+						{_.map(watchlistItems, (stock, i) => (
+							<Tab
+								key={i}
+								value={stock.instrument.name}
+								onActive={() => this.changeTab(stock.instrument.name, +stock.quantity > 0, stock.historicals.day)}
+								label={stock.instrument.symbol}
+								className={`watchlist-button ${(this.props.title.present.fixedTitle == stock.instrument.name ? 'active' : '')}`}
+							/>
+						))}
+					</Tabs>
+
 				</div>
 			);
 			titleBar = (
