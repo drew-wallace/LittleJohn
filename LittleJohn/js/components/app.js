@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
+import _ from 'lodash';
 
-import { Drawer, AppBar, MenuItem, IconButton, IconMenu, RadioButtonGroup, RadioButton } from 'material-ui';
+import { Drawer, AppBar, MenuItem, IconButton, IconMenu, RadioButtonGroup, RadioButton, FlatButton } from 'material-ui';
 import ArrowBack from 'material-ui/svg-icons/navigation/arrow-back';
 import AddCircleOutline from 'material-ui/svg-icons/content/add-circle-outline';
 import RemoveCircleOutline from 'material-ui/svg-icons/content/remove-circle-outline';
@@ -9,6 +10,11 @@ import Search from 'material-ui/svg-icons/action/search';
 
 import PorfolioPane from '../containers/portfolio-pane';
 import PositionPane from '../containers/position-pane';
+import WatchlistPane from '../containers/watchlist-pane';
+
+import styles from '../styles';
+
+const { positivePrimaryColor, negativePrimaryColor } = styles;
 
 class AppLayout extends Component {
 
@@ -16,7 +22,7 @@ class AppLayout extends Component {
 		super(props);
 		this.state = {
 			moreOpen: false
-		}
+		};
 	}
 
 	handleToggle() {
@@ -53,6 +59,13 @@ class AppLayout extends Component {
 		});
 	}
 
+	changeTab(tab, isPosition, dayData) {
+		if(tab != this.props.title.present.fixedTitle) {
+			this.props.changeTitleFromTab(tab, '', false, isPosition, !isPosition);
+        	this.props.changePrimaryColor(+_.last(dayData).adjusted_open_equity >= +dayData[0].adjusted_open_equity ? positivePrimaryColor : negativePrimaryColor);
+		}
+	}
+
     render() {
 		let iconElementLeft = null;
 		let iconElementRight = null;
@@ -69,7 +82,7 @@ class AppLayout extends Component {
 		}
 
 		if(this.props.title.present.isStock) {
-			if(this.props.title.present.isWatchList) {
+			if(this.props.title.present.isWatchlist) {
 				iconElementRight = (
 					<IconButton>
 						<AddCircleOutline/>
@@ -87,6 +100,8 @@ class AppLayout extends Component {
 		let titleBar = (
 			<div style={{height: 55}}></div>
 		);
+
+		let watchlistBar = (<div></div>);
 
 		switch(this.props.title.present.floatingTitle) {
 			case 'Portfolio':
@@ -149,9 +164,43 @@ class AppLayout extends Component {
 		if(this.props.title.present.isStock) {
 
 		} else if(this.props.title.present.isPosition) {
-			pane = (<PositionPane/>)
-		} else if(this.props.title.present.isWatchList) {
-
+			pane = (<PositionPane/>);
+			watchlistBar = (
+				<div style={{display: 'flex', zIndex: 1100, backgroundColor: this.props.primaryColor, position: 'relative'}}>
+				{_.map(_.extend({}, this.props.watchlist.items, this.props.positions.items), (stock, i) => (
+					<FlatButton
+						key={i}
+						onTouchTap={() => this.changeTab(stock.instrument.name, +stock.quantity > 0, stock.historicals.day)}
+						label={stock.instrument.symbol}
+						labelStyle={{color: 'white'}}
+						className={`chart-button ${(this.props.title.present.fixedTitle == stock.instrument.name ? 'active' : '')}`}
+						style={{flex: 1, minWidth: 0}}
+					/>
+				))}
+				</div>
+			);
+			titleBar = (
+				<div style={{height: 91}}></div>
+			);
+		} else if(this.props.title.present.isWatchlist) {
+			pane = (<WatchlistPane/>);
+			watchlistBar = (
+				<div style={{display: 'flex', zIndex: 1100, backgroundColor: this.props.primaryColor, position: 'relative'}}>
+				{_.map(_.extend({}, this.props.watchlist.items, this.props.positions.items), (stock, i) => (
+					<FlatButton
+						key={i}
+						onTouchTap={() => this.changeTab(stock.instrument.name, +stock.quantity > 0, stock.historicals.day)}
+						label={stock.instrument.symbol}
+						labelStyle={{color: 'white'}}
+						className={`chart-button ${(this.props.title.present.fixedTitle == stock.instrument.name ? 'active' : '')}`}
+						style={{flex: 1, minWidth: 0}}
+					/>
+				))}
+				</div>
+			);
+			titleBar = (
+				<div style={{height: 91}}></div>
+			);
 		}
 
         return (
@@ -197,6 +246,7 @@ class AppLayout extends Component {
 					iconStyleRight={{marginBottom: 8, alignSelf: 'center'}}
 					style={{height: 55}}
 				/>
+				{watchlistBar}
 				<div className="scrollable-pane-content">
 					{titleBar}
 					{pane}

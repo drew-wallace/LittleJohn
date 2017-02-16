@@ -50,6 +50,16 @@ export const changeTitle = (fixedTitle, floatingTitle, isStock=false, isPosition
         isWatchlist
     };
 }
+export const changeTitleFromTab = (fixedTitle, floatingTitle, isStock=false, isPosition=false, isWatchlist=false) => {
+    return {
+        type: 'CHANGE_TITLE_FROM_TAB',
+        fixedTitle,
+        floatingTitle,
+        isStock,
+        isPosition,
+        isWatchlist
+    };
+}
 export const changeDisplayedValue = (value) => {
     return {
         type: 'CHANGE_DISPLAYED_VALUE',

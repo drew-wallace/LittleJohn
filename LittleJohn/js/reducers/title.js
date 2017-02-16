@@ -1,7 +1,8 @@
-﻿import undoable, { distinctState } from 'redux-undo';
+﻿import undoable, { distinctState, combineFilters, excludeAction, includeAction } from 'redux-undo';
 
 const title = (state = {}, action) => {
     switch (action.type) {
+        case 'CHANGE_TITLE_FROM_TAB':
         case 'CHANGE_TITLE':
             return Object.assign({}, state, {
                 floatingTitle: action.floatingTitle,
@@ -17,7 +18,7 @@ const title = (state = {}, action) => {
 }
 
 const undoableTitle = undoable(title, {
-  filter: distinctState(),
+  filter: excludeAction('CHANGE_TITLE_FROM_TAB'),
   undoType: 'UNDO_TITLE',
   redoType: 'REDO_TITLE'
 })
