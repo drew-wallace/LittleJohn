@@ -6,7 +6,6 @@ import CircularProgress from 'material-ui/CircularProgress';
 
 import RobinhoodChartComponent from './robinhood-chart';
 
-import { formatCurrency, formatCurrencyDiff, formatPercentDiff, formatTime } from '../lib/formaters';
 
 class PositionPaneComponent extends Component {
 	constructor(props) {
@@ -14,20 +13,17 @@ class PositionPaneComponent extends Component {
 	}
 
     render() {
-		console.log(this.props.position);
 		// if(this.props.position.lastUpdated) {
 			let changePrimaryColor = this.props.changePrimaryColor;
 			let primaryColor = this.props.primaryColor;
-			let { historicals, quote, quantity } = this.props.position;
-			// let subtitle = `${formatCurrencyDiff(quote.previous_close - quote.last_trade_price)} (${formatPercentDiff((quote.previous_close - quote.last_trade_price) / quote.last_trade_price)}) ${formatTime(quote.updated_at, 'day')}`;
-			let { day/*, week, month, quarter, year, all*/ } = historicals;
+			let { historicals, quote } = this.props.position;
 
 			return (
 				<div>
 					<RobinhoodChartComponent
-						title={formatCurrency(quote.last_trade_price * +quantity)}
+						title={+quote.last_trade_price}
 						margin={{top: 0, right: 0, bottom: 0, left: 0}}
-						data={{day/*, week, quarter, month, year, all*/}}
+						data={historicals}
 						changePrimaryColor={changePrimaryColor}
 					/>
 				</div>

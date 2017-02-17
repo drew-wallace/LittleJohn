@@ -31,7 +31,7 @@ class PortfolioPaneComponent extends Component {
 					/>
 					<CardStackContainer/>
 					<PositionListContainer/>
-					<div style={{marginBottom: 15}}><span>WatchlistContainer</span></div>
+					<div style={{marginBottom: 15}}><span>Watchlist</span></div>
 					<WatchlistContainer/>
 				</div>
 			);

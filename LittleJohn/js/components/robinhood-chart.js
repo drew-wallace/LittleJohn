@@ -7,7 +7,7 @@ import { bisector, scaleLinear, line, select, extent, drag, mouse } from 'd3';
 
 import styles from '../styles';
 
-import {formatCurrency, formatCurrencyDiff, formatPercentDiff, formatTime} from '../lib/formaters';
+import { formatCurrency, formatCurrencyDiff, formatPercentDiff, formatTime, formatRelativeTime } from '../lib/formaters';
 
 import {Card, CardActions, CardHeader, CardText} from 'material-ui/Card';
 import FlatButton from 'material-ui/FlatButton';
@@ -30,24 +30,47 @@ class RobinhoodChart extends Component {
 
         this.bisectDate = bisector(function(d) { return d.xVal; }).left;
 
+        if(_.has(this.props.data.day[0], 'adjusted_open_equity')) {
+            this.openKey = 'adjusted_open_equity';
+            this.closeKey = 'adjusted_close_equity';
+        } else if(_.has(this.props.data.day[0], 'open_price')){
+            this.openKey = 'open_price';
+            this.closeKey = 'close_price';
+        }
+
+        const subtitle = this.generateSubtitle();
+
         this.state = {
             title: this.props.title,
-            subtitle: this.props.subtitle/* || `${formatCurrencyDiff(netReturn)} (${formatPercentDiff(netPercentReturn)}) ${formatTime(d.begins_at, this.state.tab)}`*/,
+            subtitle,
             data: this.props.data.day,
             tab: 'day',
-            primaryColor: (+_.last(this.props.data.day).adjusted_open_equity >= +this.props.data.day[0].adjusted_open_equity ? positivePrimaryColor : negativePrimaryColor),
+            primaryColor: (+_.last(this.props.data.day)[this.openKey] >= +this.props.data.day[0][this.openKey] ? positivePrimaryColor : negativePrimaryColor),
             margin,
             width,
             height
         };
     }
 
+    generateSubtitle(tab=_.get(this, 'state.tab', 'day'), data=_.get(this, 'state.data', this.props.data[tab])) {
+        const equityKey = (tab == 'day' ? this.openKey : this.closeKey);
+        const startingEquity = +data[0][equityKey];
+		const endingEquity = this.props.title;
+		const netReturn = endingEquity - startingEquity;
+		const netPercentReturn = netReturn / startingEquity;
+		const equityChangeText = `${formatCurrencyDiff(netReturn)} (${formatPercentDiff(netPercentReturn)}) ${formatRelativeTime(data[0].begins_at, tab)}`;
+
+        return equityChangeText;
+    }
+
     changeTab(tab) {
-        const equityKey = (tab == 'day' ? 'adjusted_open_equity' : 'adjusted_close_equity');
+        const equityKey = (tab == 'day' ? this.openKey : this.closeKey);
+        const subtitle = this.generateSubtitle(tab, this.props.data[tab]);
         this.props.changePrimaryColor(+_.last(this.props.data[tab])[equityKey] >= +this.props.data[tab][0][equityKey] ? positivePrimaryColor : negativePrimaryColor)
 		this.setState({
             tab,
             data: this.props.data[tab],
+            subtitle,
             primaryColor: (+_.last(this.props.data[tab])[equityKey] >= +this.props.data[tab][0][equityKey] ? positivePrimaryColor : negativePrimaryColor)
         });
 	}
@@ -107,24 +130,14 @@ class RobinhoodChart extends Component {
     }
 
 	_startdrag() {
-    	select(ReactDOM.findDOMNode(this.refs.focus))
-			.style('display', null);
-
-		const startingEquity = +this.state.data[0].adjusted_open_equity;
-		const endingEquity = this.props.title;
-		const netReturn = endingEquity - startingEquity;
-		const netPercentReturn = netReturn / startingEquity;
-		const equityChangeText = `${formatCurrencyDiff(netReturn)} (${formatPercentDiff(netPercentReturn)}) 04:00 PM EDT`;
-
 		this.setState({
-			title: startingEquity,
-			subtitle: equityChangeText,
             dragging: true
 		});
     }
 
     _dragging(ignoreThis, elmIndex, elms) {
-    	// -$7.41 (-3.11%) 10:55 AM EDT
+        select(ReactDOM.findDOMNode(this.refs.focus))
+			.style('display', null);
 
     	const x0 = this.x.invert(mouse(elms[elmIndex])[0]);
         const i = this.bisectDate(this.state.data, x0, 1);
@@ -173,11 +186,17 @@ class RobinhoodChart extends Component {
 
     _enddrag() {
 		select(ReactDOM.findDOMNode(this.refs.focus))
-			.style('display', 'none');
+			.style('display', 'none')
+			.attr('transform', 'translate(0,0)');
+
+        select(ReactDOM.findDOMNode(this.refs.header))
+			.select("div span:nth-child(1)")
+			.text(formatCurrency(this.state.title));
+		select(ReactDOM.findDOMNode(this.refs.header))
+			.select("div span:nth-child(2)")
+			.text(this.state.subtitle);
 
 		this.setState({
-			title: this.props.title,
-			subtitle: this.props.subtitle,
             dragging: false
 		});
     }
