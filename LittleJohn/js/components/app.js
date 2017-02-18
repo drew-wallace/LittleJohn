@@ -10,8 +10,7 @@ import MoreVert from 'material-ui/svg-icons/navigation/more-vert';
 import Search from 'material-ui/svg-icons/action/search';
 
 import PorfolioPaneContainer from '../containers/portfolio-pane';
-import PositionPaneContainer from '../containers/position-pane';
-import WatchlistPaneContainer from '../containers/watchlist-pane';
+import StockPaneContainer from '../containers/stock-pane';
 
 import styles from '../styles';
 
@@ -30,13 +29,9 @@ class AppLayout extends Component {
 		this.props.toggleMenu(!this.props.open);
 	}
 
-	changeTitle(title) {
+	handleMenuSelect(title, options) {
 		this.props.toggleMenu(false);
-		if(title == 'Portfolio') {
-			this.props.changeTitle(this.props.portfolio.equity, title);
-		} else {
-			this.props.changeTitle(title, '');
-		}
+		this.props.changeTitle(title, options);
 	}
 
 	handleClose() {
@@ -60,162 +55,147 @@ class AppLayout extends Component {
 		});
 	}
 
-	changeTab(tab, isPosition, dayData) {
+	changeTab(stock) {
+		const tab = stock.instrument.name;
+		const stockType = (+stock.quantity > 0 ? 'position' : 'watchlist');
+		const dayData = stock.historicals.day;
+		const symbol = stock.instrument.symbol;
+
 		if(tab != this.props.title.present.fixedTitle) {
-			this.props.changeTitleFromTab(tab, '', false, isPosition, !isPosition);
+			this.props.changeTitleFromTab(tab, {stockType, symbol, hasBackButton: true});
         	this.props.changePrimaryColor(+_.last(dayData).adjusted_open_equity >= +dayData[0].adjusted_open_equity ? positivePrimaryColor : negativePrimaryColor);
 		}
 	}
 
     render() {
+		const { changeTitle, portfolio, title, watchlist, positions } = this.props;
 		let iconElementLeft = null;
 		let iconElementRight = null;
 		let onLeftIconButtonTouchTap = this.handleToggle.bind(this);
-		let pane = (<div>If you're seeing this, I messed something up...</div>)
+		let pane = (<div>If you're seeing this, I messed something up...</div>);
+		let titleBar = (<div style={{height: 55}}></div>);
+		let watchlistBar = (<div></div>);
+		const watchlistItems = _.extend({}, watchlist.items, positions.items);
 
-		if(this.props.title.present.hasBackButton) {
+		if(title.present.hasBackButton) {
 			iconElementLeft = (
 				<IconButton>
 					<ArrowBack/>
 				</IconButton>
 			);
-			onLeftIconButtonTouchTap = this.handleBack.bind(this);
+			onLeftIconButtonTouchTap = () => this.handleBack();
 		}
 
-		if(this.props.title.present.isStock) {
-			if(this.props.title.present.isWatchlist) {
-				iconElementRight = (
-					<IconButton>
-						<AddCircleOutline/>
-					</IconButton>
-				);
-			} else {
-				iconElementRight = (
-					<IconButton>
-						<RemoveCircleOutline/>
-					</IconButton>
-				);
-			}
-		}
-
-		let titleBar = (
-			<div style={{height: 55}}></div>
-		);
-
-		let watchlistBar = (<div></div>);
-
-		switch(this.props.title.present.floatingTitle) {
-			case 'Portfolio':
-				iconElementRight = (
-					<div style={{display: 'flex'}}>
-						<IconButton onTouchTap={() => console.log('Searching here')} style={{flex: 1}}>
-							<Search/>
+		switch(title.present.stockType) {
+			case 'position':
+				iconElementRight = null;
+				// pane = (<PositionPaneContainer/>);
+				pane = (<StockPaneContainer/>);
+			case 'watchlist':
+				if(title.present.stockType == 'watchlist') {
+					iconElementRight = (
+						<IconButton>
+							<RemoveCircleOutline/>
 						</IconButton>
-						<IconMenu
-							iconButtonElement={<IconButton><MoreVert/></IconButton>}
-							open={this.state.moreOpen}
-							useLayerForClickAway={true}
-							onRequestChange={(open) => this.toggleMoreMenu(open)}
-							anchorOrigin={{horizontal: 'right', vertical: 'top'}}
-							targetOrigin={{horizontal: 'right', vertical: 'top'}}
-							listStyle={{paddingLeft: 8, width: 165}}
-							style={{flex: 1}}
+					);
+					// pane = (<WatchlistPaneContainer/>);
+					pane = (<StockPaneContainer/>);
+				}
+				watchlistBar = (
+					<div style={{display: 'flex', zIndex: 1100, backgroundColor: this.props.primaryColor, position: 'relative'}}>
+						<Tabs
+							value={title.present.fixedTitle}
+							style={{width: '100%'}}
+							inkBarStyle={{backgroundColor: 'white'}}
 						>
-							<RadioButtonGroup
-								name="stockValueDisplay"
-								labelPosition="left"
-								defaultSelected="price"
-								valueSelected={this.props.settings.displayedValue}
-								onChange={(e, value) => this.handleDisplayedValue(value)}
-							>
-								<RadioButton
-									value="price"
-									label="Last Price"
-									style={{paddingTop: 8, paddingBottom: 8}}
+							{_.map(watchlistItems, (stock, i) => (
+								<Tab
+									key={i}
+									value={stock.instrument.name}
+									onActive={() => this.changeTab(stock)}
+									label={stock.instrument.symbol}
+									className={`watchlist-button ${(title.present.symbol == stock.instrument.symbol ? 'active' : '')}`}
 								/>
-								<RadioButton
-									value="equity"
-									label="Equity"
-									style={{paddingTop: 8, paddingBottom: 8}}
-								/>
-								<RadioButton
-									value="percent"
-									label="Percent Change"
-									style={{paddingTop: 8, paddingBottom: 8}}
-								/>
-							</RadioButtonGroup>
-						</IconMenu>
+							))}
+						</Tabs>
 					</div>
 				);
-				titleBar = (
-					<AppBar
-						title={this.props.title.present.floatingTitle}
-						titleStyle={{alignSelf: 'center'}}
-						onLeftIconButtonTouchTap={this.handleToggle.bind(this)}
-						iconStyleLeft={{marginBottom: 8, alignSelf: 'center'}}
-						iconElementRight={iconElementRight}
-						iconStyleRight={{marginBottom: 8, alignSelf: 'center'}}
-						style={{height: 130, paddingTop: 75, marginTop: -75}}
-					/>
-				);
-				pane = (<PorfolioPaneContainer/>);
-				break;
+			case 'stock':
+				if(title.present.stockType == 'stock') {
+					iconElementRight = (
+						<IconButton>
+							<AddCircleOutline/>
+						</IconButton>
+					);
+					// FIX: Need to make this a stock pane container
+					pane = (<StockPaneContainer/>);
+				}
+				titleBar = (<div style={{height: 91}}></div>);
 		}
 
-		if(this.props.title.present.isStock) {
-
-		} else if(this.props.title.present.isPosition) {
-			const watchlistItems = _.extend({}, this.props.watchlist.items, this.props.positions.items);
-			pane = (<PositionPaneContainer/>);
-			watchlistBar = (
-				<div style={{display: 'flex', zIndex: 1100, backgroundColor: this.props.primaryColor, position: 'relative'}}>
-					<Tabs
-						value={this.props.title.present.fixedTitle}
-						style={{width: '100%'}}
-						inkBarStyle={{backgroundColor: 'white'}}
-					>
-						{_.map(watchlistItems, (stock, i) => (
-							<Tab
-								key={i}
-								value={stock.instrument.name}
-								onActive={() => this.changeTab(stock.instrument.name, +stock.quantity > 0, stock.historicals.day)}
-								label={stock.instrument.symbol}
-								className={`watchlist-button ${(this.props.title.present.fixedTitle == stock.instrument.name ? 'active' : '')}`}
-							/>
-						))}
-					</Tabs>
-
-				</div>
-			);
-			titleBar = (
-				<div style={{height: 91}}></div>
-			);
-		} else if(this.props.title.present.isWatchlist) {
-			const watchlistItems = _.extend({}, this.props.watchlist.items, this.props.positions.items);
-			pane = (<WatchlistPaneContainer/>);
-			watchlistBar = (
-				<div style={{display: 'flex', zIndex: 1100, backgroundColor: this.props.primaryColor, position: 'relative'}}>
-					<Tabs
-						value={this.props.title.present.fixedTitle}
-						style={{width: '100%'}}
-						inkBarStyle={{backgroundColor: 'white'}}
-					>
-						{_.map(watchlistItems, (stock, i) => (
-							<Tab
-								key={i}
-								value={stock.instrument.name}
-								onActive={() => this.changeTab(stock.instrument.name, +stock.quantity > 0, stock.historicals.day)}
-								label={stock.instrument.symbol}
-								className={`watchlist-button ${(this.props.title.present.fixedTitle == stock.instrument.name ? 'active' : '')}`}
-							/>
-						))}
-					</Tabs>
-
-				</div>
-			);
-			titleBar = (
-				<div style={{height: 91}}></div>
-			);
+		if(!title.present.stockType) {
+			switch(title.present.floatingTitle) {
+				case 'Portfolio':
+					iconElementRight = (
+						<div style={{display: 'flex'}}>
+							<IconButton onTouchTap={() => console.log('Searching here')} style={{flex: 1}}>
+								<Search/>
+							</IconButton>
+							<IconMenu
+								iconButtonElement={<IconButton><MoreVert/></IconButton>}
+								open={this.state.moreOpen}
+								useLayerForClickAway={true}
+								onRequestChange={(open) => this.toggleMoreMenu(open)}
+								anchorOrigin={{horizontal: 'right', vertical: 'top'}}
+								targetOrigin={{horizontal: 'right', vertical: 'top'}}
+								listStyle={{paddingLeft: 8, width: 165}}
+								style={{flex: 1}}
+							>
+								<RadioButtonGroup
+									name="stockValueDisplay"
+									labelPosition="left"
+									defaultSelected="price"
+									valueSelected={this.props.settings.displayedValue}
+									onChange={(e, value) => this.handleDisplayedValue(value)}
+								>
+									<RadioButton
+										value="price"
+										label="Last Price"
+										style={{paddingTop: 8, paddingBottom: 8}}
+									/>
+									<RadioButton
+										value="equity"
+										label="Equity"
+										style={{paddingTop: 8, paddingBottom: 8}}
+									/>
+									<RadioButton
+										value="percent"
+										label="Percent Change"
+										style={{paddingTop: 8, paddingBottom: 8}}
+									/>
+								</RadioButtonGroup>
+							</IconMenu>
+						</div>
+					);
+					titleBar = (
+						<AppBar
+							title={title.present.floatingTitle}
+							titleStyle={{alignSelf: 'center'}}
+							onLeftIconButtonTouchTap={this.handleToggle.bind(this)}
+							iconStyleLeft={{marginBottom: 8, alignSelf: 'center'}}
+							iconElementRight={iconElementRight}
+							iconStyleRight={{marginBottom: 8, alignSelf: 'center'}}
+							style={{height: 130, paddingTop: 75, marginTop: -75}}
+						/>
+					);
+					pane = (<PorfolioPaneContainer/>);
+					break;
+				case 'Market Sell':
+					iconElementRight = (<FlattButton label="ORDER TYPES" onTouchTap={() => this.props.changeTitle('Order Types')}/>);
+					titleBar = (<div style={{height: 91}}></div>);
+					pane = (<PorfolioPaneContainer/>);
+					break;
+			}
 		}
 
         return (
@@ -226,7 +206,7 @@ class AppLayout extends Component {
 					onRequestChange={(open) => this.props.toggleMenu(open)}
 					width={280}
 				>
-					<MenuItem onTouchTap={() => this.changeTitle('Account')} style={{height: 165}}>
+					<MenuItem onTouchTap={() => this.handleMenuSelect('Account')} style={{height: 165}}>
 						<div style={{height: 165, flex: 1, display: 'flex', flexDirection: 'column'}}>
 							<div style={{flex: 1, display: 'flex', alignItems: 'flex-end'}}>
 								<span style={{fontSize: 14, lineHeight: 'normal'}}>Drew Wallace</span>
@@ -243,16 +223,16 @@ class AppLayout extends Component {
 							</div>
 						</div>
 					</MenuItem>
-					<MenuItem onTouchTap={() => this.changeTitle('Portfolio')}>Portfolio</MenuItem>
-					<MenuItem onTouchTap={() => this.changeTitle('Account')}>Account</MenuItem>
-					<MenuItem onTouchTap={() => this.changeTitle('Banking')}>Banking</MenuItem>
-					<MenuItem onTouchTap={() => this.changeTitle('History')}>History</MenuItem>
-					<MenuItem onTouchTap={() => this.changeTitle('Settings')}>Settings</MenuItem>
-					<MenuItem onTouchTap={() => this.changeTitle('Refer friends')}>Refer friends</MenuItem>
-					<MenuItem onTouchTap={() => this.changeTitle('Help')}>Help</MenuItem>
+					<MenuItem onTouchTap={() => this.handleMenuSelect(portfolio.equity, {floatingTitle: 'Portfolio'})}>Portfolio</MenuItem>
+					<MenuItem onTouchTap={() => this.handleMenuSelect('Account')}>Account</MenuItem>
+					<MenuItem onTouchTap={() => this.handleMenuSelect('Banking')}>Banking</MenuItem>
+					<MenuItem onTouchTap={() => this.handleMenuSelect('History')}>History</MenuItem>
+					<MenuItem onTouchTap={() => this.handleMenuSelect('Settings')}>Settings</MenuItem>
+					<MenuItem onTouchTap={() => this.handleMenuSelect('Refer friends')}>Refer friends</MenuItem>
+					<MenuItem onTouchTap={() => this.handleMenuSelect('Help')}>Help</MenuItem>
 				</Drawer>
 				<AppBar
-					title={this.props.title.present.fixedTitle}
+					title={title.present.fixedTitle}
 					titleStyle={{alignSelf: 'center'}}
 					iconElementLeft={iconElementLeft}
 					iconStyleLeft={{marginBottom: 8, alignSelf: 'center'}}

@@ -7,10 +7,9 @@ const title = (state = {}, action) => {
             return Object.assign({}, state, {
                 floatingTitle: action.floatingTitle,
                 fixedTitle: action.fixedTitle,
-                isStock: action.isStock,
-                isPosition: action.isPosition,
-                isWatchlist: action.isWatchlist,
-                hasBackButton: (action.isStock || action.isPosition || action.isWatchlist)
+                stockType: action.stockType,
+                symbol: action.symbol,
+                hasBackButton: action.hasBackButton,
             });
         default:
             return state;

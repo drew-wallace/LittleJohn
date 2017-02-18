@@ -16,8 +16,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        changeTitle: (fixedTitle) => {
-			dispatch(changeTitle(fixedTitle, '', false, true));
+        changeTitle: (fixedTitle, options) => {
+			dispatch(changeTitle(fixedTitle, options));
 		},
         fetchPositionsIfNeeded: () => {
             dispatch(fetchPositionsIfNeeded());

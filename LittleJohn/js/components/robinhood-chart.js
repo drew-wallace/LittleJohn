@@ -18,27 +18,7 @@ class RobinhoodChart extends Component {
     constructor(props) {
         super(props);
 
-        const margin = this.props.margin;
-		const width = 700 - margin.left - margin.right;
-		const height = 500 - margin.top - margin.bottom;
-
-        this.x = scaleLinear().range([0, width]);
-		this.y = scaleLinear().range([height, 0]);
-		this.lineD3 = line()
-						.x((d) => this.x(d.xVal))
-						.y((d) => this.y(d.yVal));
-
-        this.bisectDate = bisector(function(d) { return d.xVal; }).left;
-
-        if(_.has(this.props.data.day[0], 'adjusted_open_equity')) {
-            this.openKey = 'adjusted_open_equity';
-            this.closeKey = 'adjusted_close_equity';
-        } else if(_.has(this.props.data.day[0], 'open_price')){
-            this.openKey = 'open_price';
-            this.closeKey = 'close_price';
-        }
-
-        const subtitle = this.generateSubtitle();
+        const { subtitle, margin, width, height } = this.setupChart(this.props);
 
         this.state = {
             title: this.props.title,
@@ -52,10 +32,36 @@ class RobinhoodChart extends Component {
         };
     }
 
-    generateSubtitle(tab=_.get(this, 'state.tab', 'day'), data=_.get(this, 'state.data', this.props.data[tab])) {
+    setupChart(props) {
+        const margin = props.margin;
+		const width = 700 - margin.left - margin.right;
+		const height = 500 - margin.top - margin.bottom;
+
+        this.x = scaleLinear().range([0, width]);
+		this.y = scaleLinear().range([height, 0]);
+		this.lineD3 = line()
+						.x((d) => this.x(d.xVal))
+						.y((d) => this.y(d.yVal));
+
+        this.bisectDate = bisector(function(d) { return d.xVal; }).left;
+
+        if(_.has(props.data.day[0], 'adjusted_open_equity')) {
+            this.openKey = 'adjusted_open_equity';
+            this.closeKey = 'adjusted_close_equity';
+        } else if(_.has(props.data.day[0], 'open_price')){
+            this.openKey = 'open_price';
+            this.closeKey = 'close_price';
+        }
+
+        const subtitle = this.generateSubtitle('day', props.data.day, props.title);
+
+        return { subtitle, margin, width, height };
+    }
+
+    generateSubtitle(tab=_.get(this, 'state.tab', 'day'), data=_.get(this, 'state.data', this.props.data[tab]), title=this.props.title) {
         const equityKey = (tab == 'day' ? this.openKey : this.closeKey);
         const startingEquity = +data[0][equityKey];
-		const endingEquity = this.props.title;
+		const endingEquity = title;
 		const netReturn = endingEquity - startingEquity;
 		const netPercentReturn = netReturn / startingEquity;
 		const equityChangeText = `${formatCurrencyDiff(netReturn)} (${formatPercentDiff(netPercentReturn)}) ${formatRelativeTime(data[0].begins_at, tab)}`;
@@ -121,6 +127,26 @@ class RobinhoodChart extends Component {
 	componentWillUnmount() {
 		window.removeEventListener("resize", this.onResizeThrottled);
 	}
+
+    componentWillReceiveProps(nextProps) {
+        if(_.has(nextProps.data.day[0], 'adjusted_open_equity')) {
+            this.openKey = 'adjusted_open_equity';
+            this.closeKey = 'adjusted_close_equity';
+        } else if(_.has(nextProps.data.day[0], 'open_price')){
+            this.openKey = 'open_price';
+            this.closeKey = 'close_price';
+        }
+
+        const subtitle = this.generateSubtitle('day', nextProps.data.day, nextProps.title);
+
+        this.setState({
+            title: nextProps.title,
+            subtitle,
+            data: nextProps.data.day,
+            tab: 'day',
+            primaryColor: (+_.last(nextProps.data.day)[this.openKey] >= +nextProps.data.day[0][this.openKey] ? positivePrimaryColor : negativePrimaryColor),
+        });
+    }
 
     componentWillUpdate(nextProps, nextState) {
         if(!this.state.dragging) {

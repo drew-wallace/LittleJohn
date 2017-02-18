@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import numeral from 'numeral';
 import moment from 'moment';
 
+import { RaisedButton } from 'material-ui';
 import CircularProgress from 'material-ui/CircularProgress';
 
 import RobinhoodChartComponent from './robinhood-chart';
@@ -12,11 +13,19 @@ class PositionPaneComponent extends Component {
 	    super(props);
 	}
 
+	handleSell() {
+		this.props.changeTitle('Market Sell', {symbol: this.props.stock.instrument.symbol, hasBackButton: true});
+	}
+
+	handleBuy() {
+		this.props.changeTitle('Market Buy', {symbol: this.props.stock.instrument.symbol, hasBackButton: true});
+	}
+
     render() {
-		// if(this.props.position.lastUpdated) {
+		// if(this.props.stock.lastUpdated) {
 			let changePrimaryColor = this.props.changePrimaryColor;
 			let primaryColor = this.props.primaryColor;
-			let { historicals, quote } = this.props.position;
+			let { historicals, quote } = this.props.stock;
 
 			return (
 				<div>
@@ -26,6 +35,20 @@ class PositionPaneComponent extends Component {
 						data={historicals}
 						changePrimaryColor={changePrimaryColor}
 					/>
+					<div style={{display: 'flex', justifyContent: 'space-around'}}>
+						<RaisedButton
+							label="SELL"
+							primary={true}
+							style={{flex: '0 0 49%'}}
+							onTouchTap={() => this.handleSell()}
+						/>
+						<RaisedButton
+							label="BUY"
+							primary={true}
+							style={{flex: '0 0 49%'}}
+							onTouchTap={() => this.handleBuy()}
+						/>
+					</div>
 				</div>
 			);
 		// } else {

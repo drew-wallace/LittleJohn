@@ -40,24 +40,18 @@ export const toggleMenu = (open) => {
         open
     };
 }
-export const changeTitle = (fixedTitle, floatingTitle, isStock=false, isPosition=false, isWatchlist=false) => {
+export const changeTitle = (fixedTitle='Portfolio', options={}) => {
     return {
         type: 'CHANGE_TITLE',
         fixedTitle,
-        floatingTitle,
-        isStock,
-        isPosition,
-        isWatchlist
+        ...options
     };
 }
-export const changeTitleFromTab = (fixedTitle, floatingTitle, isStock=false, isPosition=false, isWatchlist=false) => {
+export const changeTitleFromTab = (fixedTitle='Portfolio', options={}) => {
     return {
         type: 'CHANGE_TITLE_FROM_TAB',
         fixedTitle,
-        floatingTitle,
-        isStock,
-        isPosition,
-        isWatchlist
+        ...options
     };
 }
 export const changeDisplayedValue = (value) => {
@@ -191,7 +185,7 @@ function fetchPortfolio(state) {
 				// 	return Windows.Storage.FileIO.writeTextAsync(sampleFile, allRes.responseText);
 				// });
                 const portfolio = processPortfolio(portfolioRes, dayRes, weekRes, yearRes, allRes);
-                dispatch(changeTitle(formatCurrency(portfolio.equity), 'Portfolio'));
+                dispatch(changeTitle(formatCurrency(portfolio.equity), {floatingTitle: 'Portfolio'}));
                 dispatch(changePrimaryColor((_.last(portfolio.historicals.day).adjusted_open_equity >= portfolio.historicals.day[0].adjusted_open_equity ? positivePrimaryColor : negativePrimaryColor)));
                 dispatch(receivePortfolio(portfolio));
 			}
