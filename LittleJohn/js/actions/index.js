@@ -8,6 +8,7 @@ import { formatCurrency } from '../lib/formaters';
 import styles from '../styles';
 
 import env from "../../env";
+import Account from '../../data/account';
 import Portfolios from '../../data/portfolios';
 import Day from '../../data/day';
 import Week from '../../data/week';
@@ -125,6 +126,74 @@ export const updateStocks = (stocks) => {
         type: 'UPDATE_STOCKS',
         stocks
     }
+}
+
+export const invalidateAccount = (account) => {
+  return {
+    type: 'INVALIDATE_ACCOUNT',
+    account
+  }
+}
+
+function requestAccount() {
+    return {
+        type: 'REQUEST_ACCOUNT'
+    };
+}
+
+function receiveAccount(account) {
+    return {
+        type: 'RECEIVE_ACCOUNT',
+        account,
+        receivedAt: Date.now()
+    };
+}
+
+function fetchAccount(state) {
+    return dispatch => {
+        dispatch(requestAccount());
+
+        // let robinhood = state.robinhood;
+
+        // robinhood.account().then(function(res) {
+        //     let account = res.responseJSON.results[0];
+        //     dispatch(receiveAccount(account));
+        // });
+        dispatch(receiveAccount(Account.responseJSON.results[0]));
+    }
+}
+
+function shouldFetchAccount(state) {
+    const account = state.account;
+
+    if (_.isEmpty(account)) {
+        return true;
+    } else if (account.isFetching) {
+        return false;
+    } else {
+        return account.didInvalidate;
+    }
+}
+
+export function fetchAccountIfNeeded() {
+
+    // Note that the function also receives getState()
+    // which lets you choose what to dispatch next.
+
+    // This is useful for avoiding a network request if
+    // a cached value is already available.
+
+    return (dispatch, getState) => {
+        const state = getState();
+
+        if (shouldFetchAccount(state)) {
+            // Dispatch a thunk from thunk!
+            return dispatch(fetchAccount(state));
+        } else {
+            // Let the calling code know there's nothing to wait for.
+            return Promise.resolve()
+        }
+    };
 }
 
 export const invalidatePortfolio = (portfolio) => {
@@ -251,7 +320,7 @@ function fetchCards(state) {
     return dispatch => {
         dispatch(requestCards());
 
-        let robinhood = state.robinhood;
+        // let robinhood = state.robinhood;
 
         // robinhood.cards().then(function(res) {
         //     let cards = res.responseJSON.results.filter(function(card) {
@@ -321,7 +390,7 @@ function fetchPositions(state) {
     return dispatch => {
         dispatch(requestPositions());
 
-        let robinhood = state.robinhood;
+        // let robinhood = state.robinhood;
 
         // robinhood.positions({nonzero: true}).then(function(positions){
         //     var promises = [];
@@ -332,12 +401,14 @@ function fetchPositions(state) {
         //         }).then(function(symbol){
         //             return Promise.join(
         //                 robinhood.quote_data(symbol),
+        //                 robinhood.quote_data(news),
         //                 robinhood.symbolHistoricals(symbol, {span: 'day', interval: '5minute'}),
         //                 robinhood.symbolHistoricals(symbol, {span: 'week', interval: '10minute'}),
         //                 robinhood.symbolHistoricals(symbol, {span: 'year', interval: 'day'}),
         //                 robinhood.symbolHistoricals(symbol, {span: '5year', interval: 'week'}),
-        //                 function(quoteRes, dayRes, weekRes, yearRes, allRes) {
+        //                 function(quoteRes, newsRes, dayRes, weekRes, yearRes, allRes) {
         //                     position.quote = quoteRes.responseJSON.results[0];
+        //                     position.news = newsRes.responseJSON.results;
         //                     position.historicals = {
         //                         day: dayRes.responseJSON.historicals,
         //                         week: weekRes.responseJSON.historicals,
@@ -434,12 +505,14 @@ function fetchWatchlist(state) {
         //             if(!state.stocks[symbol]) {
         //                 return Promise.join(
         //                     robinhood.quote_data(symbol),
+        //                     robinhood.news(symbol),
         //                     robinhood.symbolHistoricals(symbol, {span: 'day', interval: '5minute'}),
         //                     robinhood.symbolHistoricals(symbol, {span: 'week', interval: '10minute'}),
         //                     robinhood.symbolHistoricals(symbol, {span: 'year', interval: 'day'}),
         //                     robinhood.symbolHistoricals(symbol, {span: '5year', interval: 'week'}),
-        //                     function(quoteRes, dayRes, weekRes, yearRes, allRes) {
+        //                     function(quoteRes, newsRes, dayRes, weekRes, yearRes, allRes) {
         //                         stock.quote = quoteRes.responseJSON.results[0];
+        //                         stock.news = newsRes.responseJSON.results;
         //                         stock.historicals = {
         //                             day: dayRes.responseJSON.historicals,
         //                             week: weekRes.responseJSON.historicals,

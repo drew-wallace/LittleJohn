@@ -3,6 +3,7 @@ import _ from 'lodash';
 
 import { Drawer, AppBar, MenuItem, IconButton, IconMenu, RadioButtonGroup, RadioButton, FlatButton } from 'material-ui';
 import {Tabs, Tab} from 'material-ui/Tabs';
+import CircularProgress from 'material-ui/CircularProgress';
 import ArrowBack from 'material-ui/svg-icons/navigation/arrow-back';
 import AddCircleOutline from 'material-ui/svg-icons/content/add-circle-outline';
 import RemoveCircleOutline from 'material-ui/svg-icons/content/remove-circle-outline';
@@ -68,186 +69,197 @@ class AppLayout extends Component {
 	}
 
     render() {
-		const { changeTitle, portfolio, title, watchlist, positions } = this.props;
-		let iconElementLeft = null;
-		let iconElementRight = null;
-		let onLeftIconButtonTouchTap = this.handleToggle.bind(this);
-		let pane = (<div>If you're seeing this, I messed something up...</div>);
-		let titleBar = (<div style={{height: 55}}></div>);
-		let watchlistBar = (<div></div>);
-		const watchlistItems = _.extend({}, watchlist.items, positions.items);
+		const { account, fetchAccountIfNeeded } = this.props;
 
-		if(title.present.hasBackButton) {
-			iconElementLeft = (
-				<IconButton>
-					<ArrowBack/>
-				</IconButton>
-			);
-			onLeftIconButtonTouchTap = () => this.handleBack();
-		}
+		if(account.lastUpdated) {
+			const { changeTitle, portfolio, title, watchlist, positions } = this.props;
+			let iconElementLeft = null;
+			let iconElementRight = null;
+			let onLeftIconButtonTouchTap = this.handleToggle.bind(this);
+			let pane = (<div>If you're seeing this, I messed something up...</div>);
+			let titleBar = (<div style={{height: 55}}></div>);
+			let watchlistBar = (<div></div>);
+			const watchlistItems = _.extend({}, watchlist.items, positions.items);
 
-		switch(title.present.stockType) {
-			case 'position':
-				iconElementRight = null;
-				// pane = (<PositionPaneContainer/>);
-				pane = (<StockPaneContainer/>);
-			case 'watchlist':
-				if(title.present.stockType == 'watchlist') {
-					iconElementRight = (
-						<IconButton>
-							<RemoveCircleOutline/>
-						</IconButton>
-					);
-					// pane = (<WatchlistPaneContainer/>);
-					pane = (<StockPaneContainer/>);
-				}
-				watchlistBar = (
-					<div style={{display: 'flex', zIndex: 1100, backgroundColor: this.props.primaryColor, position: 'relative'}}>
-						<Tabs
-							value={title.present.fixedTitle}
-							style={{width: '100%'}}
-							inkBarStyle={{backgroundColor: 'white'}}
-						>
-							{_.map(watchlistItems, (stock, i) => (
-								<Tab
-									key={i}
-									value={stock.instrument.name}
-									onActive={() => this.changeTab(stock)}
-									label={stock.instrument.symbol}
-									className={`watchlist-button ${(title.present.symbol == stock.instrument.symbol ? 'active' : '')}`}
-								/>
-							))}
-						</Tabs>
-					</div>
+			if(title.present.hasBackButton) {
+				iconElementLeft = (
+					<IconButton>
+						<ArrowBack/>
+					</IconButton>
 				);
-			case 'stock':
-				if(title.present.stockType == 'stock') {
-					iconElementRight = (
-						<IconButton>
-							<AddCircleOutline/>
-						</IconButton>
-					);
-					// FIX: Need to make this a stock pane container
-					pane = (<StockPaneContainer/>);
-				}
-				titleBar = (<div style={{height: 91}}></div>);
-		}
-
-		if(!title.present.stockType) {
-			switch(title.present.floatingTitle) {
-				case 'Portfolio':
-					iconElementRight = (
-						<div style={{display: 'flex'}}>
-							<IconButton onTouchTap={() => console.log('Searching here')} style={{flex: 1}}>
-								<Search/>
-							</IconButton>
-							<IconMenu
-								iconButtonElement={<IconButton><MoreVert/></IconButton>}
-								open={this.state.moreOpen}
-								useLayerForClickAway={true}
-								onRequestChange={(open) => this.toggleMoreMenu(open)}
-								anchorOrigin={{horizontal: 'right', vertical: 'top'}}
-								targetOrigin={{horizontal: 'right', vertical: 'top'}}
-								listStyle={{paddingLeft: 8, width: 165}}
-								style={{flex: 1}}
-							>
-								<RadioButtonGroup
-									name="stockValueDisplay"
-									labelPosition="left"
-									defaultSelected="price"
-									valueSelected={this.props.settings.displayedValue}
-									onChange={(e, value) => this.handleDisplayedValue(value)}
-								>
-									<RadioButton
-										value="price"
-										label="Last Price"
-										style={{paddingTop: 8, paddingBottom: 8}}
-									/>
-									<RadioButton
-										value="equity"
-										label="Equity"
-										style={{paddingTop: 8, paddingBottom: 8}}
-									/>
-									<RadioButton
-										value="percent"
-										label="Percent Change"
-										style={{paddingTop: 8, paddingBottom: 8}}
-									/>
-								</RadioButtonGroup>
-							</IconMenu>
-						</div>
-					);
-					titleBar = (
-						<AppBar
-							title={title.present.floatingTitle}
-							titleStyle={{alignSelf: 'center'}}
-							onLeftIconButtonTouchTap={this.handleToggle.bind(this)}
-							iconStyleLeft={{marginBottom: 8, alignSelf: 'center'}}
-							iconElementRight={iconElementRight}
-							iconStyleRight={{marginBottom: 8, alignSelf: 'center'}}
-							style={{height: 130, paddingTop: 75, marginTop: -75}}
-						/>
-					);
-					pane = (<PorfolioPaneContainer/>);
-					break;
-				case 'Market Sell':
-					iconElementRight = (<FlattButton label="ORDER TYPES" onTouchTap={() => this.props.changeTitle('Order Types')}/>);
-					titleBar = (<div style={{height: 91}}></div>);
-					pane = (<PorfolioPaneContainer/>);
-					break;
+				onLeftIconButtonTouchTap = () => this.handleBack();
 			}
-		}
 
-        return (
-			<div>
-				<Drawer
-					docked={false}
-					open={this.props.menu}
-					onRequestChange={(open) => this.props.toggleMenu(open)}
-					width={280}
-				>
-					<MenuItem onTouchTap={() => this.handleMenuSelect('Account')} style={{height: 165}}>
-						<div style={{height: 165, flex: 1, display: 'flex', flexDirection: 'column'}}>
-							<div style={{flex: 1, display: 'flex', alignItems: 'flex-end'}}>
-								<span style={{fontSize: 14, lineHeight: 'normal'}}>Drew Wallace</span>
-							</div>
-							<div style={{flex: 1, display: 'flex', alignItems: 'flex-end', paddingBottom: 20}}>
-								<div style={{flex: 1, display: 'flex', flexDirection: 'column'}}>
-									<span style={{flex: 1, fontSize: 22, lineHeight: 'normal'}}>$235.60</span>
-									<span style={{flex: 1, fontSize: 14, lineHeight: 'normal'}}>Portfolio Value</span>
-								</div>
-								<div style={{flex: 1, display: 'flex', flexDirection: 'column'}}>
-									<span style={{flex: 1, fontSize: 22, lineHeight: 'normal'}}>$0.09</span>
-									<span style={{flex: 1, fontSize: 14, lineHeight: 'normal'}}>Buying Power</span>
-								</div>
-							</div>
+			switch(title.present.stockType) {
+				case 'position':
+					iconElementRight = null;
+					// pane = (<PositionPaneContainer/>);
+					pane = (<StockPaneContainer/>);
+				case 'watchlist':
+					if(title.present.stockType == 'watchlist') {
+						iconElementRight = (
+							<IconButton>
+								<RemoveCircleOutline/>
+							</IconButton>
+						);
+						// pane = (<WatchlistPaneContainer/>);
+						pane = (<StockPaneContainer/>);
+					}
+					titleBar = (<div style={{height: 91}}></div>);
+					watchlistBar = (
+						<div style={{display: 'flex', zIndex: 1100, backgroundColor: this.props.primaryColor, position: 'relative'}}>
+							<Tabs
+								value={title.present.fixedTitle}
+								style={{width: '100%'}}
+								inkBarStyle={{backgroundColor: 'white'}}
+							>
+								{_.map(watchlistItems, (stock, i) => (
+									<Tab
+										key={i}
+										value={stock.instrument.name}
+										onActive={() => this.changeTab(stock)}
+										label={stock.instrument.symbol}
+										className={`watchlist-button ${(title.present.symbol == stock.instrument.symbol ? 'active' : '')}`}
+									/>
+								))}
+							</Tabs>
 						</div>
-					</MenuItem>
-					<MenuItem onTouchTap={() => this.handleMenuSelect(portfolio.equity, {floatingTitle: 'Portfolio'})}>Portfolio</MenuItem>
-					<MenuItem onTouchTap={() => this.handleMenuSelect('Account')}>Account</MenuItem>
-					<MenuItem onTouchTap={() => this.handleMenuSelect('Banking')}>Banking</MenuItem>
-					<MenuItem onTouchTap={() => this.handleMenuSelect('History')}>History</MenuItem>
-					<MenuItem onTouchTap={() => this.handleMenuSelect('Settings')}>Settings</MenuItem>
-					<MenuItem onTouchTap={() => this.handleMenuSelect('Refer friends')}>Refer friends</MenuItem>
-					<MenuItem onTouchTap={() => this.handleMenuSelect('Help')}>Help</MenuItem>
-				</Drawer>
-				<AppBar
-					title={title.present.fixedTitle}
-					titleStyle={{alignSelf: 'center'}}
-					iconElementLeft={iconElementLeft}
-					iconStyleLeft={{marginBottom: 8, alignSelf: 'center'}}
-					onLeftIconButtonTouchTap={onLeftIconButtonTouchTap}
-					iconElementRight={iconElementRight}
-					iconStyleRight={{marginBottom: 8, alignSelf: 'center'}}
-					style={{height: 55}}
-				/>
-				{watchlistBar}
-				<div className="scrollable-pane-content">
-					{titleBar}
-					{pane}
+					);
+				case 'stock':
+					if(title.present.stockType == 'stock') {
+						iconElementRight = (
+							<IconButton>
+								<AddCircleOutline/>
+							</IconButton>
+						);
+						// FIX: Need to make this a stock pane container
+						pane = (<StockPaneContainer/>);
+					}
+			}
+
+			if(!title.present.stockType) {
+				switch(title.present.fixedTitle) {
+					case 'Market Sell':
+						iconElementRight = (<FlatButton label="ORDER TYPES" onTouchTap={() => this.props.changeTitle('Order Types', {hasBackButton: true})} style={{marginTop: 0}}/>);
+						pane = (<PorfolioPaneContainer/>);
+						break;
+					default:
+						if(title.present.floatingTitle == 'Portfolio') {
+							iconElementRight = (
+								<div style={{display: 'flex'}}>
+									<IconButton onTouchTap={() => console.log('Searching here')} style={{flex: 1}}>
+										<Search/>
+									</IconButton>
+									<IconMenu
+										iconButtonElement={<IconButton><MoreVert/></IconButton>}
+										open={this.state.moreOpen}
+										useLayerForClickAway={true}
+										onRequestChange={(open) => this.toggleMoreMenu(open)}
+										anchorOrigin={{horizontal: 'right', vertical: 'top'}}
+										targetOrigin={{horizontal: 'right', vertical: 'top'}}
+										listStyle={{paddingLeft: 8, width: 165}}
+										style={{flex: 1}}
+									>
+										<RadioButtonGroup
+											name="stockValueDisplay"
+											labelPosition="left"
+											defaultSelected="price"
+											valueSelected={this.props.settings.displayedValue}
+											onChange={(e, value) => this.handleDisplayedValue(value)}
+										>
+											<RadioButton
+												value="price"
+												label="Last Price"
+												style={{paddingTop: 8, paddingBottom: 8}}
+											/>
+											<RadioButton
+												value="equity"
+												label="Equity"
+												style={{paddingTop: 8, paddingBottom: 8}}
+											/>
+											<RadioButton
+												value="percent"
+												label="Percent Change"
+												style={{paddingTop: 8, paddingBottom: 8}}
+											/>
+										</RadioButtonGroup>
+									</IconMenu>
+								</div>
+							);
+							titleBar = (
+								<AppBar
+									title={title.present.floatingTitle}
+									titleStyle={{alignSelf: 'center'}}
+									onLeftIconButtonTouchTap={this.handleToggle.bind(this)}
+									iconStyleLeft={{marginBottom: 8, alignSelf: 'center'}}
+									iconElementRight={iconElementRight}
+									iconStyleRight={{marginBottom: 8, alignSelf: 'center'}}
+									style={{height: 130, paddingTop: 75, marginTop: -75}}
+								/>
+							);
+							pane = (<PorfolioPaneContainer/>);
+						}
+				}
+			}
+
+			return (
+				<div>
+					<Drawer
+						docked={false}
+						open={this.props.menu}
+						onRequestChange={(open) => this.props.toggleMenu(open)}
+						width={280}
+					>
+						<MenuItem onTouchTap={() => this.handleMenuSelect('Account')} style={{height: 165}}>
+							<div style={{height: 165, flex: 1, display: 'flex', flexDirection: 'column'}}>
+								<div style={{flex: 1, display: 'flex', alignItems: 'flex-end'}}>
+									<span style={{fontSize: 14, lineHeight: 'normal'}}>Drew Wallace</span>
+								</div>
+								<div style={{flex: 1, display: 'flex', alignItems: 'flex-end', paddingBottom: 20}}>
+									<div style={{flex: 1, display: 'flex', flexDirection: 'column'}}>
+										<span style={{flex: 1, fontSize: 22, lineHeight: 'normal'}}>$235.60</span>
+										<span style={{flex: 1, fontSize: 14, lineHeight: 'normal'}}>Portfolio Value</span>
+									</div>
+									<div style={{flex: 1, display: 'flex', flexDirection: 'column'}}>
+										<span style={{flex: 1, fontSize: 22, lineHeight: 'normal'}}>$0.09</span>
+										<span style={{flex: 1, fontSize: 14, lineHeight: 'normal'}}>Buying Power</span>
+									</div>
+								</div>
+							</div>
+						</MenuItem>
+						<MenuItem onTouchTap={() => this.handleMenuSelect(portfolio.equity, {floatingTitle: 'Portfolio'})}>Portfolio</MenuItem>
+						<MenuItem onTouchTap={() => this.handleMenuSelect('Account')}>Account</MenuItem>
+						<MenuItem onTouchTap={() => this.handleMenuSelect('Banking')}>Banking</MenuItem>
+						<MenuItem onTouchTap={() => this.handleMenuSelect('History')}>History</MenuItem>
+						<MenuItem onTouchTap={() => this.handleMenuSelect('Settings')}>Settings</MenuItem>
+						<MenuItem onTouchTap={() => this.handleMenuSelect('Refer friends')}>Refer friends</MenuItem>
+						<MenuItem onTouchTap={() => this.handleMenuSelect('Help')}>Help</MenuItem>
+					</Drawer>
+					<AppBar
+						title={title.present.fixedTitle}
+						titleStyle={{alignSelf: 'center'}}
+						iconElementLeft={iconElementLeft}
+						iconStyleLeft={{marginBottom: 8, alignSelf: 'center'}}
+						onLeftIconButtonTouchTap={onLeftIconButtonTouchTap}
+						iconElementRight={iconElementRight}
+						iconStyleRight={{marginBottom: 8, alignSelf: 'center'}}
+						style={{height: 55}}
+					/>
+					{watchlistBar}
+					<div className="scrollable-pane-content">
+						{titleBar}
+						{pane}
+					</div>
 				</div>
-			</div>
-        );
+			);
+		} else {
+			fetchAccountIfNeeded();
+			return (
+				<div style={{display: 'flex', width: '100%', height: '100%', alignItems: 'center', position: 'absolute', marginTop: -75}}>
+					<CircularProgress size={80} thickness={5} style={{marginLeft: 'auto', marginRight: 'auto'}}/>
+				</div>
+			);
+		}
     }
 }
 

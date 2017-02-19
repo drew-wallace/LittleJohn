@@ -25,6 +25,7 @@ const mapStateToProps = (state) => {
     }
 
     return {
+        account: state.account,
         stockType,
         stock,
         primaryColor: state.primaryColor

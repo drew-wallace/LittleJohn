@@ -30,5 +30,8 @@ export default StyleSheet.create({
   },
   'watchlist-buttonactive': {
     'color': 'white !important'
+  },
+  'card-divider': {
+    'margin': [{ 'unit': 'px', 'value': 15 }, { 'unit': 'px', 'value': -15 }, { 'unit': 'px', 'value': 15 }, { 'unit': 'px', 'value': -15 }, { 'unit': 'string', 'value': '!important' }]
   }
 });

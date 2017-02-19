@@ -46,6 +46,7 @@ const initialState = {
         displayedValue: 'price',
     },
     portfolio: {},
+    account: {},
     cards: {},
     positions: {},
     watchlist: {},

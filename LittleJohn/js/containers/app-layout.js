@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 
-import { toggleMenu, closeMenu, changeTitle, changeDisplayedValue, undoTitle, changePrimaryColor, changeTitleFromTab } from '../actions';
+import { toggleMenu, closeMenu, changeTitle, changeDisplayedValue, undoTitle, changePrimaryColor, changeTitleFromTab, fetchAccountIfNeeded } from '../actions';
 
 import App from '../components/app';
 
@@ -12,6 +12,7 @@ const mapStateToProps = (state) => {
 		menu: state.menu,
 		robinhood: state.robinhood,
 		portfolio: state.portfolio,
+		account: state.account,
 		primaryColor: state.primaryColor,
 		settings: state.settings,
 		watchlist: state.watchlist,
@@ -26,7 +27,8 @@ const mapDispatchToProps = (dispatch) => {
 		changeTitleFromTab: (fixedTitle, options) => dispatch(changeTitleFromTab(fixedTitle, options)),
 		changeDisplayedValue: (value) => dispatch(changeDisplayedValue(value)),
 		undoTitle: () => dispatch(undoTitle()),
-		changePrimaryColor: (color) => dispatch(changePrimaryColor(color))
+		changePrimaryColor: (color) => dispatch(changePrimaryColor(color)),
+		fetchAccountIfNeeded: () => dispatch(fetchAccountIfNeeded())
     }
 }
 

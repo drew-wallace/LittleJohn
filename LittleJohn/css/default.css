@@ -31,3 +31,7 @@
 .watchlist-button.active {
     color: white !important;
 }
+
+.card-divider {
+    margin: 15px -15px 15px -15px !important;
+}

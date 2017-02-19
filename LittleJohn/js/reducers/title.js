@@ -4,13 +4,13 @@ const title = (state = {}, action) => {
     switch (action.type) {
         case 'CHANGE_TITLE_FROM_TAB':
         case 'CHANGE_TITLE':
-            return Object.assign({}, state, {
+            return {
                 floatingTitle: action.floatingTitle,
                 fixedTitle: action.fixedTitle,
                 stockType: action.stockType,
                 symbol: action.symbol,
                 hasBackButton: action.hasBackButton,
-            });
+            };
         default:
             return state;
     }
