@@ -71,6 +71,13 @@ export const redoTitle = () => {
         type: 'REDO_TITLE'
     };
 }
+export const initTitle = (fixedTitle, options) => {
+    return {
+        type: 'INIT_TITLE',
+        fixedTitle,
+        ...options
+    };
+}
 export const changeEquityTitle = (text) => {
     return {
         type: 'CHANGE_EQUITY_TITLE',

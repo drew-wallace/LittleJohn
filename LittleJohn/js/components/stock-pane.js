@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import numeral from 'numeral';
 import moment from 'moment';
 
-import { RaisedButton, Divider, List, ListItem } from 'material-ui';
+import { RaisedButton, Divider, List, ListItem, FlatButton } from 'material-ui';
 import CircularProgress from 'material-ui/CircularProgress';
 import {Card, CardText} from 'material-ui/Card';
 
@@ -23,11 +23,17 @@ class PositionPaneComponent extends Component {
 		this.props.changeTitle('Market Buy', {symbol: this.props.stock.instrument.symbol, hasBackButton: true});
 	}
 
+	handleMoreNews() {
+		this.props.initTitle(`${this.props.stock.instrument.symbol} News`, {symbol: this.props.stock.instrument.symbol, stockType: 'news', hasBackButton: true});
+	}
+
     render() {
 		// if(this.props.stock.lastUpdated) {
 			const { changePrimaryColor, primaryColor, stockType } = this.props;
-			const { historicals, quote, instrument, news } = this.props.stock;
+			const { historicals, quote, instrument } = this.props.stock;
 			const { buying_power } = this.props.account.accountData;
+
+			const news = this.props.stock.news.slice(0, 3);
 
 			let yourPosition = (<div></div>);
 			let sellButton = (<div></div>);
@@ -128,26 +134,21 @@ class PositionPaneComponent extends Component {
 					<Card style={{marginBottom: 15}} containerStyle={{padding: 0}}>
 						<CardText style={{padding: 0}}>
 							<List style={{padding: 0}}>
-								{news.map((article, index) => {
-									const item = (
+								{news.map((article, index) => (
+									<div key={index}>
 										<ListItem
-											key={index}
 											primaryText={article.title}
 											secondaryText={moment(article.published_at).format('MMM DD, YYYY')}
 											onTouchTap={() => window.location = article.url}
 										/>
-									);
-									if(index < news.length - 1) {
-										return (
-											<div key={index}>
-												{item}
-												<Divider />
-											</div>
-										);
-									} else {
-										return item;
-									}
-								})}
+										<Divider />
+									</div>
+								))}
+								<ListItem
+									innerDivStyle={{display: 'flex', justifyContent: 'flex-end'}}
+									primaryText={(<FlatButton label="MORE" primary={true} onTouchTap={() => this.handleMoreNews()} style={{flex: 0}}/>)}
+									disabled={true}
+								/>
 							</List>
 						</CardText>
 					</Card>

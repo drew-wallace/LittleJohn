@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import _ from 'lodash';
+import moment from 'moment';
 
-import { Drawer, AppBar, MenuItem, IconButton, IconMenu, RadioButtonGroup, RadioButton, FlatButton } from 'material-ui';
+import { Drawer, AppBar, MenuItem, IconButton, IconMenu, RadioButtonGroup, RadioButton, FlatButton, List, ListItem, Divider } from 'material-ui';
 import {Tabs, Tab} from 'material-ui/Tabs';
 import CircularProgress from 'material-ui/CircularProgress';
 import ArrowBack from 'material-ui/svg-icons/navigation/arrow-back';
@@ -13,6 +14,7 @@ import Search from 'material-ui/svg-icons/action/search';
 import PorfolioPaneContainer from '../containers/portfolio-pane';
 import StockPaneContainer from '../containers/stock-pane';
 
+import { formatCurrency } from '../lib/formaters';
 import styles from '../styles';
 
 const { positivePrimaryColor, negativePrimaryColor } = styles;
@@ -69,7 +71,7 @@ class AppLayout extends Component {
 	}
 
     render() {
-		const { account, fetchAccountIfNeeded } = this.props;
+		const { account, fetchAccountIfNeeded, primaryColor } = this.props;
 
 		if(account.lastUpdated) {
 			const { changeTitle, portfolio, title, watchlist, positions } = this.props;
@@ -77,9 +79,10 @@ class AppLayout extends Component {
 			let iconElementRight = null;
 			let onLeftIconButtonTouchTap = this.handleToggle.bind(this);
 			let pane = (<div>If you're seeing this, I messed something up...</div>);
-			let titleBar = (<div style={{height: 55}}></div>);
+			let titleBar = (<div style={{height: 55, backgroundColor: primaryColor}}></div>);
 			let watchlistBar = (<div></div>);
 			const watchlistItems = _.extend({}, watchlist.items, positions.items);
+			let { buying_power } = this.props.account.accountData;
 
 			if(title.present.hasBackButton) {
 				iconElementLeft = (
@@ -105,9 +108,9 @@ class AppLayout extends Component {
 						// pane = (<WatchlistPaneContainer/>);
 						pane = (<StockPaneContainer/>);
 					}
-					titleBar = (<div style={{height: 91}}></div>);
+					titleBar = (<div style={{height: 103, backgroundColor: primaryColor}}></div>);
 					watchlistBar = (
-						<div style={{display: 'flex', zIndex: 1100, backgroundColor: this.props.primaryColor, position: 'relative'}}>
+						<div style={{display: 'flex', zIndex: 1100, backgroundColor: primaryColor, position: 'relative'}}>
 							<Tabs
 								value={title.present.fixedTitle}
 								style={{width: '100%'}}
@@ -125,20 +128,36 @@ class AppLayout extends Component {
 							</Tabs>
 						</div>
 					);
+					break;
 				case 'stock':
-					if(title.present.stockType == 'stock') {
-						iconElementRight = (
-							<IconButton>
-								<AddCircleOutline/>
-							</IconButton>
-						);
-						// FIX: Need to make this a stock pane container
-						pane = (<StockPaneContainer/>);
-					}
+					iconElementRight = (
+						<IconButton>
+							<AddCircleOutline/>
+						</IconButton>
+					);
+					pane = (<StockPaneContainer/>);
+					break;
+				case 'news':
+					pane = (
+						<List style={{padding: 0}}>
+							{watchlistItems[title.present.symbol].news.map((article, index) => (
+								<div key={index}>
+									<ListItem
+										primaryText={article.title}
+										secondaryText={moment(article.published_at).format('MMM DD, YYYY')}
+										onTouchTap={() => window.location = article.url}
+									/>
+									<Divider />
+								</div>
+							))}
+						</List>
+					);
+					break;
 			}
 
 			if(!title.present.stockType) {
 				switch(title.present.fixedTitle) {
+					// FIX: put make `sell` a stockType and this is the result
 					case 'Market Sell':
 						iconElementRight = (<FlatButton label="ORDER TYPES" onTouchTap={() => this.props.changeTitle('Order Types', {hasBackButton: true})} style={{marginTop: 0}}/>);
 						pane = (<PorfolioPaneContainer/>);
@@ -221,7 +240,7 @@ class AppLayout extends Component {
 										<span style={{flex: 1, fontSize: 14, lineHeight: 'normal'}}>Portfolio Value</span>
 									</div>
 									<div style={{flex: 1, display: 'flex', flexDirection: 'column'}}>
-										<span style={{flex: 1, fontSize: 22, lineHeight: 'normal'}}>$0.09</span>
+										<span style={{flex: 1, fontSize: 22, lineHeight: 'normal'}}>{formatCurrency(+buying_power)}</span>
 										<span style={{flex: 1, fontSize: 14, lineHeight: 'normal'}}>Buying Power</span>
 									</div>
 								</div>

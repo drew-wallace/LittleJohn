@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 
-import { changePrimaryColor, changeTitle } from '../actions';
+import { changePrimaryColor, changeTitle, initTitle } from '../actions';
 
 import PositionPaneComponent from '../components/stock-pane';
 
@@ -35,7 +35,8 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
     return {
         changePrimaryColor: (color) => dispatch(changePrimaryColor(color)),
-        changeTitle: (fixedTitle, options) => dispatch(changeTitle(fixedTitle, options))
+        changeTitle: (fixedTitle, options) => dispatch(changeTitle(fixedTitle, options)),
+        initTitle: (fixedTitle, options) => dispatch(initTitle(fixedTitle, options))
     }
 }
 
