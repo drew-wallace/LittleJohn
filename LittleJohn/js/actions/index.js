@@ -10,10 +10,6 @@ import styles from '../styles';
 import env from "../../env";
 import Account from '../../data/account';
 import Portfolios from '../../data/portfolios';
-import Day from '../../data/day';
-import Week from '../../data/week';
-import Year from '../../data/year';
-import AllTime from '../../data/5year';
 import Positions from '../../data/positions';
 import Watchlist from '../../data/watchlist';
 
@@ -164,6 +160,9 @@ function fetchAccount(state) {
 
         // robinhood.account().then(function(res) {
         //     let account = res.responseJSON.results[0];
+        //     Windows.Storage.ApplicationData.current.localFolder.createFileAsync("cards.json", Windows.Storage.CreationCollisionOption.replaceExisting).then(function (sampleFile) {
+        //         return Windows.Storage.FileIO.writeTextAsync(sampleFile, JSON.stringify(cards));
+        //     });
         //     dispatch(receiveAccount(account));
         // });
         dispatch(receiveAccount(Account.responseJSON.results[0]));
@@ -228,44 +227,29 @@ function fetchPortfolio(state) {
     return dispatch => {
         dispatch(requestPortfolio());
 
-        let robinhood = state.robinhood;
-        // let promises = [
+        // let robinhood = state.robinhood;
+
+        // Promise.join(
         //     robinhood.portfolios(),
+        //     robinhood.disclosures(),
         //     robinhood.portfolioHistoricals({span: 'day', interval: '5minute'}),
         //     robinhood.portfolioHistoricals({span: 'week', interval: '10minute'}),
         //     robinhood.portfolioHistoricals({span: 'year', interval: 'day'}),
-        //     robinhood.portfolioHistoricals({span: '5year', interval: 'week'})
-        // ];
-        let promises = [
-            Portfolios,
-            Day,
-            Week,
-            Year,
-            AllTime
-        ]
-
-        Promise.all(promises).spread((portfolioRes, dayRes, weekRes, yearRes, allRes) => {
-				// Windows.Storage.ApplicationData.current.localFolder.createFileAsync("portfolios.json", Windows.Storage.CreationCollisionOption.replaceExisting).then(function (sampleFile) {
-				// 	return Windows.Storage.FileIO.writeTextAsync(sampleFile, portfolioRes.responseText);
-				// });
-				// Windows.Storage.ApplicationData.current.localFolder.createFileAsync("day.json", Windows.Storage.CreationCollisionOption.replaceExisting).then(function (sampleFile) {
-				// 	return Windows.Storage.FileIO.writeTextAsync(sampleFile, dayRes.responseText);
-				// });
-				// Windows.Storage.ApplicationData.current.localFolder.createFileAsync("week.json", Windows.Storage.CreationCollisionOption.replaceExisting).then(function (sampleFile) {
-				// 	return Windows.Storage.FileIO.writeTextAsync(sampleFile, weekRes.responseText);
-				// });
-				// Windows.Storage.ApplicationData.current.localFolder.createFileAsync("year.json", Windows.Storage.CreationCollisionOption.replaceExisting).then(function (sampleFile) {
-				// 	return Windows.Storage.FileIO.writeTextAsync(sampleFile, yearRes.responseText);
-				// });
-				// Windows.Storage.ApplicationData.current.localFolder.createFileAsync("5year.json", Windows.Storage.CreationCollisionOption.replaceExisting).then(function (sampleFile) {
-				// 	return Windows.Storage.FileIO.writeTextAsync(sampleFile, allRes.responseText);
-				// });
-                const portfolio = processPortfolio(portfolioRes, dayRes, weekRes, yearRes, allRes);
-                dispatch(changeTitle(formatCurrency(portfolio.equity), {floatingTitle: 'Portfolio'}));
-                dispatch(changePrimaryColor((_.last(portfolio.historicals.day).adjusted_open_equity >= portfolio.historicals.day[0].adjusted_open_equity ? positivePrimaryColor : negativePrimaryColor)));
-                dispatch(receivePortfolio(portfolio));
-			}
-		);
+        //     robinhood.portfolioHistoricals({span: '5year', interval: 'week'}),
+        //     (portfolioRes, disclosuresRes, dayRes, weekRes, yearRes, allRes) => {
+        //         const portfolio = processPortfolio(portfolioRes, dayRes, weekRes, yearRes, allRes);
+        //         portfolio.disclosures = disclosuresRes.responseJSON.disclosure;
+        //         // Windows.Storage.ApplicationData.current.localFolder.createFileAsync("portfolio.json", Windows.Storage.CreationCollisionOption.replaceExisting).then(function (sampleFile) {
+        //         //     return Windows.Storage.FileIO.writeTextAsync(sampleFile, JSON.stringify(portfolio));
+        //         // });
+        //         dispatch(changeTitle(formatCurrency(portfolio.equity), {floatingTitle: 'Portfolio'}));
+        //         dispatch(changePrimaryColor((_.last(portfolio.historicals.day).adjusted_open_equity >= portfolio.historicals.day[0].adjusted_open_equity ? positivePrimaryColor : negativePrimaryColor)));
+        //         dispatch(receivePortfolio(portfolio));
+        //     }
+        // );
+        dispatch(changeTitle(formatCurrency(Portfolios.responseJSON.equity), {floatingTitle: 'Portfolio'}));
+        dispatch(changePrimaryColor((_.last(Portfolios.responseJSON.historicals.day).adjusted_open_equity >= Portfolios.responseJSON.historicals.day[0].adjusted_open_equity ? positivePrimaryColor : negativePrimaryColor)));
+        dispatch(receivePortfolio(Portfolios.responseJSON));
     }
 }
 
@@ -332,6 +316,9 @@ function fetchCards(state) {
         // robinhood.cards().then(function(res) {
         //     let cards = res.responseJSON.results.filter(function(card) {
         //         return card.show_if_unsupported;
+        //     });
+        //     Windows.Storage.ApplicationData.current.localFolder.createFileAsync("cards.json", Windows.Storage.CreationCollisionOption.replaceExisting).then(function (sampleFile) {
+        //         return Windows.Storage.FileIO.writeTextAsync(sampleFile, JSON.stringify(cards));
         //     });
         //     dispatch(receiveCards(cards));
         // });
@@ -432,15 +419,14 @@ function fetchPositions(state) {
         //         }));
         //     });
         //     return Promise.all(promises).then(function(positions){
+        //         positions = _.mapKeys(positions, stock => stock.instrument.symbol);
         //         // Windows.Storage.ApplicationData.current.localFolder.createFileAsync("positions.json", Windows.Storage.CreationCollisionOption.replaceExisting).then(function (sampleFile) {
         //         //     return Windows.Storage.FileIO.writeTextAsync(sampleFile, JSON.stringify(positions));
         //         // });
-        //         positions = _.mapKeys(positions, stock => stock.instrument.symbol);
         //         dispatch(receivePositions(positions));
         //         dispatch(updateStocks(positions));
         //     });
         // });
-        Positions.responseJSON = _.mapKeys(Positions.responseJSON, stock => stock.instrument.symbol);
         dispatch(receivePositions(Positions.responseJSON));
         dispatch(updateStocks(Positions.responseJSON));
     }
@@ -541,11 +527,11 @@ function fetchWatchlist(state) {
         //         }));
         //     });
         //     return Promise.all(promises).then(function(watchlist){
+        //         watchlist = _.filter(watchlist, stock => _.get(stock, 'instrument.symbol'));
+        //         watchlist = _.mapKeys(watchlist, stock => _.get(stock, 'instrument.symbol'));
         //         // Windows.Storage.ApplicationData.current.localFolder.createFileAsync("watchlist.json", Windows.Storage.CreationCollisionOption.replaceExisting).then(function (sampleFile) {
         //         //     return Windows.Storage.FileIO.writeTextAsync(sampleFile, JSON.stringify(watchlist));
         //         // });
-        //         watchlist = _.filter(watchlist, stock => _.get(stock, 'instrument.symbol'));
-        //         watchlist = _.mapKeys(watchlist, stock => _.get(stock, 'instrument.symbol'));
         //         dispatch(receiveWatchlist(watchlist));
         //         dispatch(updateStocks(watchlist));
         //     });

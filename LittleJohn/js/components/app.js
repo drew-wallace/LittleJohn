@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
 import _ from 'lodash';
 import moment from 'moment';
 
@@ -68,6 +69,11 @@ class AppLayout extends Component {
 			this.props.changeTitleFromTab(tab, {stockType, symbol, hasBackButton: true});
         	this.props.changePrimaryColor(+_.last(dayData).adjusted_open_equity >= +dayData[0].adjusted_open_equity ? positivePrimaryColor : negativePrimaryColor);
 		}
+	}
+
+	componentDidUpdate() {
+		let element = ReactDOM.findDOMNode(this.refs.scrollableView);
+		element.scrollTop = 0;
 	}
 
     render() {
@@ -152,6 +158,43 @@ class AppLayout extends Component {
 							))}
 						</List>
 					);
+					break;
+				case 'sell':
+					// <- Market Sell                        [Order Types]
+					// 	 (i) Shares of {symbol}                          0 <-- number input, fills to left
+					//
+					// 	 Market Price                                $1.03
+					//   -------------------------------------------------
+					//   Estimated Credit    {quantity} share(s) available <-- Becomes ${shares * Market price}
+					break;
+				case 'order':
+					// <-
+					// 	Limit Sell
+					// 	instrument name
+					// ==============================
+
+					// 	sub: Order Status
+					// 	status
+
+					// 	sub: Time In Force
+					// 	gtc or gfd
+
+					// 	sub: Submitted
+					// 	MMM DD, YYYY
+
+					// 	sub: Estimated Price
+					// 	price (tried to buy/sell for)
+
+					// 	sub: Entered Quantity
+					// 	quantity
+
+					// 	sub: Filled Quantity
+					// 	filled quantity
+
+					// 	sub: Total Notional
+					// 	Queued, Canceled, Placed, ...
+
+					// 	button: Cancel Order
 					break;
 			}
 
@@ -265,7 +308,7 @@ class AppLayout extends Component {
 						style={{height: 55}}
 					/>
 					{watchlistBar}
-					<div className="scrollable-pane-content">
+					<div ref="scrollableView" className="scrollable-pane-content">
 						{titleBar}
 						{pane}
 					</div>

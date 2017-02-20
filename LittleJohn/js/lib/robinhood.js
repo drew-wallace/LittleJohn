@@ -28,7 +28,8 @@ class Robinhood{
             symbolHistoricals: 'https://api.robinhood.com/quotes/historicals/',
             cards: 'https://api.robinhood.com/midlands/notifications/stack/',
             fundamentals: 'https://api.robinhood.com/fundamentals/',
-            news: 'https://api.robinhood.com/midlands/news/'
+            news: 'https://api.robinhood.com/midlands/news/',
+            disclosures: 'https://brokerage-static.s3.amazonaws.com/disclosures/home_screen_disclosures.json'
         };
         this._isInit = false;
         this._private = {
@@ -536,6 +537,26 @@ class Robinhood{
                 true
             );
             this._setHeaders(request);
+            request.send();
+            request.onload = function () {
+                request.responseJSON = JSON.parse(request.response);
+                if (request.status == 200) {
+                    resolve(request);
+                } else {
+                    reject(request);
+                }
+            }.bind(this);
+            request.onerror = function () { reject(request);}.bind(this);
+        }.bind(this));
+    }
+    disclosures() {
+        return new Promise(function(resolve, reject) {
+            var request = new XMLHttpRequest();
+            request.open(
+                'GET',
+                this._endpoints.disclosures,
+                true
+            );
             request.send();
             request.onload = function () {
                 request.responseJSON = JSON.parse(request.response);

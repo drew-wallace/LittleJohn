@@ -20,7 +20,6 @@ function processDayData(data) {
     let day = data.responseJSON.equity_historicals;
     day = day.map(function(d, i){
         d.xVal = i;
-        // data key: open for day timeSpan, close for all others
         d.yVal = +d.adjusted_open_equity;
         return d;
     }.bind(this));
@@ -33,7 +32,6 @@ function processWeekData(data, portfolio) {
     if(moment(week[0].begins_at).hour(0).minute(0).second(0).isAfter(moment(portfolio.start_date).hour(0).minute(0).second(0))) {
         week = week.map(function(d, i){
             d.xVal = i;
-            // data key: open for day timeSpan, close for all others
             d.yVal = +d.adjusted_close_equity;
             return d;
         }.bind(this));
@@ -93,7 +91,6 @@ function processAllData(data, portfolio) {
     if(moment(all[0].begins_at).hour(0).minute(0).second(0).isAfter(moment(portfolio.start_date).hour(0).minute(0).second(0))) {
         all = all.map(function(d, i){
             d.xVal = i;
-            // data key: open for day timeSpan, close for all others
             d.yVal = +d.adjusted_close_equity;
             return d;
         }.bind(this));

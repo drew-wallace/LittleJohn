@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import numeral from 'numeral';
 
-import CircularProgress from 'material-ui/CircularProgress';
+import { CircularProgress, Dialog, FlatButton } from 'material-ui';
 
 import RobinhoodChartComponent from './robinhood-chart';
 import CardStackContainer from '../containers/card-stack';
@@ -11,13 +11,25 @@ import WatchlistContainer from '../containers/watchlist';
 class PortfolioPaneComponent extends Component {
 	constructor(props) {
 	    super(props);
+
+		this.state = {
+			dialogOpen: false
+		}
 	}
+
+	handleDialogOpen = () => {
+		this.setState({dialogOpen: true});
+	};
+
+	handleDialogClose = () => {
+		this.setState({dialogOpen: false});
+	};
 
     render() {
 		if(this.props.portfolio.lastUpdated) {
 			let changePrimaryColor = this.props.changePrimaryColor;
 			let primaryColor = this.props.primaryColor;
-			let {equity, historicals, subtitle} = this.props.portfolio;
+			let {equity, historicals, subtitle, disclosures} = this.props.portfolio;
 			let {day, week, month, quarter, year, all} = historicals;
 
 			return (
@@ -33,6 +45,31 @@ class PortfolioPaneComponent extends Component {
 					<PositionListContainer/>
 					<div style={{marginBottom: 15}}><span>Watchlist</span></div>
 					<WatchlistContainer/>
+					<Dialog
+						title="Disclosures"
+						titleStyle={{border: 'none'}}
+						actions={
+							<FlatButton
+								label="OK"
+								primary={true}
+								onTouchTap={() => this.handleDialogClose()}
+							/>
+						}
+						actionsContainerStyle={{border: 'none'}}
+						modal={true}
+						open={this.state.dialogOpen}
+						onRequestClose={() => this.handleDialogClose()}
+						autoScrollBodyContent={true}
+						contentStyle={{whiteSpace: 'pre-wrap'}}
+					>
+						{disclosures}
+					</Dialog>
+					<FlatButton
+						label="DISCLOSURES"
+						primary={true}
+						onTouchTap={() => this.handleDialogOpen()}
+						style={{marginBottom: 15}}
+					/>
 				</div>
 			);
 		} else {

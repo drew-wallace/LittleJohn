@@ -24,11 +24,11 @@ class PositionPaneComponent extends Component {
 	}
 
 	handleSell() {
-		this.props.changeTitle('Market Sell', {symbol: this.props.stock.instrument.symbol, hasBackButton: true});
+		this.props.initTitle('Market Sell', {symbol: this.props.stock.instrument.symbol, stockType: 'sell', hasBackButton: true});
 	}
 
 	handleBuy() {
-		this.props.changeTitle('Market Buy', {symbol: this.props.stock.instrument.symbol, hasBackButton: true});
+		this.props.initTitle('Market Buy', {symbol: this.props.stock.instrument.symbol, stockType: 'buy', hasBackButton: true});
 	}
 
 	handleMoreNews() {
@@ -42,7 +42,6 @@ class PositionPaneComponent extends Component {
 	}
 
 	handleShowMoreDescription(isTruncated) {
-		console.log('truncated:', isTruncated);
 		if(isTruncated && !this.state.showMoreDescription) {
 			this.setState({
 				showMoreDescription: true
