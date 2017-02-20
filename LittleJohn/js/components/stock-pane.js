@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import _ from 'lodash';
 import numeral from 'numeral';
 import moment from 'moment';
 
@@ -8,7 +9,7 @@ import {Card, CardText} from 'material-ui/Card';
 
 import RobinhoodChartComponent from './robinhood-chart';
 
-import { formatCurrency, formatCurrencyDiff, formatPercentDiff } from '../lib/formaters';
+import { formatCurrency, formatCurrencyDiff, formatPercentDiff, formatNumberBig, formatCurrencyBig } from '../lib/formaters';
 
 class PositionPaneComponent extends Component {
 	constructor(props) {
@@ -30,11 +31,9 @@ class PositionPaneComponent extends Component {
     render() {
 		// if(this.props.stock.lastUpdated) {
 			const { changePrimaryColor, primaryColor, stockType } = this.props;
-			const { historicals, quote, instrument } = this.props.stock;
+			const { historicals, quote, instrument, fundamentals, orders } = this.props.stock;
 			const { buying_power } = this.props.account.accountData;
-
-			const news = this.props.stock.news.slice(0, 3);
-
+			const news = this.props.stock.news.slice(0, Math.min(this.props.stock.news.length, 3));
 			let yourPosition = (<div></div>);
 			let sellButton = (<div></div>);
 			let buyButton = (
@@ -45,6 +44,7 @@ class PositionPaneComponent extends Component {
 					onTouchTap={() => this.handleBuy()}
 				/>
 			);
+			let recentTransactions = (<div></div>);
 
 			if(stockType == 'position') {
 				let { quantity, average_buy_price } = this.props.stock;
@@ -68,34 +68,85 @@ class PositionPaneComponent extends Component {
 					<div>
 						<div style={{marginBottom: 15}}><span>Your Position</span></div>
 						<Card style={{marginBottom: 15}}>
-							<CardText>
-								<div style={{display: 'flex', flexDirection: 'column'}}>
-									<div style={{flex: '0 1 30%', display: 'flex', padding: '0px 0 0px'}}>
-										<div style={{flex: 1, display: 'flex', flexDirection: 'column'}}>
-											<span style={{flex: 1}}>{numeral(+quantity).format('0,0')}</span>
-											<span style={{flex: 1}}>Shares</span>
-										</div>
-										<div style={{flex: 1, display: 'flex', flexDirection: 'column'}}>
-											<span style={{flex: 1}}>{formatCurrency(+quote.last_trade_price * +quantity)}</span>
-											<span style={{flex: 1}}>Equity Value</span>
-										</div>
-									</div>
-									<Divider className="card-divider"/>
-									<div style={{flex: '0 1 6%', display: 'flex', flexDirection: 'column'}}>
-										<div style={{flex: 1, display: 'flex'}}>
-											<span style={{flex: 1}}>Average Cost</span>
-											<span style={{flex: 1}}>{formatCurrency(+average_buy_price)}</span>
-										</div>
-										<div style={{flex: 1, display: 'flex'}}>
-											<span style={{flex: 1}}>Total Return</span>
-											<span style={{flex: 1}}>{'Ignore this for now'/*`${formatCurrencyDiff((+quote.last_trade_price - +historicals.all[0].open_price) * +quantity)} (${formatPercentDiff((+quote.last_trade_price - +historicals.all[0].open_price) / +historicals.all[0].open_price)})`*/}</span>
-										</div>
-										<div style={{flex: 1, display: 'flex'}}>
-											<span style={{flex: 1}}>Today's Return</span>
-											<span style={{flex: 1}}>{`${formatCurrencyDiff((+quote.last_trade_price - +historicals.day[0].open_price) * +quantity)} (${formatPercentDiff((+quote.last_trade_price - +historicals.day[0].open_price) / +historicals.day[0].open_price)})`}</span>
-										</div>
-									</div>
+							<CardText style={{padding: 0}}>
+								<div style={{display: 'flex'}}>
+									<List style={{flex: 1, padding: 0}}>
+										<ListItem
+											primaryText={formatNumberBig(+quantity)}
+											secondaryText="Shares"
+											disabled={true}
+										/>
+										<Divider/>
+										<ListItem
+											primaryText="Average Cost"
+											disabled={true}
+										/>
+										<ListItem
+											primaryText="Total Return"
+											disabled={true}
+										/>
+										<ListItem
+											primaryText="Today's Return"
+											disabled={true}
+										/>
+									</List>
+									<List style={{flex: 1, padding: 0}}>
+										<ListItem
+											primaryText={formatCurrency(+quote.last_trade_price * +quantity)}
+											secondaryText="Equity Value"
+											disabled={true}
+										/>
+										<Divider/>
+										<ListItem
+											primaryText={formatCurrency(+average_buy_price)}
+											disabled={true}
+										/>
+										<ListItem
+											primaryText={'Ignore this for now'/*`${formatCurrencyDiff((+quote.last_trade_price - +historicals.all[0].open_price) * +quantity)} (${formatPercentDiff((+quote.last_trade_price - +historicals.all[0].open_price) / +historicals.all[0].open_price)})`*/}
+											disabled={true}
+										/>
+										<ListItem
+											primaryText={`${formatCurrencyDiff((+quote.last_trade_price - +historicals.day[0].open_price) * +quantity)} (${formatPercentDiff((+quote.last_trade_price - +historicals.day[0].open_price) / +historicals.day[0].open_price)})`}
+											disabled={true}
+										/>
+									</List>
 								</div>
+							</CardText>
+						</Card>
+					</div>
+				);
+			}
+
+			if(orders && orders.length > 0) {
+				const lessOrders = orders.slice(0, Math.min(orders.length, 4));
+				recentTransactions = (
+					<div>
+						<div style={{marginBottom: 15}}><span>Recent Transactions</span></div>
+						<Card style={{marginBottom: 15}} containerStyle={{padding: 0}}>
+							<CardText style={{padding: 0}}>
+								<List style={{padding: 0}}>
+									{lessOrders.map((order, index) => {
+										let status = order.state;
+										if(status == 'filled') {
+											status = formatCurrency(+order.price * +order.quantity);
+										} else {
+											status = _.capitalize(status);
+										}
+
+										return (
+											<div key={index}>
+												<ListItem
+													innerDivStyle={{display: 'flex', flexDirection: 'row-reverse', flexWrap: 'wrap'}}
+													primaryText={(<span style={{flex: '0 1 50%'}}>{moment(order.updated_at).format('MMM DD, YYYY')}</span>)}
+													secondaryText={(<span style={{flex: '0 1 100%'}}>{`${_.capitalize(order.type)} ${_.capitalize(order.side)}`}</span>)}
+													onTouchTap={() => console.log(order.id)}
+												>
+													<div style={{flex: '0 1 50%', display: 'flex', justifyContent: 'flex-end'}}><span style={{position: 'relative', top: '50%'}}>{status}</span></div>
+												</ListItem>
+											</div>
+										);
+									})}
+								</List>
 							</CardText>
 						</Card>
 					</div>
@@ -117,16 +168,28 @@ class PositionPaneComponent extends Component {
 					{yourPosition}
 					<div style={{marginBottom: 15}}><span>Volatitlity</span></div>
 					<Card style={{marginBottom: 15}}>
-						<CardText>
-							<div style={{display: 'flex', flexDirection: 'column'}}>
-								<div style={{flex: 1, display: 'flex'}}>
-									<span style={{flex: 1}}>Volatility</span>
-									<span style={{flex: 1}}>{(+instrument.maintenance_ratio < 0.5 ? 'Low' : 'High')}</span>
-								</div>
-								<div style={{flex: 1, display: 'flex'}}>
-									<span style={{flex: 1}}>Buying Power</span>
-									<span style={{flex: 1}}>{formatCurrency(+buying_power)}</span>
-								</div>
+						<CardText style={{padding: 0}}>
+							<div style={{display: 'flex'}}>
+								<List style={{flex: 1, padding: 0}}>
+									<ListItem
+										primaryText="Volatility"
+										disabled={true}
+									/>
+									<ListItem
+										primaryText="Buying Power"
+										disabled={true}
+									/>
+								</List>
+								<List style={{flex: 1, padding: 0}}>
+									<ListItem
+										primaryText={(+instrument.maintenance_ratio < 0.5 ? 'Low' : 'High')}
+										disabled={true}
+									/>
+									<ListItem
+										primaryText={formatCurrency(+buying_power)}
+										disabled={true}
+									/>
+								</List>
 							</div>
 						</CardText>
 					</Card>
@@ -152,6 +215,68 @@ class PositionPaneComponent extends Component {
 							</List>
 						</CardText>
 					</Card>
+					<div style={{marginBottom: 15}}><span>Statistics</span></div>
+					<Card style={{marginBottom: 15}}>
+						<CardText>
+							<div style={{display: 'flex'}}>
+								<List style={{flex: 1, padding: 0}}>
+									<ListItem
+										primaryText={formatCurrency(+fundamentals.open)}
+										secondaryText="Open"
+										disabled={true}
+									/>
+									<ListItem
+										primaryText={formatCurrency(+fundamentals.high)}
+										secondaryText="Today's High"
+										disabled={true}
+									/>
+									<ListItem
+										primaryText={formatCurrency(+fundamentals.low)}
+										secondaryText="Today's Low"
+										disabled={true}
+									/>
+									<ListItem
+										primaryText={formatCurrency(+fundamentals.high_52_weeks)}
+										secondaryText="52 Wk High"
+										disabled={true}
+									/>
+									<ListItem
+										primaryText={formatCurrency(+fundamentals.low_52_weeks)}
+										secondaryText="52 Wk Low"
+										disabled={true}
+									/>
+								</List>
+								<List style={{flex: 1, padding: 0}}>
+									<ListItem
+										primaryText={formatNumberBig(+fundamentals.volume)}
+										secondaryText="Volume"
+										disabled={true}
+									/>
+									<ListItem
+										primaryText={formatNumberBig(+fundamentals.average_volume)}
+										secondaryText="Average Volume"
+										disabled={true}
+									/>
+									<ListItem
+										primaryText={formatCurrencyBig(+fundamentals.market_cap)}
+										secondaryText="Market Cap"
+										disabled={true}
+									/>
+									<ListItem
+										primaryText={(fundamentals.pe_ratio ? formatNumberBig(+fundamentals.pe_ratio) : 'N/A')}
+										secondaryText="P/E Ratio"
+										disabled={true}
+									/>
+									<ListItem
+										primaryText={(fundamentals.dividend_yield ? formatNumberBig(+fundamentals.dividend_yield) : 'N/A')}
+										secondaryText="Div/Yield"
+										disabled={true}
+									/>
+								</List>
+							</div>
+						</CardText>
+					</Card>
+					{recentTransactions}
 				</div>
 			);
 		// } else {

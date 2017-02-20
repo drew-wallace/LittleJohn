@@ -13,23 +13,6 @@ let title = (state = {}, action) => {
                 symbol: action.symbol,
                 hasBackButton: action.hasBackButton,
             };
-        // case 'INIT_TITLE':
-        //     return {
-        //         past: [
-        //             ...state.past,
-        //             state.present
-        //         ],
-        //         present: {
-        //             floatingTitle: action.floatingTitle,
-        //             fixedTitle: action.fixedTitle,
-        //             stockType: action.stockType,
-        //             symbol: action.symbol,
-        //             hasBackButton: action.hasBackButton,
-        //         },
-        //         future: [
-        //             ...state.future
-        //         ]
-        //     };
         default:
             return state;
     }

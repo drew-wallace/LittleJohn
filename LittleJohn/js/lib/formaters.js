@@ -60,3 +60,19 @@ export function formatRelativeTime (exactDate, span) {
             return `Since ${moment(exactDate).format('MMM D YYYY')}`;
     }
 }
+
+export function formatNumberBig (d) {
+    if(d < 1000000) {
+        return numeral(d).format('0,0');
+    } else {
+        return numeral(d).format('0.000a');
+    }
+}
+
+export function formatCurrencyBig (d) {
+    if(d < 1000000) {
+        return formatCurrency(d);
+    } else {
+        return numeral(d).format('$0.000a');
+    }
+}

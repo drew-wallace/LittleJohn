@@ -274,12 +274,12 @@ class Robinhood{
             request.onerror = function () { reject(request);}.bind(this);
         }.bind(this));
     }
-    orders() {
+    orders(instrumentUrl) {
         return new Promise(function(resolve, reject) {
             var request = new XMLHttpRequest();
             request.open(
                 'GET',
-                this._endpoints.orders,
+                this._endpoints.orders + '?instrument=' + instrumentUrl,
                 true
             );
             this._setHeaders(request);

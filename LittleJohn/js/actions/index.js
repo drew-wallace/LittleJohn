@@ -408,14 +408,18 @@ function fetchPositions(state) {
         //         }).then(function(symbol){
         //             return Promise.join(
         //                 robinhood.quote_data(symbol),
-        //                 robinhood.quote_data(news),
+        //                 robinhood.news(symbol),
+        //                 robinhood.fundamentals(symbol),
+        //                 robinhood.orders(position.instrument.url),
         //                 robinhood.symbolHistoricals(symbol, {span: 'day', interval: '5minute'}),
         //                 robinhood.symbolHistoricals(symbol, {span: 'week', interval: '10minute'}),
         //                 robinhood.symbolHistoricals(symbol, {span: 'year', interval: 'day'}),
         //                 robinhood.symbolHistoricals(symbol, {span: '5year', interval: 'week'}),
-        //                 function(quoteRes, newsRes, dayRes, weekRes, yearRes, allRes) {
+        //                 function(quoteRes, newsRes, fundamentalsRes, ordersRes, dayRes, weekRes, yearRes, allRes) {
         //                     position.quote = quoteRes.responseJSON.results[0];
         //                     position.news = newsRes.responseJSON.results;
+        //                     position.fundamentals = fundamentalsRes.responseJSON;
+        //                     position.orders = ordersRes.responseJSON.results;
         //                     position.historicals = {
         //                         day: dayRes.responseJSON.historicals,
         //                         week: weekRes.responseJSON.historicals,
@@ -513,13 +517,17 @@ function fetchWatchlist(state) {
         //                 return Promise.join(
         //                     robinhood.quote_data(symbol),
         //                     robinhood.news(symbol),
+        //                     robinhood.fundamentals(symbol),
+        //                     robinhood.orders(stock.instrument.url),
         //                     robinhood.symbolHistoricals(symbol, {span: 'day', interval: '5minute'}),
         //                     robinhood.symbolHistoricals(symbol, {span: 'week', interval: '10minute'}),
         //                     robinhood.symbolHistoricals(symbol, {span: 'year', interval: 'day'}),
         //                     robinhood.symbolHistoricals(symbol, {span: '5year', interval: 'week'}),
-        //                     function(quoteRes, newsRes, dayRes, weekRes, yearRes, allRes) {
+        //                     function(quoteRes, newsRes, fundamentalsRes, orders, dayRes, weekRes, yearRes, allRes) {
         //                         stock.quote = quoteRes.responseJSON.results[0];
         //                         stock.news = newsRes.responseJSON.results;
+        //                         stock.fundamentals = fundamentalsRes.responseJSON;
+        //                         stock.orders = ordersRes.responseJSON.results;
         //                         stock.historicals = {
         //                             day: dayRes.responseJSON.historicals,
         //                             week: weekRes.responseJSON.historicals,
