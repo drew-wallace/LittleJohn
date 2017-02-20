@@ -6,6 +6,8 @@ import moment from 'moment';
 import { RaisedButton, Divider, List, ListItem, FlatButton } from 'material-ui';
 import CircularProgress from 'material-ui/CircularProgress';
 import {Card, CardText} from 'material-ui/Card';
+import Truncate from 'react-truncate-html';
+// import Truncate from 'react-truncate';
 
 import RobinhoodChartComponent from './robinhood-chart';
 
@@ -14,6 +16,11 @@ import { formatCurrency, formatCurrencyDiff, formatPercentDiff, formatNumberBig,
 class PositionPaneComponent extends Component {
 	constructor(props) {
 	    super(props);
+
+		this.state = {
+			descriptionExpanded: false,
+			showMoreDescription: false
+		};
 	}
 
 	handleSell() {
@@ -26,6 +33,21 @@ class PositionPaneComponent extends Component {
 
 	handleMoreNews() {
 		this.props.initTitle(`${this.props.stock.instrument.symbol} News`, {symbol: this.props.stock.instrument.symbol, stockType: 'news', hasBackButton: true});
+	}
+
+	handleDescriptionExpanded() {
+		this.setState({
+			descriptionExpanded: !this.state.descriptionExpanded
+		});
+	}
+
+	handleShowMoreDescription(isTruncated) {
+		console.log('truncated:', isTruncated);
+		if(isTruncated && !this.state.showMoreDescription) {
+			this.setState({
+				showMoreDescription: true
+			});
+		}
 	}
 
     render() {
@@ -45,6 +67,13 @@ class PositionPaneComponent extends Component {
 				/>
 			);
 			let recentTransactions = (<div></div>);
+			// let description = (
+			// 	<span className="stock-description-container">
+			// 		{fundamentals.description}
+			// 	</span>
+			// );
+			let description = fundamentals.description;
+			let moreDescription = (<div></div>);
 
 			if(stockType == 'position') {
 				let { quantity, average_buy_price } = this.props.stock;
@@ -149,6 +178,39 @@ class PositionPaneComponent extends Component {
 								</List>
 							</CardText>
 						</Card>
+					</div>
+				);
+			}
+
+			if(!this.state.descriptionExpanded) { //onTruncate={(isTruncated) => this.handleShowMoreDescription(isTruncated)}
+				description = (
+					<Truncate
+						ref="description"
+						lines={7}
+						dangerouslySetInnerHTML={{__html: fundamentals.description}}
+					/>
+				);
+			}
+
+			// if(!this.state.descriptionExpanded) {
+			// 	description = (
+			// 		<div className="stock-description-container">
+			// 			{fundamentals.description}
+			// 		</div>
+			// 	);
+			// }
+
+			// waiting for an onTruncate function from here: https://github.com/jariz/react-truncate-html/issues/1
+			// or a fix for parent padding here: https://github.com/One-com/react-truncate/issues/32
+			if(true || this.state.showMoreDescription) {
+				moreDescription = (
+					<div>
+						<Divider />
+						<ListItem
+							innerDivStyle={{display: 'flex', justifyContent: 'flex-end'}}
+							primaryText={(<FlatButton label={(this.state.descriptionExpanded ? "LESS" : "MORE")} primary={true} onTouchTap={() => this.handleDescriptionExpanded()} style={{flex: 0}}/>)}
+							disabled={true}
+						/>
 					</div>
 				);
 			}
@@ -277,6 +339,17 @@ class PositionPaneComponent extends Component {
 						</CardText>
 					</Card>
 					{recentTransactions}
+					<div style={{marginBottom: 15}}><span>About</span></div>
+					<Card style={{marginBottom: 15}} containerStyle={{padding: 0}}>
+						<CardText style={{padding: 0}}>
+							<List style={{padding: 0}}>
+								<ListItem disabled={true}>
+									{description}
+								</ListItem>
+								{moreDescription}
+							</List>
+						</CardText>
+					</Card>
 				</div>
 			);
 		// } else {

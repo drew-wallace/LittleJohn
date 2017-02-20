@@ -33,5 +33,18 @@ export default StyleSheet.create({
   },
   'card-divider': {
     'margin': [{ 'unit': 'px', 'value': 15 }, { 'unit': 'px', 'value': -15 }, { 'unit': 'px', 'value': 15 }, { 'unit': 'px', 'value': -15 }, { 'unit': 'string', 'value': '!important' }]
-  }
+  },
+  // .stock-description-container {
+    overflow: hidden;
+    position: relative;
+    height: 112px;
+}
+.stock-description-container:after {
+    content: "...";
+    text-align: right;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 1%;
+}
 });
