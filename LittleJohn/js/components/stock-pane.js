@@ -170,7 +170,9 @@ class PositionPaneComponent extends Component {
 													secondaryText={(<span style={{flex: '0 1 100%'}}>{`${_.capitalize(order.type)} ${_.capitalize(order.side)}`}</span>)}
 													onTouchTap={() => console.log(order.id)}
 												>
-													<div style={{flex: '0 1 50%', display: 'flex', justifyContent: 'flex-end'}}><span style={{position: 'relative', top: '50%'}}>{status}</span></div>
+													<div style={{flex: '0 1 50%', display: 'flex', justifyContent: 'flex-end'}}>
+														<span style={{position: 'relative', top: '50%'}}>{status}</span>
+													</div>
 												</ListItem>
 											</div>
 										);

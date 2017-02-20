@@ -47,4 +47,7 @@ export default StyleSheet.create({
     right: 0;
     width: 1%;
 }
+  'stock-list-item-subheader': {
+    'margin': [{ 'unit': 'px', 'value': 0 }, { 'unit': 'string', 'value': '!important' }, { 'unit': 'px', 'value': 0 }, { 'unit': 'string', 'value': '!important' }]
+  }
 });

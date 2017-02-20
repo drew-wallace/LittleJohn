@@ -49,3 +49,7 @@
     right: 0;
     width: 1%;
 }*/
+
+.stock-list-item-subheader {
+    margin: 0 !important;
+}
