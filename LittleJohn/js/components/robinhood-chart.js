@@ -19,13 +19,14 @@ class RobinhoodChart extends Component {
         super(props);
 
         const { subtitle, margin, width, height } = this.setupChart(this.props);
+        const newPrimaryColor = (+_.last(this.props.data.day)[this.openKey] >= +this.props.data.day[0][this.openKey] ? positivePrimaryColor : negativePrimaryColor);
 
         this.state = {
             title: this.props.title,
             subtitle,
             data: this.props.data.day,
             tab: 'day',
-            primaryColor: (+_.last(this.props.data.day)[this.openKey] >= +this.props.data.day[0][this.openKey] ? positivePrimaryColor : negativePrimaryColor),
+            primaryColor: newPrimaryColor,
             margin,
             width,
             height
@@ -72,12 +73,13 @@ class RobinhoodChart extends Component {
     changeTab(tab) {
         const equityKey = (tab == 'day' ? this.openKey : this.closeKey);
         const subtitle = this.generateSubtitle(tab, this.props.data[tab]);
-        this.props.changePrimaryColor(+_.last(this.props.data[tab])[equityKey] >= +this.props.data[tab][0][equityKey] ? positivePrimaryColor : negativePrimaryColor)
+        const primaryColor = (+_.last(this.props.data[tab])[equityKey] >= +this.props.data[tab][0][equityKey] ? positivePrimaryColor : negativePrimaryColor)
+        this.props.changePrimaryColor(primaryColor);
 		this.setState({
             tab,
             data: this.props.data[tab],
             subtitle,
-            primaryColor: (+_.last(this.props.data[tab])[equityKey] >= +this.props.data[tab][0][equityKey] ? positivePrimaryColor : negativePrimaryColor)
+            primaryColor
         });
 	}
 
@@ -128,24 +130,33 @@ class RobinhoodChart extends Component {
 		window.removeEventListener("resize", this.onResizeThrottled);
 	}
 
+    // shouldComponentUpdate(nextProps, nextState) {
+    //     return nextProps.primaryColor != this.props.primaryColor || nextState.tab != this.state.tab;
+    // }
+
     componentWillReceiveProps(nextProps) {
-        if(_.has(nextProps.data.day[0], 'adjusted_open_equity')) {
-            this.openKey = 'adjusted_open_equity';
-            this.closeKey = 'adjusted_close_equity';
-        } else if(_.has(nextProps.data.day[0], 'open_price')){
-            this.openKey = 'open_price';
-            this.closeKey = 'close_price';
+        console.log('received new props, setting to day tab');
+        if(nextProps.title != this.props.title) {
+            if(_.has(nextProps.data.day[0], 'adjusted_open_equity')) {
+                this.openKey = 'adjusted_open_equity';
+                this.closeKey = 'adjusted_close_equity';
+            } else if(_.has(nextProps.data.day[0], 'open_price')){
+                this.openKey = 'open_price';
+                this.closeKey = 'close_price';
+            }
+
+            const subtitle = this.generateSubtitle('day', nextProps.data.day, nextProps.title);
+            const primaryColor = (+_.last(nextProps.data.day)[this.openKey] >= +nextProps.data.day[0][this.openKey] ? positivePrimaryColor : negativePrimaryColor);
+
+
+            this.setState({
+                title: nextProps.title,
+                subtitle,
+                data: nextProps.data.day,
+                tab: 'day',
+                primaryColor: primaryColor,
+            });
         }
-
-        const subtitle = this.generateSubtitle('day', nextProps.data.day, nextProps.title);
-
-        this.setState({
-            title: nextProps.title,
-            subtitle,
-            data: nextProps.data.day,
-            tab: 'day',
-            primaryColor: (+_.last(nextProps.data.day)[this.openKey] >= +nextProps.data.day[0][this.openKey] ? positivePrimaryColor : negativePrimaryColor),
-        });
     }
 
     componentWillUpdate(nextProps, nextState) {

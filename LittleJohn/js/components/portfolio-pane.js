@@ -27,19 +27,18 @@ class PortfolioPaneComponent extends Component {
 
     render() {
 		if(this.props.portfolio.lastUpdated) {
-			let changePrimaryColor = this.props.changePrimaryColor;
-			let primaryColor = this.props.primaryColor;
-			let {equity, historicals, subtitle, disclosures} = this.props.portfolio;
+			let { changePrimaryColor, primaryColor} = this.props;
+			let {equity, historicals, disclosures} = this.props.portfolio;
 			let {day, week, month, quarter, year, all} = historicals;
 
 			return (
 				<div>
 					<RobinhoodChartComponent
 						title={equity}
-						subtitle={subtitle}
 						margin={{top: 0, right: 0, bottom: 0, left: 0}}
-						data={{day, week, quarter, month, year, all}}
+						data={{day: day.equity_historicals, week: week.equity_historicals, quarter: quarter.equity_historicals, month: month.equity_historicals, year: year.equity_historicals, all: all.equity_historicals}}
 						changePrimaryColor={changePrimaryColor}
+						primaryColor={primaryColor}
 					/>
 					<CardStackContainer/>
 					<PositionListContainer/>

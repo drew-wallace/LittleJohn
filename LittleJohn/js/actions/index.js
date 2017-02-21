@@ -239,16 +239,16 @@ function fetchPortfolio(state) {
         //     (portfolioRes, disclosuresRes, dayRes, weekRes, yearRes, allRes) => {
         //         const portfolio = processPortfolio(portfolioRes, dayRes, weekRes, yearRes, allRes);
         //         portfolio.disclosures = disclosuresRes.responseJSON.disclosure;
-        //         // Windows.Storage.ApplicationData.current.localFolder.createFileAsync("portfolio.json", Windows.Storage.CreationCollisionOption.replaceExisting).then(function (sampleFile) {
-        //         //     return Windows.Storage.FileIO.writeTextAsync(sampleFile, JSON.stringify(portfolio));
-        //         // });
+        //         Windows.Storage.ApplicationData.current.localFolder.createFileAsync("portfolio.json", Windows.Storage.CreationCollisionOption.replaceExisting).then(function (sampleFile) {
+        //             return Windows.Storage.FileIO.writeTextAsync(sampleFile, JSON.stringify(portfolio));
+        //         });
         //         dispatch(changeTitle(formatCurrency(portfolio.equity), {floatingTitle: 'Portfolio'}));
-        //         dispatch(changePrimaryColor((_.last(portfolio.historicals.day).adjusted_open_equity >= portfolio.historicals.day[0].adjusted_open_equity ? positivePrimaryColor : negativePrimaryColor)));
+        //         dispatch(changePrimaryColor((portfolio.historicals.day.total_return > 0 ? positivePrimaryColor : negativePrimaryColor)));
         //         dispatch(receivePortfolio(portfolio));
         //     }
         // );
         dispatch(changeTitle(formatCurrency(Portfolios.responseJSON.equity), {floatingTitle: 'Portfolio'}));
-        dispatch(changePrimaryColor((_.last(Portfolios.responseJSON.historicals.day).adjusted_open_equity >= Portfolios.responseJSON.historicals.day[0].adjusted_open_equity ? positivePrimaryColor : negativePrimaryColor)));
+        dispatch(changePrimaryColor((Portfolios.responseJSON.historicals.day.total_return > 0 ? positivePrimaryColor : negativePrimaryColor)));
         dispatch(receivePortfolio(Portfolios.responseJSON));
     }
 }
