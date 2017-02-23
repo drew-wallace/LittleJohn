@@ -25,12 +25,6 @@ export const logout = () => {
         type: 'LOGOUT'
     };
 }
-export const attachRobinhood = (robinhood) => {
-    return {
-        type: 'ATTACH_ROBINHOOD',
-        robinhood
-    };
-}
 export const toggleMenu = (open) => {
     return {
         type: 'TOGGLE_MENU',
@@ -72,30 +66,6 @@ export const initTitle = (fixedTitle, options) => {
         type: 'INIT_TITLE',
         fixedTitle,
         ...options
-    };
-}
-export const changeEquityTitle = (text) => {
-    return {
-        type: 'CHANGE_EQUITY_TITLE',
-        text
-    };
-}
-export const changePaneTitle = (text) => {
-    return {
-        type: 'CHANGE_PANE_TITLE',
-        text
-    };
-}
-export const changePaneSubtitle = (text) => {
-    return {
-        type: 'CHANGE_PANE_SUBTITLE',
-        text
-    };
-}
-export const addPortfolio = (portfolio) => {
-    return {
-        type: 'ADD_PORTFOLIO',
-        portfolio
     };
 }
 export const addCard = (card) => {

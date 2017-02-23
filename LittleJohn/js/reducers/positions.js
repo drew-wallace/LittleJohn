@@ -1,16 +1,16 @@
-﻿const positions = (state = {}, action) => {
+﻿import { set } from 'monolite';
+
+const positions = (state = {}, action) => {
     switch (action.type) {
         case 'INVALIDATE_POSITIONS':
-            return Object.assign({}, state, {
-                didInvalidate: true
-            });
+            return set(state, root => root.didInvalidate)(true);
         case 'REQUEST_POSITIONS':
-            return Object.assign({}, state, {
+            return set(state, root => root)({
                 isFetching: true,
                 didInvalidate: false
             });
         case 'RECEIVE_POSITIONS':
-            return Object.assign({}, state, {
+            return set(state, root => root)({
                 isFetching: false,
                 didInvalidate: false,
                 lastUpdated: action.receivedAt,

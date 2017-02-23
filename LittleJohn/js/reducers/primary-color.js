@@ -1,7 +1,9 @@
-﻿const primaryColor = (state = {}, action) => {
+﻿import { set } from 'monolite';
+
+const primaryColor = (state = {}, action) => {
     switch (action.type) {
         case 'CHANGE_PRIMARY_COLOR':
-            return action.color
+            return set(state, root => root)(action.color);
         default:
             return state;
     }

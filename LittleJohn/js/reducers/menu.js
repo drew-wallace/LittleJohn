@@ -1,7 +1,9 @@
-﻿const menu = (state = {}, action) => {
+﻿import { set } from 'monolite';
+
+const menu = (state = {}, action) => {
     switch (action.type) {
         case 'TOGGLE_MENU':
-            return action.open;
+            return set(state, root => root)(action.open);
         default:
             return state;
     }

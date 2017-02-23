@@ -5,7 +5,6 @@ import robinhood from './robinhood';
 import menu from './menu';
 import settings from './settings';
 import title from './title';
-import pane from './pane';
 import account from './account';
 import portfolio from './portfolio';
 import cards from './cards';
@@ -20,7 +19,6 @@ const LittleJohnApp = combineReducers({
     menu,
     settings,
     title,
-    pane,
     account,
     portfolio,
     cards,

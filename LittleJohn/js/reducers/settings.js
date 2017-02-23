@@ -1,9 +1,9 @@
-﻿const settings = (state = {}, action) => {
+﻿import { set } from 'monolite';
+
+const settings = (state = {}, action) => {
     switch (action.type) {
         case 'CHANGE_DISPLAYED_VALUE':
-            return Object.assign({}, state, {
-                displayedValue: action.value
-            });
+            return set(state, root => root.displayedValue)(action.value);
         default:
             return state;
     }

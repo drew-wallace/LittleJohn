@@ -1,28 +1,21 @@
-﻿const account = (state = {}, action) => {
+﻿import { set, setAppend } from 'monolite';
+
+const account = (state = {}, action) => {
     switch (action.type) {
         case 'INVALIDATE_ACCOUNT':
-            return Object.assign({}, state, {
-                didInvalidate: true
-            });
+            return set(state, root => root.didInvalidate)(true);
         case 'REQUEST_ACCOUNT':
-            return Object.assign({}, state, {
+            return set(state, root => root)({
                 isFetching: true,
                 didInvalidate: false
             });
         case 'RECEIVE_ACCOUNT':
-            console.log('RECEIVE_ACCOUNT', action);
-            return Object.assign({}, state, {
+            return set(state, root => root)({
                 isFetching: false,
                 didInvalidate: false,
                 lastUpdated: action.receivedAt,
                 accountData: action.account
             });
-        case 'DISMISS_CARD':
-            const newCards = [
-                ...state
-            ];
-            newCards.shift();
-            return newCards;
         default:
             return state
     }

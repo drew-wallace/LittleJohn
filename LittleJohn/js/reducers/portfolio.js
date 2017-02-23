@@ -1,16 +1,16 @@
-﻿function portfolio(state = { isFetching: false, didInvalidate: false }, action) {
+﻿import { set } from 'monolite';
+
+function portfolio(state = { isFetching: false, didInvalidate: false }, action) {
     switch (action.type) {
         case 'INVALIDATE_PORTFOLIO':
-            return Object.assign({}, state, {
-                didInvalidate: true
-            });
+            return set(state, root => root.didInvalidate)(true);
         case 'REQUEST_PORTFOLIO':
-            return Object.assign({}, state, {
+            return set(state, root => root)({
                 isFetching: true,
                 didInvalidate: false
             });
         case 'RECEIVE_PORTFOLIO':
-            return Object.assign({}, state, {
+            return set(state, root => root)({
                 isFetching: false,
                 didInvalidate: false,
                 lastUpdated: action.receivedAt,

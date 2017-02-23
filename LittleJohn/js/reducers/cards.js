@@ -1,29 +1,26 @@
-﻿const cards = (state = {}, action) => {
+﻿import { set } from 'monolite';
+
+const cards = (state = {}, action) => {
     switch (action.type) {
         case 'INVALIDATE_CARDS':
-            return Object.assign({}, state, {
-                didInvalidate: true
-            });
+            return set(state, root => root.didInvalidate)(true);
         case 'REQUEST_CARDS':
-            return Object.assign({}, state, {
+            return set(state, root => root)({
                 isFetching: true,
                 didInvalidate: false
             });
         case 'RECEIVE_CARDS':
-            return Object.assign({}, state, {
+            return set(state, root => root)({
                 isFetching: false,
                 didInvalidate: false,
                 lastUpdated: action.receivedAt,
+                accountData: action.account,
                 items: [
                     ...action.cards
                 ]
             });
         case 'DISMISS_CARD':
-            const newCards = [
-                ...state
-            ];
-            newCards.shift();
-            return newCards;
+            return set(state, root => root.items)(state.items.shift());
         default:
             return state
     }

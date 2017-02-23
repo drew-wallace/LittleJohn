@@ -1,9 +1,9 @@
-﻿const stocks = (state = {}, action) => {
+﻿import { set } from 'monolite';
+
+const stocks = (state = {}, action) => {
     switch (action.type) {
         case 'UPDATE_STOCKS':
-            return Object.assign({}, state, {
-                ...action.stocks
-            });
+            return set(state, root => root)(action.stocks);
         default:
             return state
     }

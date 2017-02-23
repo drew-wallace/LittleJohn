@@ -7,9 +7,10 @@ import { createStore, applyMiddleware } from 'redux';
 import thunkMiddleware from 'redux-thunk';
 import createLogger from 'redux-logger'
 import _ from 'lodash';
+import { set } from 'monolite';
 // import rgbHex from 'rgb-hex';
 
-import LittleJohnApp from './reducers';
+import reducers from './reducers';
 import Robinhood from './lib/robinhood';
 import processPortfolio from './lib/process-portfolio';
 
@@ -29,15 +30,12 @@ const activation = Windows.ApplicationModel.Activation;
 const { positivePrimaryColor } = styles;
 const robinhood = new Robinhood(env.robinhoodSession);
 
-const initialState = {
+let initialState = {
     title: {
         past: [],
         present: {
             fixedTitle: '$0.00',
-            floatingTitle: 'Portfolio',
-            isStock: false,
-            isPosition: false,
-            isWatchlist: false,
+            floatingTitle: 'Portfolio'
         },
         future: []
     },
@@ -54,8 +52,9 @@ const initialState = {
     login: robinhood.isLoggedIn(),
     primaryColor: positivePrimaryColor
 };
+initialState = set(initialState, root => root)(initialState);
 const loggerMiddleware = createLogger();
-let store = createStore(LittleJohnApp, initialState,
+let store = createStore(reducers, initialState,
     applyMiddleware(
         thunkMiddleware/*,
         loggerMiddleware*/
