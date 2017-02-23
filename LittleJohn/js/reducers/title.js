@@ -12,28 +12,24 @@ const title = (state = {}, action) => {
             });
         case 'CHANGE_TITLE':
             const newState = setAppend(state, root => root.past)(state.present);
-            return set(newState, root => root.present)({
+            const newerState = set(newState, root => root.present)({
                 floatingTitle: action.floatingTitle,
                 fixedTitle: action.fixedTitle,
                 stockType: action.stockType,
                 symbol: action.symbol,
                 hasBackButton: action.hasBackButton,
             });
+            return newerState;
         case 'UNDO_TITLE':
-            const newStateUndo = set(state, root => root)({
-                past: state.past.slice(0, state.past.length - 1),
-                present: state.past[state.past.length - 1],
-                future: state.future
-            });
-            return setPrepend(newStateUndo, root => root.future)(state.present);
+            const newPastStateUndo = set(state, root => root.past)(state.past.slice(0, state.past.length - 1));
+            const newPresentStateUndo = set(newPastStateUndo, root => root.present)(state.past[state.past.length - 1]);
+            return setPrepend(newPresentStateUndo, root => root.future)(state.present);
         case 'REDO_TITLE':
             const newPastStateRedo = setAppend(state, root => root.past)(state.present);
-            return set(newPastStateRedo, root => root)({
-                present: state.future[0],
-                future: state.future.slice(1, state.future.length)
-            });
+            const newPresentStateRedo = set(newPastStateRedo, root => root.present)(state.future[0]);
+            return set(newPresentStateRedo, root => root.present)(state.future.slice(1, state.future.length));
         case 'INIT_TITLE':
-            const newPastInit = setAppend(state, root => root)(state.present)
+            const newPastInit = setAppend(state, root => root.past)(state.present)
             return set(newPastInit, root => root.present)({
                 floatingTitle: action.floatingTitle,
                 fixedTitle: action.fixedTitle,
