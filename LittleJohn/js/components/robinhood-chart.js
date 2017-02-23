@@ -130,12 +130,7 @@ class RobinhoodChart extends Component {
 		window.removeEventListener("resize", this.onResizeThrottled);
 	}
 
-    // shouldComponentUpdate(nextProps, nextState) {
-    //     return nextProps.primaryColor != this.props.primaryColor || nextState.tab != this.state.tab;
-    // }
-
     componentWillReceiveProps(nextProps) {
-        console.log('received new props, setting to day tab');
         if(nextProps.title != this.props.title) {
             if(_.has(nextProps.data.day[0], 'adjusted_open_equity')) {
                 this.openKey = 'adjusted_open_equity';
@@ -148,14 +143,19 @@ class RobinhoodChart extends Component {
             const subtitle = this.generateSubtitle('day', nextProps.data.day, nextProps.title);
             const primaryColor = (+_.last(nextProps.data.day)[this.openKey] >= +nextProps.data.day[0][this.openKey] ? positivePrimaryColor : negativePrimaryColor);
 
-
             this.setState({
                 title: nextProps.title,
                 subtitle,
                 data: nextProps.data.day,
                 tab: 'day',
-                primaryColor: primaryColor,
+                primaryColor,
             });
+        }
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        if(prevProps.primaryColor != this.state.primaryColor) {
+            this.props.changePrimaryColor(this.state.primaryColor);
         }
     }
 
