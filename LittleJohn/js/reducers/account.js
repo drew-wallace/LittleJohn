@@ -10,19 +10,12 @@
                 didInvalidate: false
             });
         case 'RECEIVE_ACCOUNT':
-            console.log('RECEIVE_ACCOUNT', action);
             return Object.assign({}, state, {
                 isFetching: false,
                 didInvalidate: false,
                 lastUpdated: action.receivedAt,
                 accountData: action.account
             });
-        case 'DISMISS_CARD':
-            const newCards = [
-                ...state
-            ];
-            newCards.shift();
-            return newCards;
         default:
             return state
     }

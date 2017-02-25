@@ -3,6 +3,8 @@ import numeral from 'numeral';
 
 import { CircularProgress, Dialog, FlatButton } from 'material-ui';
 
+import value_equals from '../lib/value_equals';
+
 import RobinhoodChartComponent from './robinhood-chart';
 import CardStackContainer from '../containers/card-stack';
 import PositionListContainer from '../containers/position-list';
@@ -24,6 +26,10 @@ class PortfolioPaneComponent extends Component {
 	handleDialogClose = () => {
 		this.setState({dialogOpen: false});
 	};
+
+	shouldComponentUpdate(nextProps, nextState) {
+		return nextState.dialogOpen !== this.state.dialogOpen || !value_equals(nextProps, this.props);
+	}
 
     render() {
 		if(this.props.portfolio.lastUpdated) {

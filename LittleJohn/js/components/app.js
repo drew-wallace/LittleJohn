@@ -16,6 +16,7 @@ import PorfolioPaneContainer from '../containers/portfolio-pane';
 import StockPaneContainer from '../containers/stock-pane';
 
 import { formatCurrency } from '../lib/formaters';
+import value_equals from '../lib/value_equals';
 import styles from '../styles';
 
 const { positivePrimaryColor, negativePrimaryColor } = styles;
@@ -74,6 +75,10 @@ class AppLayout extends Component {
 	componentDidUpdate() {
 		let element = ReactDOM.findDOMNode(this.refs.scrollableView);
 		element.scrollTop = 0;
+	}
+
+	shouldComponentUpdate(nextProps, nextState) {
+		return nextState.moreOpen !== this.state.moreOpen || !value_equals(nextProps, this.props);
 	}
 
     render() {
@@ -263,7 +268,6 @@ class AppLayout extends Component {
 						}
 				}
 			}
-
 			return (
 				<div>
 					<Drawer

@@ -1,7 +1,4 @@
 import React, { Component } from 'react';
-// import RaisedButton from 'material-ui/RaisedButton';
-// import TextField from 'material-ui/TextField';
-
 import { MuiThemeProvider, RaisedButton, TextField } from 'material-ui';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
@@ -11,6 +8,8 @@ import injectTapEventPlugin from 'react-tap-event-plugin';
 injectTapEventPlugin();
 
 import env from '../../env';
+
+import value_equals from '../lib/value_equals';
 
 import AppLayout from '../containers/app-layout';
 
@@ -26,6 +25,10 @@ class LoginPage extends Component {
 		const muiTheme = getMuiTheme(darkBaseTheme);
 
 		return muiTheme;
+	}
+
+	shouldComponentUpdate(nextProps, nextState) {
+		return !value_equals(nextProps, this.props);
 	}
 
   	render() {

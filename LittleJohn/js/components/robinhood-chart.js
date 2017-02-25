@@ -5,6 +5,7 @@ import moment from 'moment';
 import _ from 'lodash';
 import { bisector, scaleLinear, line, select, extent, drag, mouse } from 'd3';
 
+import value_equals from '../lib/value_equals';
 import styles from '../styles';
 
 import { formatCurrency, formatCurrencyDiff, formatPercentDiff, formatTime, formatRelativeTime } from '../lib/formaters';
@@ -17,6 +18,9 @@ const { positivePrimaryColor, negativePrimaryColor } = styles;
 class RobinhoodChart extends Component {
     constructor(props) {
         super(props);
+
+        this.setupChart = _.memoize(this.setupChart);
+        this.generateSubtitle = _.memoize(this.generateSubtitle);
 
         const { subtitle, margin, width, height } = this.setupChart(this.props);
         const newPrimaryColor = (+_.last(this.props.data.day)[this.openKey] >= +this.props.data.day[0][this.openKey] ? positivePrimaryColor : negativePrimaryColor);
@@ -165,6 +169,10 @@ class RobinhoodChart extends Component {
             this.y.domain(extent(nextState.data, function(d) { return d.yVal; }));
         }
     }
+
+    shouldComponentUpdate(nextProps, nextState) {
+		return !value_equals(nextState, this.state) || !value_equals(nextProps, this.props);
+	}
 
 	_startdrag() {
 		this.setState({

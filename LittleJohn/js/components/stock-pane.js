@@ -6,12 +6,13 @@ import moment from 'moment';
 import { RaisedButton, Divider, List, ListItem, FlatButton } from 'material-ui';
 import CircularProgress from 'material-ui/CircularProgress';
 import {Card, CardText} from 'material-ui/Card';
-import Truncate from 'react-truncate-html';
-// import Truncate from 'react-truncate';
+// import Truncate from 'react-truncate-html';
+import Truncate from 'react-truncate';
 
 import RobinhoodChartComponent from './robinhood-chart';
 
 import { formatCurrency, formatCurrencyDiff, formatPercentDiff, formatNumberBig, formatCurrencyBig } from '../lib/formaters';
+import value_equals from '../lib/value_equals';
 
 class PositionPaneComponent extends Component {
 	constructor(props) {
@@ -49,6 +50,10 @@ class PositionPaneComponent extends Component {
 		}
 	}
 
+	shouldComponentUpdate(nextProps, nextState) {
+		return nextState.descriptionExpanded !== this.state.descriptionExpanded || nextState.showMoreDescription !== this.state.showMoreDescription || !value_equals(nextProps, this.props);
+	}
+
     render() {
 		// if(this.props.stock.lastUpdated) {
 			const { changePrimaryColor, primaryColor, stockType } = this.props;
@@ -66,11 +71,6 @@ class PositionPaneComponent extends Component {
 				/>
 			);
 			let recentTransactions = (<div></div>);
-			// let description = (
-			// 	<span className="stock-description-container">
-			// 		{fundamentals.description}
-			// 	</span>
-			// );
 			let description = fundamentals.description;
 			let moreDescription = (<div></div>);
 
@@ -183,13 +183,19 @@ class PositionPaneComponent extends Component {
 				);
 			}
 
-			if(!this.state.descriptionExpanded) { //onTruncate={(isTruncated) => this.handleShowMoreDescription(isTruncated)}
+			if(!this.state.descriptionExpanded) {
 				description = (
-					<Truncate
-						ref="description"
-						lines={7}
-						dangerouslySetInnerHTML={{__html: fundamentals.description}}
-					/>
+					<div class="stock-description-container">
+						<div>
+							<Truncate
+								ref="description"
+								onTruncate={(isTruncated) => this.handleShowMoreDescription(isTruncated)}
+								lines={7}
+							>
+								{description}
+							</Truncate>
+						</div>
+					</div>
 				);
 			}
 
