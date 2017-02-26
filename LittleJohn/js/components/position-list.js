@@ -13,8 +13,14 @@ const PositionListComponent = class extends Component {
 		return !value_equals(nextProps, this.props);
 	}
 
+    componentWillMount() {
+		if(!this.props.positions.lastUpdated) {
+			this.props.fetchPositionsIfNeeded();
+		}
+	}
+
     render() {
-        const { positions, settings, changeTitle, fetchPositionsIfNeeded } = this.props;
+        const { positions, settings, changeTitle } = this.props;
 
         if(positions.lastUpdated) {
             return (
@@ -60,7 +66,6 @@ const PositionListComponent = class extends Component {
                 </Card>
             );
         } else {
-            fetchPositionsIfNeeded();
             return (
                 <div style={{height: 140, marginBottom: 15}}>
                     <div style={{display: 'flex', width: '100%', height: 140, alignItems: 'center'}}>

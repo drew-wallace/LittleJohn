@@ -77,12 +77,18 @@ class AppLayout extends Component {
 		element.scrollTop = 0;
 	}
 
+	componentWillMount() {
+		if(!this.props.account.lastUpdated) {
+			this.props.fetchAccountIfNeeded();
+		}
+	}
+
 	shouldComponentUpdate(nextProps, nextState) {
 		return nextState.moreOpen !== this.state.moreOpen || !value_equals(nextProps, this.props);
 	}
 
     render() {
-		const { account, fetchAccountIfNeeded, primaryColor } = this.props;
+		const { account, primaryColor } = this.props;
 
 		if(account.lastUpdated) {
 			const { changeTitle, portfolio, title, watchlist, positions } = this.props;
@@ -319,7 +325,6 @@ class AppLayout extends Component {
 				</div>
 			);
 		} else {
-			fetchAccountIfNeeded();
 			return (
 				<div style={{display: 'flex', width: '100%', height: '100%', alignItems: 'center', position: 'absolute', marginTop: -75}}>
 					<CircularProgress size={80} thickness={5} style={{marginLeft: 'auto', marginRight: 'auto'}}/>

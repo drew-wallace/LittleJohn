@@ -71,6 +71,7 @@ app.onactivated = function (args) {
             // To create a smooth user experience, restore application state here so that it looks like the app never stopped running.
         }
 
+        console.log(process.env.NODE_ENV);
 
         ReactDOM.render(
             <Provider store={store}>

@@ -185,7 +185,7 @@ class PositionPaneComponent extends Component {
 
 			if(!this.state.descriptionExpanded) {
 				description = (
-					<div class="stock-description-container">
+					<div className="stock-description-container">
 						<div>
 							<Truncate
 								ref="description"
@@ -199,17 +199,7 @@ class PositionPaneComponent extends Component {
 				);
 			}
 
-			// if(!this.state.descriptionExpanded) {
-			// 	description = (
-			// 		<div className="stock-description-container">
-			// 			{fundamentals.description}
-			// 		</div>
-			// 	);
-			// }
-
-			// waiting for an onTruncate function from here: https://github.com/jariz/react-truncate-html/issues/1
-			// or a fix for parent padding here: https://github.com/One-com/react-truncate/issues/32
-			if(true || this.state.showMoreDescription) {
+			if(this.state.showMoreDescription) {
 				moreDescription = (
 					<div>
 						<Divider />

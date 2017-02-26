@@ -31,6 +31,12 @@ class PortfolioPaneComponent extends Component {
 		return nextState.dialogOpen !== this.state.dialogOpen || !value_equals(nextProps, this.props);
 	}
 
+	componentWillMount() {
+		if(!this.props.portfolio.lastUpdated) {
+			this.props.fetchPortfolioIfNeeded();
+		}
+	}
+
     render() {
 		if(this.props.portfolio.lastUpdated) {
 			let { changePrimaryColor, primaryColor} = this.props;
@@ -78,7 +84,6 @@ class PortfolioPaneComponent extends Component {
 				</div>
 			);
 		} else {
-			this.props.fetchPortfolioIfNeeded();
 			return (
 				<div style={{display: 'flex', width: '100%', height: '100%', alignItems: 'center', marginTop: -75}}>
 					<CircularProgress size={80} thickness={5} style={{marginLeft: 'auto', marginRight: 'auto'}}/>

@@ -13,8 +13,14 @@ const WatchlistComponent = class extends Component {
 		return !value_equals(nextProps, this.props);
 	}
 
+    componentWillMount() {
+		if(!this.props.watchlist.lastUpdated) {
+			this.props.fetchWatchlistIfNeeded();
+		}
+	}
+
     render() {
-        const { watchlist, settings, changeTitle, fetchWatchlistIfNeeded } = this.props;
+        const { watchlist, settings, changeTitle } = this.props;
 
         if(watchlist.lastUpdated) {
             return (
@@ -60,7 +66,6 @@ const WatchlistComponent = class extends Component {
                 </Card>
             );
         } else {
-            fetchWatchlistIfNeeded();
             return (
                 <div style={{height: 140, marginBottom: 15}}>
                     <div style={{display: 'flex', width: '100%', height: 140, alignItems: 'center'}}>
