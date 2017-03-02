@@ -41,6 +41,7 @@ const initialState = {
         },
         future: []
     },
+    currentOrder: {},
     menu: false,
     settings: {
         displayedValue: 'price',

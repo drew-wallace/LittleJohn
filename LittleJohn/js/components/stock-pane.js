@@ -6,7 +6,6 @@ import moment from 'moment';
 import { RaisedButton, Divider, List, ListItem, FlatButton } from 'material-ui';
 import CircularProgress from 'material-ui/CircularProgress';
 import {Card, CardText} from 'material-ui/Card';
-// import Truncate from 'react-truncate-html';
 import Truncate from 'react-truncate';
 
 import RobinhoodChartComponent from './robinhood-chart';
@@ -25,11 +24,11 @@ class PositionPaneComponent extends Component {
 	}
 
 	handleSell() {
-		this.props.initTitle('Market Sell', {symbol: this.props.stock.instrument.symbol, stockType: 'sell', hasBackButton: true});
+		this.props.selectedOrderSide('Market Sell', {symbol: this.props.stock.instrument.symbol, stockType: 'sell', hasBackButton: true});
 	}
 
 	handleBuy() {
-		this.props.initTitle('Market Buy', {symbol: this.props.stock.instrument.symbol, stockType: 'buy', hasBackButton: true});
+		this.props.selectedOrderSide('Market Buy', {symbol: this.props.stock.instrument.symbol, stockType: 'buy', hasBackButton: true});
 	}
 
 	handleMoreNews() {

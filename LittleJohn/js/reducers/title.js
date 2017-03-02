@@ -1,6 +1,7 @@
 ﻿import { combineReducers } from 'redux';
 import undoable, { excludeAction } from 'redux-undo';
 import recycleState from 'redux-recycle';
+import _ from 'lodash';
 
 let title = (state = {}, action) => {
     switch (action.type) {
@@ -24,23 +25,42 @@ title = undoable(title, {
   redoType: 'REDO_TITLE'
 })
 
-title = recycleState(title, ['INIT_TITLE'], (state, action) => {
-    return {
-        past: [
-            ...state.past,
-            state.present
-        ],
-        present: {
-            floatingTitle: action.floatingTitle,
-            fixedTitle: action.fixedTitle,
-            stockType: action.stockType,
-            symbol: action.symbol,
-            hasBackButton: action.hasBackButton,
-        },
-        future: [
-            ...state.future
-        ]
-    };
+title = recycleState(title, ['INIT_TITLE', 'SELECTED_ORDER_TYPE'], (state, action) => {
+    switch (action.type) {
+        case 'INIT_TITLE':
+            return {
+                _latestUnfiltered: {
+                    floatingTitle: action.floatingTitle,
+                    fixedTitle: action.fixedTitle,
+                    stockType: action.stockType,
+                    symbol: action.symbol,
+                    hasBackButton: action.hasBackButton
+                },
+                past: [
+                    ...state.past,
+                    state.present
+                ],
+                present: {
+                    floatingTitle: action.floatingTitle,
+                    fixedTitle: action.fixedTitle,
+                    stockType: action.stockType,
+                    symbol: action.symbol,
+                    hasBackButton: action.hasBackButton
+                },
+                future: [
+                    ...state.future
+                ]
+            };
+        case 'SELECTED_ORDER_TYPE':
+            let past = state.past.slice(0, 3);
+
+            return {
+                _latestUnfiltered: _.last(past),
+                past: state.past.slice(0, 2),
+                present: _.last(past),
+                future: []
+            };
+    }
 });
 
 export default title;

@@ -3,9 +3,9 @@ import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 
-import { changePrimaryColor, changeTitle, initTitle } from '../actions';
+import { changeTitleFromTab } from '../actions';
 
-import PositionPaneComponent from '../components/stock-pane';
+import OrderPlacementPaneComponent from '../components/order-placement-pane';
 
 const mapStateToProps = (state) => {
     const symbol = state.title.present.symbol;
@@ -25,7 +25,6 @@ const mapStateToProps = (state) => {
     }
 
     return {
-        account: state.account,
         stockType,
         stock,
         primaryColor: state.primaryColor
@@ -34,16 +33,13 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        changePrimaryColor: (color) => dispatch(changePrimaryColor(color)),
-        changeTitle: (fixedTitle, options) => dispatch(changeTitle(fixedTitle, options)),
-        initTitle: (fixedTitle, options) => dispatch(initTitle(fixedTitle, options)),
-        selectedOrderSide: (fixedTitle, options) => dispatch(initTitle(fixedTitle, options))
+        changeTitleFromTab: (fixedTitle, options) => dispatch(changeTitle(fixedTitle, options))
     }
 }
 
-const PositionPaneContainer = connect(
+const OrderPlacementPaneContainer = connect(
     mapStateToProps,
     mapDispatchToProps
-)(PositionPaneComponent);
+)(OrderPlacementPaneComponent);
 
-export default PositionPaneContainer;
+export default OrderPlacementPaneContainer;

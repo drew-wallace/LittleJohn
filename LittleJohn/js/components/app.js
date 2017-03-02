@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import _ from 'lodash';
 import moment from 'moment';
 
-import { Drawer, AppBar, MenuItem, IconButton, IconMenu, RadioButtonGroup, RadioButton, FlatButton, List, ListItem, Divider } from 'material-ui';
+import { Drawer, AppBar, MenuItem, IconButton, IconMenu, RadioButtonGroup, RadioButton, FlatButton, List, ListItem, Divider, TextField } from 'material-ui';
 import {Tabs, Tab} from 'material-ui/Tabs';
 import CircularProgress from 'material-ui/CircularProgress';
 import ArrowBack from 'material-ui/svg-icons/navigation/arrow-back';
@@ -14,6 +14,7 @@ import Search from 'material-ui/svg-icons/action/search';
 
 import PorfolioPaneContainer from '../containers/portfolio-pane';
 import StockPaneContainer from '../containers/stock-pane';
+import OrderPlacementPaneContainer from '../containers/order-placement-pane';
 
 import { formatCurrency } from '../lib/formaters';
 import value_equals from '../lib/value_equals';
@@ -91,7 +92,7 @@ class AppLayout extends Component {
 		const { account, primaryColor } = this.props;
 
 		if(account.lastUpdated) {
-			const { changeTitle, portfolio, title, watchlist, positions } = this.props;
+			const { changeTitle, initTitle, selectedOrderType, portfolio, title, watchlist, positions, currentOrder, stocks } = this.props;
 			let iconElementLeft = null;
 			let iconElementRight = null;
 			let onLeftIconButtonTouchTap = this.handleToggle.bind(this);
@@ -170,6 +171,7 @@ class AppLayout extends Component {
 						</List>
 					);
 					break;
+				case 'buy':
 				case 'sell':
 					// <- Market Sell                        [Order Types]
 					// 	 (i) Shares of {symbol}                          0 <-- number input, fills to left
@@ -177,6 +179,69 @@ class AppLayout extends Component {
 					// 	 Market Price                                $1.03
 					//   -------------------------------------------------
 					//   Estimated Credit    {quantity} share(s) available <-- Becomes ${shares * Market price}
+					iconElementRight = (
+						<FlatButton label="Order Types" onTouchTap={() => changeTitle('Order Types', {stockType: 'order types', hasBackButton: true})}/>
+					);
+					pane = (<OrderPlacementPaneContainer/>);
+					break;
+				case 'order types':
+					pane = (
+						<List style={{padding: 0}}>
+							<ListItem
+								primaryText="Market"
+								insetChildren={true}
+								onTouchTap={() => selectedOrderType(`Market ${_.capitalize(currentOrder.side)}`, {stockType: currentOrder.side, hasBackButton: true})}
+							/>
+							<ListItem
+								primaryText="Limit"
+								insetChildren={true}
+								onTouchTap={() => changeTitle('Limit Price', {stockType: 'limit price', hasBackButton: true})}
+							/>
+							<ListItem
+								primaryText="Stop Loss"
+								insetChildren={true}
+								onTouchTap={() => changeTitle('Stop Price', {stockType: 'stop loss', hasBackButton: true})}
+							/>
+							<ListItem
+								primaryText="Stop Limit"
+								insetChildren={true}
+								onTouchTap={() => changeTitle('Stop Price', {stockType: 'stop limit', hasBackButton: true})}
+							/>
+						</List>
+					);
+					break;
+				case 'limit sell':
+					pane = (
+						<div>
+							<p>Specify the minimum amount you're\nwilling to receive per share.</p>
+							<h1>$<TextField hintText="Hint Text"/></h1>
+							<p>Current Price: {stocks[currentOrder.symbol].quote.last_trade_price}</p>
+						</div>
+					);
+					// Large $ field 0.00 placeholder
+					// Current Price: $1.04 <-- I think it fetches the latest quote on render.
+					// button to take user to time in force pane
+					// on screen keyboard?
+					break;
+				case 'stop loss':
+					`A price below the current price that\nconverts your order to a market order.`
+					// Large $ field 0.00 placeholder
+					// Current Price: $1.04 <-- I think it fetches the latest quote on render.
+					// button to take user to time in force pane
+					// on screen keyboard?
+					break;
+				case 'stop limit':
+					`A price below the current price that\nconverts your order to a limit order.`
+					// Large $ field 0.00 placeholder
+					// Current Price: $1.04 <-- I think it fetches the latest quote on render.
+					// button to take user to time in force pane
+					// on screen keyboard?
+					break;
+				case 'time in force':
+					`How long an order will remain active\nbefore it is canceled.`
+					// List item: GOOD FOR DAY
+					// List item: GOOD TILL CANCELED
+					// both will take you to sell pane
 					break;
 				case 'order':
 					// <-

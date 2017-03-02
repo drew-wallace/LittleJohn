@@ -13,6 +13,7 @@ import positions from './positions';
 import watchlist from './watchlist';
 import login from './login';
 import stocks from './stocks';
+import currentOrder from './current-order';
 
 const LittleJohnApp = combineReducers({
     primaryColor,
@@ -27,7 +28,8 @@ const LittleJohnApp = combineReducers({
     positions,
     watchlist,
     login,
-    stocks
+    stocks,
+    currentOrder
 });
 
 export default LittleJohnApp

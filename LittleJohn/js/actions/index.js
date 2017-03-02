@@ -40,15 +40,45 @@ export const toggleMenu = (open) => {
 export const changeTitle = (fixedTitle='Portfolio', options={}) => {
     return {
         type: 'CHANGE_TITLE',
-        fixedTitle,
-        ...options
+        ...options,
+        fixedTitle
     };
 }
 export const changeTitleFromTab = (fixedTitle='Portfolio', options={}) => {
     return {
         type: 'CHANGE_TITLE_FROM_TAB',
-        fixedTitle,
-        ...options
+        ...options,
+        fixedTitle
+    };
+}
+export const initTitle = (fixedTitle='Portfolio', options={}) => {
+    return {
+        type: 'INIT_TITLE',
+        ...options,
+        fixedTitle
+    };
+}
+export const selectedOrderType = (fixedTitle='Portfolio', options={}) => {
+    return {
+        type: 'SELECTED_ORDER_TYPE',
+        ...options,
+        fixedTitle
+    };
+}
+export const updateCurrentOrder = (options={}) => {
+    return {
+        type: 'UPDATE_CURRENT_ORDER',
+        options
+    };
+}
+export function selectedOrderSide(fixedTitle, options) {
+    return (dispatch) => {
+        dispatch(updateCurrentOrder({
+            side: options.stockType,
+            symbol: options.symbol
+        }));
+        dispatch(changeTitle(fixedTitle, options));
+        return Promise.resolve()
     };
 }
 export const changeDisplayedValue = (value) => {
@@ -65,13 +95,6 @@ export const undoTitle = () => {
 export const redoTitle = () => {
     return {
         type: 'REDO_TITLE'
-    };
-}
-export const initTitle = (fixedTitle, options) => {
-    return {
-        type: 'INIT_TITLE',
-        fixedTitle,
-        ...options
     };
 }
 export const changeEquityTitle = (text) => {
