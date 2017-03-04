@@ -92,7 +92,7 @@ class AppLayout extends Component {
 		const { account, primaryColor } = this.props;
 
 		if(account.lastUpdated) {
-			const { changeTitle, initTitle, selectedOrderType, portfolio, title, watchlist, positions, currentOrder, stocks } = this.props;
+			const { changeTitle, initTitle, selectedOrderType, portfolio, title, watchlist, positions, currentOrder, stocks, selectedOrderTypeWithPrice } = this.props;
 			let iconElementLeft = null;
 			let iconElementRight = null;
 			let onLeftIconButtonTouchTap = this.handleToggle.bind(this);
@@ -190,27 +190,29 @@ class AppLayout extends Component {
 							<ListItem
 								primaryText="Market"
 								insetChildren={true}
-								onTouchTap={() => selectedOrderType(`Market ${_.capitalize(currentOrder.side)}`, {stockType: currentOrder.side, hasBackButton: true})}
+								onTouchTap={() => selectedOrderType(`Market ${_.capitalize(currentOrder.side)}`, {stockType: 'market', hasBackButton: true})}
 							/>
 							<ListItem
 								primaryText="Limit"
 								insetChildren={true}
-								onTouchTap={() => changeTitle('Limit Price', {stockType: 'limit price', hasBackButton: true})}
+								onTouchTap={() => selectedOrderTypeWithPrice('Limit Price', {stockType: 'limit', hasBackButton: true})}
 							/>
 							<ListItem
 								primaryText="Stop Loss"
 								insetChildren={true}
-								onTouchTap={() => changeTitle('Stop Price', {stockType: 'stop loss', hasBackButton: true})}
+								onTouchTap={() => selectedOrderTypeWithPrice('Stop Price', {stockType: 'stop loss', hasBackButton: true})}
 							/>
 							<ListItem
 								primaryText="Stop Limit"
 								insetChildren={true}
-								onTouchTap={() => changeTitle('Stop Price', {stockType: 'stop limit', hasBackButton: true})}
+								onTouchTap={() => selectedOrderTypeWithPrice('Stop Price', {stockType: 'stop limit', hasBackButton: true})}
 							/>
 						</List>
 					);
 					break;
-				case 'limit sell':
+				case 'limit':
+					console.log(currentOrder);
+					console.log(stocks);
 					pane = (
 						<div>
 							<p>Specify the minimum amount you're\nwilling to receive per share.</p>

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 
-import { toggleMenu, closeMenu, changeTitle, changeDisplayedValue, undoTitle, changePrimaryColor, changeTitleFromTab, initTitle, fetchAccountIfNeeded, selectedOrderType } from '../actions';
+import { toggleMenu, closeMenu, changeTitle, changeDisplayedValue, undoTitle, changePrimaryColor, changeTitleFromTab, initTitle, fetchAccountIfNeeded, selectedOrderType, selectedOrderTypeWithPrice } from '../actions';
 
 import App from '../components/app';
 
@@ -29,10 +29,11 @@ const mapDispatchToProps = (dispatch) => {
 		changeTitleFromTab: (fixedTitle, options) => dispatch(changeTitleFromTab(fixedTitle, options)),
 		initTitle: (fixedTitle, options) => dispatch(initTitle(fixedTitle, options)),
 		selectedOrderType: (fixedTitle, options) => dispatch(selectedOrderType(fixedTitle, options)),
+		selectedOrderTypeWithPrice: (fixedTitle, options) => dispatch(selectedOrderTypeWithPrice(fixedTitle, options)),
 		changeDisplayedValue: (value) => dispatch(changeDisplayedValue(value)),
 		undoTitle: () => dispatch(undoTitle()),
 		changePrimaryColor: (color) => dispatch(changePrimaryColor(color)),
-		fetchAccountIfNeeded: () => dispatch(fetchAccountIfNeeded())
+		fetchAccountIfNeeded: () => dispatch(fetchAccountIfNeeded()),
     }
 }
 

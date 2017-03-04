@@ -25,7 +25,7 @@ title = undoable(title, {
   redoType: 'REDO_TITLE'
 })
 
-title = recycleState(title, ['INIT_TITLE', 'SELECTED_ORDER_TYPE'], (state, action) => {
+title = recycleState(title, ['INIT_TITLE', 'BACK_TO_ORDER_PLACEMENT_PANE'], (state, action) => {
     switch (action.type) {
         case 'INIT_TITLE':
             return {
@@ -51,7 +51,7 @@ title = recycleState(title, ['INIT_TITLE', 'SELECTED_ORDER_TYPE'], (state, actio
                     ...state.future
                 ]
             };
-        case 'SELECTED_ORDER_TYPE':
+        case 'BACK_TO_ORDER_PLACEMENT_PANE':
             let past = state.past.slice(0, 3);
 
             return {

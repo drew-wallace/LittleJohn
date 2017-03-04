@@ -58,9 +58,9 @@ export const initTitle = (fixedTitle='Portfolio', options={}) => {
         fixedTitle
     };
 }
-export const selectedOrderType = (fixedTitle='Portfolio', options={}) => {
+export const backToOrderPlacementPane = (fixedTitle='Portfolio', options={}) => {
     return {
-        type: 'SELECTED_ORDER_TYPE',
+        type: 'BACK_TO_ORDER_PLACEMENT_PANE',
         ...options,
         fixedTitle
     };
@@ -71,12 +71,43 @@ export const updateCurrentOrder = (options={}) => {
         options
     };
 }
-export function selectedOrderSide(fixedTitle, options) {
+export const resetCurrentOrder = (options={}) => {
+    return {
+        type: 'RESET_CURRENT_ORDER',
+        options
+    };
+}
+export function selectedOrderSide(fixedTitle, options={}) {
     return (dispatch) => {
-        dispatch(updateCurrentOrder({
-            side: options.stockType,
+        dispatch(resetCurrentOrder({
+            type: options.stockType,
             symbol: options.symbol
         }));
+        dispatch(initTitle(fixedTitle, options));
+        return Promise.resolve()
+    };
+}
+export function selectedOrderType(fixedTitle, options={}) {
+    return (dispatch) => {
+        dispatch(updateCurrentOrder({
+            type: options.stockType,
+        }));
+        dispatch(backToOrderPlacementPane(fixedTitle, options));
+        return Promise.resolve()
+    };
+}
+export function selectedOrderTypeWithPrice(fixedTitle, options={}) {
+    let currentOrderOptions = {type: options.stockType};
+
+    if (currentOrderOptions.type == 'stop loss') {
+        currentOrderOptions.type = 'market';
+        currentOrderOptions.trigger = 'stop';
+    } else if (currentOrderOptions.type == 'stop limit') {
+        currentOrderOptions.type = 'limit';
+        currentOrderOptions.trigger = 'stop'
+    }
+    return (dispatch) => {
+        dispatch(updateCurrentOrder(currentOrderOptions));
         dispatch(changeTitle(fixedTitle, options));
         return Promise.resolve()
     };

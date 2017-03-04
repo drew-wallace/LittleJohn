@@ -4,6 +4,10 @@
             return Object.assign({}, state, {
                 ...action.options
             });
+        case 'RESET_CURRENT_ORDER':
+            return {
+                ...action.options
+            };
         default:
             return state
     }
