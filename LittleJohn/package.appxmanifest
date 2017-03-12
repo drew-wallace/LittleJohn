@@ -6,11 +6,11 @@
   IgnorableNamespaces="uap mp">
 
   <Identity
-    Name="b49a0453-3f5f-4ea5-b6f3-e9f5c9235c70"
+    Name="291ff5db-d8bf-4c65-929e-8bf6f4f69a23"
     Version="1.0.0.0"
     Publisher="CN=Drew" />
 
-  <mp:PhoneIdentity PhoneProductId="b49a0453-3f5f-4ea5-b6f3-e9f5c9235c70" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
+  <mp:PhoneIdentity PhoneProductId="291ff5db-d8bf-4c65-929e-8bf6f4f69a23" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
 
   <Properties>
     <DisplayName>LittleJohn</DisplayName>
