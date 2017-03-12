@@ -1,5 +1,5 @@
 ﻿"use strict";
-
+import WinJS from 'winjs';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
