@@ -4,7 +4,6 @@ import _ from 'lodash';
 import moment from 'moment';
 
 import { Drawer, AppBar, MenuItem, IconButton, IconMenu, RadioButtonGroup, RadioButton, FlatButton, List, ListItem, Divider, TextField } from 'material-ui';
-import NumberInput from 'material-ui-number-input';
 import {Tabs, Tab} from 'material-ui/Tabs';
 import CircularProgress from 'material-ui/CircularProgress';
 import ArrowBack from 'material-ui/svg-icons/navigation/arrow-back';
@@ -16,6 +15,7 @@ import Search from 'material-ui/svg-icons/action/search';
 import PorfolioPaneContainer from '../containers/portfolio-pane';
 import StockPaneContainer from '../containers/stock-pane';
 import OrderPlacementPaneContainer from '../containers/order-placement-pane';
+import LimitOrderPane from '../containers/limit-order-pane';
 
 import { formatCurrency } from '../lib/formaters';
 import value_equals from '../lib/value_equals';
@@ -174,7 +174,6 @@ class AppLayout extends Component {
 					break;
 				case 'buy':
 				case 'sell':
-					// <- Market Sell                        [Order Types]
 					// 	 (i) Shares of {symbol}                          0 <-- number input, fills to left
 					//
 					// 	 Market Price                                $1.03
@@ -212,32 +211,7 @@ class AppLayout extends Component {
 					);
 					break;
 				case 'limit':
-					pane = (
-						<div>
-							<p>Specify the minimum amount you're<br/>willing to receive per share.</p>
-							<span>$</span><NumberInput
-								ref="test"
-								hintText="0.00"
-								strategy='ignore'
-								min={0}
-								onValid={(price) => {
-									this.validLimitPrice = price;
-									this.toggleNextButton();
-								}}
-								onChange={(e, newVal) => {
-									this.validLimitPrice = (newVal < 0 ? 0 : this.validLimitPrice);
-									if(!newVal) {
-										this.toggleNextButton(false);
-									}
-								}}
-							/>
-							<p>Current Price: {formatCurrency(stocks[currentOrder.symbol].quote.last_trade_price)}</p>
-						</div>
-					);
-					// Large $ field 0.00 placeholder
-					// Current Price: $1.04 <-- I think it fetches the latest quote on render.
-					// button to take user to time in force pane
-					// on screen keyboard?
+					pane = (<LimitOrderPane/>);
 					break;
 				case 'stop loss':
 					`A price below the current price that\nconverts your order to a market order.`

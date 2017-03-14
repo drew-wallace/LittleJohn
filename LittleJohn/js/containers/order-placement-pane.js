@@ -20,7 +20,7 @@ const mapStateToProps = (state) => {
             stock = state.watchlist.items[symbol];
             break;
         case 'stock':
-            stock = state.stock[symbol];
+            stock = state.stocks[symbol];
             break;
     }
 
