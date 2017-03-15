@@ -58,11 +58,9 @@ export const initTitle = (fixedTitle='Portfolio', options={}) => {
         fixedTitle
     };
 }
-export const backToOrderPlacementPane = (fixedTitle='Portfolio', options={}) => {
+export const backToOrderPlacementPane = () => {
     return {
-        type: 'BACK_TO_ORDER_PLACEMENT_PANE',
-        ...options,
-        fixedTitle
+        type: 'BACK_TO_ORDER_PLACEMENT_PANE'
     };
 }
 export const updateCurrentOrder = (options={}) => {
@@ -92,7 +90,7 @@ export function selectedOrderType(fixedTitle, options={}) {
         dispatch(updateCurrentOrder({
             type: options.stockType,
         }));
-        dispatch(backToOrderPlacementPane(fixedTitle, options));
+        dispatch(backToOrderPlacementPane());
         return Promise.resolve()
     };
 }
@@ -109,6 +107,24 @@ export function selectedOrderTypeWithPrice(fixedTitle, options={}) {
     return (dispatch) => {
         dispatch(updateCurrentOrder(currentOrderOptions));
         dispatch(changeTitle(fixedTitle, options));
+        return Promise.resolve()
+    };
+}
+export function setOrderPrice(fixedTitle, options={}) {
+    return (dispatch) => {
+        dispatch(updateCurrentOrder({
+            price: options.price,
+        }));
+        dispatch(changeTitle(fixedTitle, options));
+        return Promise.resolve()
+    };
+}
+export function selectedTimeInForce(time_in_force) {
+    return (dispatch) => {
+        dispatch(updateCurrentOrder({
+            time_in_force,
+        }));
+        dispatch(backToOrderPlacementPane());
         return Promise.resolve()
     };
 }

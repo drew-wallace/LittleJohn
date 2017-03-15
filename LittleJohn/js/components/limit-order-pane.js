@@ -41,7 +41,7 @@ class LimitOrderPaneComponent extends Component {
 	}
 
     render() {
-		const { currentOrder, stock } = this.props;
+		const { currentOrder, stock, setOrderPrice } = this.props;
 		return (
 			<div style={{ paddingLeft: 65 }}>
 				<p>Specify the {(currentOrder.side == 'sell' ? 'minimum' : 'maximum')} amount you're<br />willing to {(currentOrder.side ? 'receive' : 'pay')} per share.</p>
@@ -60,7 +60,10 @@ class LimitOrderPaneComponent extends Component {
 					}}
 				/>
 				<p>Current Price: {formatCurrency(stock.quote.last_trade_price)}</p>
-				<FloatingActionButton style={{display: (this.state.showNextButton ? 'inline-block' : 'none')}}>
+				<FloatingActionButton
+					style={{display: (this.state.showNextButton ? 'inline-block' : 'none')}}
+					onTouchTap={() => setOrderPrice('Time In Force', {hasBackButton: true, stockType: 'time in force', price: Number(this.validLimitPrice)})}
+				>
 					<ChevronRight />
 				</FloatingActionButton>
 			</div>

@@ -93,7 +93,7 @@ class AppLayout extends Component {
 		const { account, primaryColor } = this.props;
 
 		if(account.lastUpdated) {
-			const { changeTitle, initTitle, selectedOrderType, portfolio, title, watchlist, positions, currentOrder, stocks, selectedOrderTypeWithPrice } = this.props;
+			const { changeTitle, initTitle, selectedOrderType, portfolio, title, watchlist, positions, currentOrder, stocks, selectedOrderTypeWithPrice, selectedTimeInForce } = this.props;
 			let iconElementLeft = null;
 			let iconElementRight = null;
 			let onLeftIconButtonTouchTap = this.handleToggle.bind(this);
@@ -228,7 +228,24 @@ class AppLayout extends Component {
 					// on screen keyboard?
 					break;
 				case 'time in force':
-					`How long an order will remain active\nbefore it is canceled.`
+					pane = (
+						<div style={{ paddingLeft: 65 }}>
+							<p>How long an order will remain active<br />before it is canceled.</p>
+							<List style={{ padding: 0 }}>
+								<ListItem
+									primaryText="Good For Day"
+									insetChildren={true}
+									onTouchTap={() => selectedTimeInForce('gfd')}
+								/>
+								<ListItem
+									primaryText="Good Till Canceled"
+									insetChildren={true}
+									onTouchTap={() => selectedTimeInForce('gtc')}
+								/>
+							</List>
+						</div>
+					);
+					// How long an order will remain active\nbefore it is canceled.
 					// List item: GOOD FOR DAY
 					// List item: GOOD TILL CANCELED
 					// both will take you to sell pane

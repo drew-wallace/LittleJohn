@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 
-import { toggleMenu, closeMenu, changeTitle, changeDisplayedValue, undoTitle, changePrimaryColor, changeTitleFromTab, initTitle, fetchAccountIfNeeded, selectedOrderType, selectedOrderTypeWithPrice } from '../actions';
+import { toggleMenu, closeMenu, changeTitle, changeDisplayedValue, undoTitle, changePrimaryColor, changeTitleFromTab, initTitle, fetchAccountIfNeeded, selectedOrderType, selectedOrderTypeWithPrice, selectedTimeInForce } from '../actions';
 
 import App from '../components/app';
 
@@ -34,6 +34,7 @@ const mapDispatchToProps = (dispatch) => {
 		undoTitle: () => dispatch(undoTitle()),
 		changePrimaryColor: (color) => dispatch(changePrimaryColor(color)),
 		fetchAccountIfNeeded: () => dispatch(fetchAccountIfNeeded()),
+		selectedTimeInForce: (time_in_force) => dispatch(selectedTimeInForce(time_in_force)),
     }
 }
 
