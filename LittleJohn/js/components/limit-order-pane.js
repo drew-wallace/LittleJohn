@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import _ from 'lodash';
 
 import { FloatingActionButton, TextField } from 'material-ui';
 import ChevronRight from 'material-ui/svg-icons/navigation/chevron-right';
@@ -26,9 +27,17 @@ class LimitOrderPaneComponent extends Component {
 
 	toggleNextButton() {
 		this.setState({
-			showNextButton: !!this.validLimitPrice,
+			showNextButton: !!Number(this.validLimitPrice),
 			value: this.validLimitPrice
 		});
+	}
+
+	diffStrings(newVal, oldVal) {
+		for (var i = 0; i < newVal.length; i++) {
+			if(newVal[i] !== oldVal[i]) {
+				return newVal[i];
+			}
+		}
 	}
 
     render() {
@@ -38,18 +47,16 @@ class LimitOrderPaneComponent extends Component {
 				<p>Specify the {(currentOrder.side == 'sell' ? 'minimum' : 'maximum')} amount you're<br />willing to {(currentOrder.side ? 'receive' : 'pay')} per share.</p>
 				<span>$</span>
 				<TextField
+					ref="money"
 					value={this.state.value}
 					hintText="0.00"
 					onChange={(e, newVal) => {
-						newVal = this.toNumber(newVal);
-
-						if (Number(newVal) >= 0) {
+						const diff = this.diffStrings(newVal, this.state.value);
+						if (diff === undefined || !isNaN(diff) || (diff === '.' && !_.includes(this.state.value, '.'))) {
+							newVal = this.toNumber(newVal);
 							this.validLimitPrice = newVal;
-						} else {
-							this.validLimitPrice = '';
+							this.toggleNextButton();
 						}
-
-						this.toggleNextButton();
 					}}
 				/>
 				<p>Current Price: {formatCurrency(stock.quote.last_trade_price)}</p>
