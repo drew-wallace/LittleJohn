@@ -53,3 +53,7 @@
 .stock-list-item-subheader {
     margin: 0 !important;
 }
+
+.order-quantity-textbox > div {
+    height: auto !important;
+}

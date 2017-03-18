@@ -47,7 +47,6 @@ class LimitOrderPaneComponent extends Component {
 				<p>Specify the {(currentOrder.side == 'sell' ? 'minimum' : 'maximum')} amount you're<br />willing to {(currentOrder.side ? 'receive' : 'pay')} per share.</p>
 				<span>$</span>
 				<TextField
-					ref="money"
 					value={this.state.value}
 					hintText="0.00"
 					onChange={(e, newVal) => {

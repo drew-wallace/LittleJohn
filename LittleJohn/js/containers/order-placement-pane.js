@@ -10,6 +10,7 @@ import OrderPlacementPaneComponent from '../components/order-placement-pane';
 const mapStateToProps = (state) => {
     const symbol = state.title.present.symbol;
     const stockType = state.title.present.stockType;
+    const currentOrder = state.currentOrder;
     let stock = null;
 
     switch(stockType) {
@@ -27,6 +28,7 @@ const mapStateToProps = (state) => {
     return {
         stockType,
         stock,
+        currentOrder,
         primaryColor: state.primaryColor
     }
 }

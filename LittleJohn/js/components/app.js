@@ -174,11 +174,6 @@ class AppLayout extends Component {
 					break;
 				case 'buy':
 				case 'sell':
-					// 	 (i) Shares of {symbol}                          0 <-- number input, fills to left
-					//
-					// 	 Market Price                                $1.03
-					//   -------------------------------------------------
-					//   Estimated Credit    {quantity} share(s) available <-- Becomes ${shares * Market price}
 					iconElementRight = (
 						<FlatButton label="Order Types" onTouchTap={() => changeTitle('Order Types', {stockType: 'order types', hasBackButton: true})}/>
 					);
@@ -229,8 +224,8 @@ class AppLayout extends Component {
 					break;
 				case 'time in force':
 					pane = (
-						<div style={{ paddingLeft: 65 }}>
-							<p>How long an order will remain active<br />before it is canceled.</p>
+						<div>
+							<p style={{ paddingLeft: 70 }}>How long an order will remain active<br />before it is canceled.</p>
 							<List style={{ padding: 0 }}>
 								<ListItem
 									primaryText="Good For Day"
