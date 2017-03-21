@@ -78,8 +78,9 @@ export const resetCurrentOrder = (options={}) => {
 export function selectedOrderSide(fixedTitle, options={}) {
     return (dispatch) => {
         dispatch(resetCurrentOrder({
-            type: options.stockType,
-            symbol: options.symbol
+            side: options.stockType,
+            symbol: options.symbol,
+            type: 'market'
         }));
         dispatch(initTitle(fixedTitle, options));
         return Promise.resolve()

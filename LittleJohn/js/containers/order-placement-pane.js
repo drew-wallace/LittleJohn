@@ -8,24 +8,14 @@ import { changeTitleFromTab } from '../actions';
 import OrderPlacementPaneComponent from '../components/order-placement-pane';
 
 const mapStateToProps = (state) => {
+    const account = state.account.accountData;
     const symbol = state.title.present.symbol;
     const stockType = state.title.present.stockType;
     const currentOrder = state.currentOrder;
-    let stock = null;
-
-    switch(stockType) {
-        case 'position':
-            stock = state.positions.items[symbol];
-            break;
-        case 'watchlist':
-            stock = state.watchlist.items[symbol];
-            break;
-        case 'stock':
-            stock = state.stocks[symbol];
-            break;
-    }
+    let stock = state.stocks[symbol];
 
     return {
+        account,
         stockType,
         stock,
         currentOrder,

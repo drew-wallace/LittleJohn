@@ -1,9 +1,10 @@
 import React, { Component, PropTypes } from 'react';
 
-import { List, ListItem, IconButton, FloatingActionButton, TextField } from 'material-ui';
+import { List, ListItem, IconButton, FloatingActionButton, TextField, Snackbar } from 'material-ui';
 import InfoOutline from 'material-ui/svg-icons/action/info-outline';
 import Check from 'material-ui/svg-icons/navigation/check';
 
+import { formatNumberBig } from '../lib/formaters';
 import value_equals from '../lib/value_equals';
 
 class OrderPlacementPaneComponent extends Component {
@@ -11,13 +12,14 @@ class OrderPlacementPaneComponent extends Component {
 	    super(props);
 
 		this.state = {
+			showSharesInfo: '',
 			showPlaceOrderButton: false,
 			value: ''
 		};
 	}
 
 	shouldComponentUpdate(nextProps, nextState) {
-		return nextState.showPlaceOrderButton !== this.state.showPlaceOrderButton || nextState.value !== this.state.value || !value_equals(nextProps, this.props);
+		return !value_equals(nextState, this.state) || !value_equals(nextProps, this.props);
 	}
 
 	toNumber(value) {
@@ -39,24 +41,32 @@ class OrderPlacementPaneComponent extends Component {
 		}
 	}
 
+	handleRequestClose() {
+		this.setState({
+			showSharesInfo: ''
+		});
+	}
+
     render() {
-		const { changePrimaryColor, primaryColor, stockType, stock, currentOrder } = this.props;
+		const { changePrimaryColor, primaryColor, stockType, stock, currentOrder, account } = this.props;
 		// 	 (i) Shares of {symbol}                          0 <-- number input, fills to left
 		//
 		// 	 Market Price                                $1.03
 		//   -------------------------------------------------
 		//   Estimated Credit    {quantity} share(s) available <-- Becomes ${shares * Market price}
+
 		return (
 			<div>
 				<List>
 					<ListItem
-						leftIcon={<InfoOutline/>}
+						leftIcon={<IconButton style={{padding: 0}} onTouchTap={() => this.setState({ showSharesInfo: `You can ${(currentOrder.side == 'sell' ? 'sell' : 'afford')} ${formatNumberBig(currentOrder.side == 'sell' ? stock.quantity : Math.floor(+account.buying_power / +stock.quote.last_trade_price))} share(s) of ${currentOrder.symbol}.`})}><InfoOutline/></IconButton>}
 						disabled={true}
 						innerDivStyle={{ display: 'flex' }}
 						primaryText={<div style={{flex: '0 1 50%', display: 'flex', alignItems: 'center', marginTop: 8}}>Shares of {currentOrder.symbol}</div>}
 						secondaryText={
 							<div style={{ flex: '0 1 50%', display: 'flex', justifyContent: 'flex-end', marginTop: 8}}>
 								<TextField
+									autoFocus={true}
 									value={this.state.value}
 									hintText="0"
 									style={{height: 16, lineHeight: '16px'}}
@@ -82,6 +92,12 @@ class OrderPlacementPaneComponent extends Component {
 				>
 					<Check />
 				</FloatingActionButton>
+				<Snackbar
+					open={!!this.state.showSharesInfo}
+					message={this.state.showSharesInfo}
+					autoHideDuration={4000}
+					onRequestClose={this.handleRequestClose.bind(this)}
+				/>
 			</div>
 		);
 	}
