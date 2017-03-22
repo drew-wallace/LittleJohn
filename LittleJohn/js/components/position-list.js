@@ -49,7 +49,7 @@ const PositionListComponent = class extends Component {
                                             innerDivStyle={{display: 'flex', flexDirection: 'row-reverse', flexWrap: 'wrap'}}
                                             primaryText={(<span style={{flex: '0 1 33.333%', display: 'flex', alignItems: 'center'}}>{instrument.symbol}</span>)}
                                             secondaryText={(<span className="stock-list-item-subheader" style={{flex: '0 1 100%'}}>{formatNumberBig(quantity)} Shares</span>)}
-                                            onTouchTap={() => changeTitle(instrument.name, {stockType: 'position', symbol: instrument.symbol, hasBackButton: true})}
+                                            onTouchTap={() => changeTitle(instrument.name, {stockType: 'position', symbol: instrument.symbol, hasBackButton: true, activePane: 'position'})}
                                         >
                                             <div style={{flex: '0 1 33.333%', display: 'flex', justifyContent: 'flex-end'}}>
                                                 <span style={{position: 'relative', top: '50%'}}>{displayedValue}</span>

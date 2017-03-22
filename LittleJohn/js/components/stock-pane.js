@@ -24,15 +24,15 @@ class PositionPaneComponent extends Component {
 	}
 
 	handleSell() {
-		this.props.selectedOrderSide('Market Sell', {symbol: this.props.stock.instrument.symbol, stockType: 'sell', hasBackButton: true});
+		this.props.selectedOrderSide('Market Sell', {symbol: this.props.stock.instrument.symbol, side: 'sell', activePane: 'sell', hasBackButton: true});
 	}
 
 	handleBuy() {
-		this.props.selectedOrderSide('Market Buy', {symbol: this.props.stock.instrument.symbol, stockType: 'buy', hasBackButton: true});
+		this.props.selectedOrderSide('Market Buy', {symbol: this.props.stock.instrument.symbol, side: 'buy', activePane:'buy', hasBackButton: true});
 	}
 
 	handleMoreNews() {
-		this.props.initTitle(`${this.props.stock.instrument.symbol} News`, {symbol: this.props.stock.instrument.symbol, stockType: 'news', hasBackButton: true});
+		this.props.initTitle(`${this.props.stock.instrument.symbol} News`, {symbol: this.props.stock.instrument.symbol, activePane: 'news', hasBackButton: true});
 	}
 
 	handleDescriptionExpanded() {

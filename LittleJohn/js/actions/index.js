@@ -78,7 +78,7 @@ export const resetCurrentOrder = (options={}) => {
 export function selectedOrderSide(fixedTitle, options={}) {
     return (dispatch) => {
         dispatch(resetCurrentOrder({
-            side: options.stockType,
+            side: options.side,
             symbol: options.symbol,
             type: 'market'
         }));
@@ -89,14 +89,14 @@ export function selectedOrderSide(fixedTitle, options={}) {
 export function selectedOrderType(fixedTitle, options={}) {
     return (dispatch) => {
         dispatch(updateCurrentOrder({
-            type: options.stockType,
+            type: options.type,
         }));
         dispatch(backToOrderPlacementPane());
         return Promise.resolve()
     };
 }
 export function selectedOrderTypeWithPrice(fixedTitle, options={}) {
-    let currentOrderOptions = {type: options.stockType};
+    let currentOrderOptions = {type: options.orderType};
 
     if (currentOrderOptions.type == 'stop loss') {
         currentOrderOptions.type = 'market';
@@ -105,10 +105,11 @@ export function selectedOrderTypeWithPrice(fixedTitle, options={}) {
         currentOrderOptions.type = 'limit';
         currentOrderOptions.trigger = 'stop'
     }
+
     return (dispatch) => {
         dispatch(updateCurrentOrder(currentOrderOptions));
         dispatch(changeTitle(fixedTitle, options));
-        return Promise.resolve()
+        return Promise.resolve();
     };
 }
 export function setOrderPrice(fixedTitle, options={}) {

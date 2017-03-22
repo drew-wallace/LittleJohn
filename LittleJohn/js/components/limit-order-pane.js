@@ -61,7 +61,7 @@ class LimitOrderPaneComponent extends Component {
 				<p>Current Price: {formatCurrency(stock.quote.last_trade_price)}</p>
 				<FloatingActionButton
 					style={{display: (this.state.showNextButton ? 'inline-block' : 'none')}}
-					onTouchTap={() => setOrderPrice('Time In Force', {hasBackButton: true, stockType: 'time in force', price: Number(this.validLimitPrice)})}
+					onTouchTap={() => setOrderPrice('Time In Force', {hasBackButton: true, activePane: 'time in force', price: Number(this.validLimitPrice)})}
 				>
 					<ChevronRight />
 				</FloatingActionButton>

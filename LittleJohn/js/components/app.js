@@ -69,7 +69,7 @@ class AppLayout extends Component {
 		const symbol = stock.instrument.symbol;
 
 		if(tab != this.props.title.present.fixedTitle) {
-			this.props.changeTitleFromTab(tab, {stockType, symbol, hasBackButton: true});
+			this.props.changeTitleFromTab(tab, {stockType, symbol, hasBackButton: true, activePane: stockType});
         	this.props.changePrimaryColor(+_.last(dayData).adjusted_open_equity >= +dayData[0].adjusted_open_equity ? positivePrimaryColor : negativePrimaryColor);
 		}
 	}
@@ -112,10 +112,9 @@ class AppLayout extends Component {
 				onLeftIconButtonTouchTap = () => this.handleBack();
 			}
 
-			switch(title.present.stockType) {
+			switch(title.present.activePane) {
 				case 'position':
 					iconElementRight = null;
-					// pane = (<PositionPaneContainer/>);
 					pane = (<StockPaneContainer/>);
 				case 'watchlist':
 					if(title.present.stockType == 'watchlist') {
@@ -124,7 +123,6 @@ class AppLayout extends Component {
 								<RemoveCircleOutline/>
 							</IconButton>
 						);
-						// pane = (<WatchlistPaneContainer/>);
 						pane = (<StockPaneContainer/>);
 					}
 					titleBar = (<div style={{height: 103, backgroundColor: primaryColor}}></div>);
@@ -175,7 +173,7 @@ class AppLayout extends Component {
 				case 'buy':
 				case 'sell':
 					iconElementRight = (
-						<FlatButton label="Order Types" onTouchTap={() => changeTitle('Order Types', {stockType: 'order types', hasBackButton: true})}/>
+						<FlatButton label="Order Types" onTouchTap={() => changeTitle('Order Types', {activePane: 'order types', hasBackButton: true})}/>
 					);
 					pane = (<OrderPlacementPaneContainer/>);
 					break;
@@ -185,22 +183,22 @@ class AppLayout extends Component {
 							<ListItem
 								primaryText="Market"
 								insetChildren={true}
-								onTouchTap={() => selectedOrderType(`Market ${_.capitalize(currentOrder.side)}`, {stockType: 'market', hasBackButton: true})}
+								onTouchTap={() => selectedOrderType(`Market ${_.capitalize(currentOrder.side)}`, { orderType: 'market', hasBackButton: true})}
 							/>
 							<ListItem
 								primaryText="Limit"
 								insetChildren={true}
-								onTouchTap={() => selectedOrderTypeWithPrice('Limit Price', {stockType: 'limit', hasBackButton: true})}
+								onTouchTap={() => selectedOrderTypeWithPrice('Limit Price', {activePane: 'limit', orderType: 'limit', hasBackButton: true})}
 							/>
 							<ListItem
 								primaryText="Stop Loss"
 								insetChildren={true}
-								onTouchTap={() => selectedOrderTypeWithPrice('Stop Price', {stockType: 'stop loss', hasBackButton: true})}
+								onTouchTap={() => selectedOrderTypeWithPrice('Stop Price', {activePane: 'stop loss', orderType: 'stop loss', hasBackButton: true})}
 							/>
 							<ListItem
 								primaryText="Stop Limit"
 								insetChildren={true}
-								onTouchTap={() => selectedOrderTypeWithPrice('Stop Price', {stockType: 'stop limit', hasBackButton: true})}
+								onTouchTap={() => selectedOrderTypeWithPrice('Stop Price', {activePane: 'stop limit', orderType: 'stop limit', hasBackButton: true})}
 							/>
 						</List>
 					);
@@ -274,73 +272,62 @@ class AppLayout extends Component {
 
 					// 	button: Cancel Order
 					break;
+				default:
+					iconElementRight = (
+						<div style={{display: 'flex'}}>
+							<IconButton onTouchTap={() => console.log('Searching here')} style={{flex: 1}}>
+								<Search/>
+							</IconButton>
+							<IconMenu
+								iconButtonElement={<IconButton><MoreVert/></IconButton>}
+								open={this.state.moreOpen}
+								useLayerForClickAway={true}
+								onRequestChange={(open) => this.toggleMoreMenu(open)}
+								anchorOrigin={{horizontal: 'right', vertical: 'top'}}
+								targetOrigin={{horizontal: 'right', vertical: 'top'}}
+								listStyle={{paddingLeft: 8, width: 165}}
+								style={{flex: 1}}
+							>
+								<RadioButtonGroup
+									name="stockValueDisplay"
+									labelPosition="left"
+									defaultSelected="price"
+									valueSelected={this.props.settings.displayedValue}
+									onChange={(e, value) => this.handleDisplayedValue(value)}
+								>
+									<RadioButton
+										value="price"
+										label="Last Price"
+										style={{paddingTop: 8, paddingBottom: 8}}
+									/>
+									<RadioButton
+										value="equity"
+										label="Equity"
+										style={{paddingTop: 8, paddingBottom: 8}}
+									/>
+									<RadioButton
+										value="percent"
+										label="Percent Change"
+										style={{paddingTop: 8, paddingBottom: 8}}
+									/>
+								</RadioButtonGroup>
+							</IconMenu>
+						</div>
+					);
+					titleBar = (
+						<AppBar
+							title={title.present.floatingTitle}
+							titleStyle={{alignSelf: 'center'}}
+							onLeftIconButtonTouchTap={this.handleToggle.bind(this)}
+							iconStyleLeft={{marginBottom: 8, alignSelf: 'center'}}
+							iconElementRight={iconElementRight}
+							iconStyleRight={{marginBottom: 8, alignSelf: 'center'}}
+							style={{height: 130, paddingTop: 75, marginTop: -75}}
+						/>
+					);
+					pane = (<PorfolioPaneContainer/>);
 			}
 
-			if(!title.present.stockType) {
-				switch(title.present.fixedTitle) {
-					// FIX: put make `sell` a stockType and this is the result
-					case 'Market Sell':
-						iconElementRight = (<FlatButton label="ORDER TYPES" onTouchTap={() => this.props.changeTitle('Order Types', {hasBackButton: true})} style={{marginTop: 0}}/>);
-						pane = (<PorfolioPaneContainer/>);
-						break;
-					default:
-						if(title.present.floatingTitle == 'Portfolio') {
-							iconElementRight = (
-								<div style={{display: 'flex'}}>
-									<IconButton onTouchTap={() => console.log('Searching here')} style={{flex: 1}}>
-										<Search/>
-									</IconButton>
-									<IconMenu
-										iconButtonElement={<IconButton><MoreVert/></IconButton>}
-										open={this.state.moreOpen}
-										useLayerForClickAway={true}
-										onRequestChange={(open) => this.toggleMoreMenu(open)}
-										anchorOrigin={{horizontal: 'right', vertical: 'top'}}
-										targetOrigin={{horizontal: 'right', vertical: 'top'}}
-										listStyle={{paddingLeft: 8, width: 165}}
-										style={{flex: 1}}
-									>
-										<RadioButtonGroup
-											name="stockValueDisplay"
-											labelPosition="left"
-											defaultSelected="price"
-											valueSelected={this.props.settings.displayedValue}
-											onChange={(e, value) => this.handleDisplayedValue(value)}
-										>
-											<RadioButton
-												value="price"
-												label="Last Price"
-												style={{paddingTop: 8, paddingBottom: 8}}
-											/>
-											<RadioButton
-												value="equity"
-												label="Equity"
-												style={{paddingTop: 8, paddingBottom: 8}}
-											/>
-											<RadioButton
-												value="percent"
-												label="Percent Change"
-												style={{paddingTop: 8, paddingBottom: 8}}
-											/>
-										</RadioButtonGroup>
-									</IconMenu>
-								</div>
-							);
-							titleBar = (
-								<AppBar
-									title={title.present.floatingTitle}
-									titleStyle={{alignSelf: 'center'}}
-									onLeftIconButtonTouchTap={this.handleToggle.bind(this)}
-									iconStyleLeft={{marginBottom: 8, alignSelf: 'center'}}
-									iconElementRight={iconElementRight}
-									iconStyleRight={{marginBottom: 8, alignSelf: 'center'}}
-									style={{height: 130, paddingTop: 75, marginTop: -75}}
-								/>
-							);
-							pane = (<PorfolioPaneContainer/>);
-						}
-				}
-			}
 			return (
 				<div>
 					<Drawer
