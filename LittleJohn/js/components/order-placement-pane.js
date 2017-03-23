@@ -73,6 +73,7 @@ class OrderPlacementPaneComponent extends Component {
 						secondaryText={
 							<div style={{ flex: '0 1 50%', display: 'flex', justifyContent: 'flex-end', marginTop: 8}}>
 								<TextField
+									ref="sharesTextField"
 									autoFocus={true}
 									value={this.state.value}
 									hintText="0"
@@ -86,6 +87,11 @@ class OrderPlacementPaneComponent extends Component {
 											newVal = this.toNumber(newVal);
 											this.validNumberOfShares = newVal;
 											this.toggleNextButton();
+										}
+									}}
+									onKeyDown={(e) => {
+										if (!e.key.match(/^[0-9]$/) && this.refs.sharesTextField.input.value == '') {
+											e.preventDefault();
 										}
 									}}
 								/>

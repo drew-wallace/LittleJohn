@@ -47,6 +47,7 @@ class LimitOrderPaneComponent extends Component {
 				<p>Specify the {(currentOrder.side == 'sell' ? 'minimum' : 'maximum')} amount you're<br />willing to {(currentOrder.side ? 'receive' : 'pay')} per share.</p>
 				<span>$</span>
 				<TextField
+					ref="priceTextField"
 					value={this.state.value}
 					hintText="0.00"
 					onChange={(e, newVal) => {
@@ -55,6 +56,11 @@ class LimitOrderPaneComponent extends Component {
 							newVal = this.toNumber(newVal);
 							this.validLimitPrice = newVal;
 							this.toggleNextButton();
+						}
+					}}
+					onKeyDown={(e) => {
+						if (!e.key.match(/^[0-9]|\.$/) && this.refs.priceTextField.input.value == '') {
+							e.preventDefault();
 						}
 					}}
 				/>

@@ -93,7 +93,7 @@ class AppLayout extends Component {
 		const { account, primaryColor } = this.props;
 
 		if(account.lastUpdated) {
-			const { changeTitle, initTitle, selectedOrderType, portfolio, title, watchlist, positions, currentOrder, stocks, selectedOrderTypeWithPrice, selectedTimeInForce } = this.props;
+			const { changeTitle, initTitle, selectedMarketOrderType, portfolio, title, watchlist, positions, currentOrder, stocks, selectedOrderTypeWithPrice, selectedTimeInForce } = this.props;
 			let iconElementLeft = null;
 			let iconElementRight = null;
 			let onLeftIconButtonTouchTap = this.handleToggle.bind(this);
@@ -183,7 +183,7 @@ class AppLayout extends Component {
 							<ListItem
 								primaryText="Market"
 								insetChildren={true}
-								onTouchTap={() => selectedOrderType(`Market ${_.capitalize(currentOrder.side)}`, { orderType: 'market', hasBackButton: true})}
+								onTouchTap={() => selectedMarketOrderType(`Market ${_.capitalize(currentOrder.side)}`, { orderType: 'market', hasBackButton: true})}
 							/>
 							<ListItem
 								primaryText="Limit"

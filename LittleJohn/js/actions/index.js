@@ -86,10 +86,13 @@ export function selectedOrderSide(fixedTitle, options={}) {
         return Promise.resolve()
     };
 }
-export function selectedOrderType(fixedTitle, options={}) {
-    return (dispatch) => {
-        dispatch(updateCurrentOrder({
-            type: options.type,
+export function selectedMarketOrderType(fixedTitle, options={}) {
+    return (dispatch, getState) => {
+        const state = getState();
+        dispatch(resetCurrentOrder({
+            side: state.currentOrder.side,
+            symbol: state.currentOrder.symbol,
+            type: 'market'
         }));
         dispatch(backToOrderPlacementPane());
         return Promise.resolve()
@@ -106,8 +109,10 @@ export function selectedOrderTypeWithPrice(fixedTitle, options={}) {
         currentOrderOptions.trigger = 'stop'
     }
 
+    currentOrderOptions.price = 0;
+
     return (dispatch) => {
-        dispatch(updateCurrentOrder(currentOrderOptions));
+        dispatch(updateCurrentOrder({potential: currentOrderOptions}));
         dispatch(changeTitle(fixedTitle, options));
         return Promise.resolve();
     };
@@ -115,16 +120,20 @@ export function selectedOrderTypeWithPrice(fixedTitle, options={}) {
 export function setOrderPrice(fixedTitle, options={}) {
     return (dispatch) => {
         dispatch(updateCurrentOrder({
-            price: options.price,
+            potential: {
+                price: options.price
+            }
         }));
         dispatch(changeTitle(fixedTitle, options));
         return Promise.resolve()
     };
 }
 export function selectedTimeInForce(time_in_force) {
-    return (dispatch) => {
+    return (dispatch, getState) => {
+        const state = getState();
         dispatch(updateCurrentOrder({
             time_in_force,
+            ...state.currentOrder.potential
         }));
         dispatch(backToOrderPlacementPane());
         return Promise.resolve()
