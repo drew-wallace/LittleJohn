@@ -235,6 +235,59 @@ class AppLayout extends Component {
 					// both will take you to sell pane
 					break;
 				case 'order':
+					titleBar = (<div style={{ height: 118, backgroundColor: primaryColor }}></div>);
+					watchlistBar = (
+						<div style={{display: 'flex', flexDirection: 'column', zIndex: 1100, backgroundColor: primaryColor, position: 'relative', paddingLeft: 72, paddingBottom: 15}}>
+							<span>Limit Sell</span>
+							<span style={{fontSize: 24}}>Comstock Resources</span>
+						</div>
+					);
+					pane = (
+						<List style={{ padding: 0 }}>
+							<ListItem
+								primaryText="Order Status"
+								secondaryText="Placed"
+								insetChildren={true}
+								disabled={true}
+							/>
+							<ListItem
+								primaryText="Time In Force"
+								secondaryText="Good Till Canceled"
+								insetChildren={true}
+								disabled={true}
+							/>
+							<ListItem
+								primaryText="Submitted"
+								secondaryText="Jun 29, 2016"
+								insetChildren={true}
+								disabled={true}
+							/>
+							<ListItem
+								primaryText="Entered Price"
+								secondaryText="$1.06"
+								insetChildren={true}
+								disabled={true}
+							/>
+							<ListItem
+								primaryText="Entered Quantity"
+								secondaryText="283"
+								insetChildren={true}
+								disabled={true}
+							/>
+							<ListItem
+								primaryText="Filled Quantity"
+								secondaryText="N/A"
+								insetChildren={true}
+								disabled={true}
+							/>
+							<ListItem
+								primaryText="Total Notional"
+								secondaryText="Placed"
+								insetChildren={true}
+								disabled={true}
+							/>
+						</List>
+					);
 					// <-
 					// 	Limit Sell
 					// 	instrument name
@@ -259,7 +312,7 @@ class AppLayout extends Component {
 					// 	filled quantity
 
 					// 	sub: Total Notional
-					// 	Queued, Canceled, Placed, ...
+					// 	Queued, Canceled, Placed, total amount subtracted or added to my portfolio based on filled quantity * price
 
 					// 	button: Cancel Order
 					break;
