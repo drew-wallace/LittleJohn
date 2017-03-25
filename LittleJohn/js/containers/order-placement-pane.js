@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 
-import { changeTitleFromTab } from '../actions';
+import { changeTitleFromTab, confirmOrder } from '../actions';
 
 import OrderPlacementPaneComponent from '../components/order-placement-pane';
 
@@ -25,7 +25,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        changeTitleFromTab: (fixedTitle, options) => dispatch(changeTitle(fixedTitle, options))
+        confirmOrder: (fixedTitle, options) => dispatch(confirmOrder())
     }
 }
 

@@ -16,6 +16,7 @@ import PorfolioPaneContainer from '../containers/portfolio-pane';
 import StockPaneContainer from '../containers/stock-pane';
 import OrderPlacementPaneContainer from '../containers/order-placement-pane';
 import LimitOrderPane from '../containers/limit-order-pane';
+import StopOrderPane from '../containers/stop-order-pane';
 
 import { formatCurrency } from '../lib/formaters';
 import value_equals from '../lib/value_equals';
@@ -75,8 +76,8 @@ class AppLayout extends Component {
 	}
 
 	componentDidUpdate() {
-		let element = ReactDOM.findDOMNode(this.refs.scrollableView);
-		element.scrollTop = 0;
+		console.log('should be scrolling...', this.props.title.present.fixedTitle);
+		this.refs.scrollableView.scrollTop = 0;
 	}
 
 	componentWillMount() {
@@ -207,18 +208,8 @@ class AppLayout extends Component {
 					pane = (<LimitOrderPane/>);
 					break;
 				case 'stop loss':
-					`A price below the current price that\nconverts your order to a market order.`
-					// Large $ field 0.00 placeholder
-					// Current Price: $1.04 <-- I think it fetches the latest quote on render.
-					// button to take user to time in force pane
-					// on screen keyboard?
-					break;
 				case 'stop limit':
-					`A price below the current price that\nconverts your order to a limit order.`
-					// Large $ field 0.00 placeholder
-					// Current Price: $1.04 <-- I think it fetches the latest quote on render.
-					// button to take user to time in force pane
-					// on screen keyboard?
+					pane = (<StopOrderPane />);
 					break;
 				case 'time in force':
 					pane = (

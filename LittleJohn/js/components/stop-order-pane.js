@@ -7,7 +7,7 @@ import ChevronRight from 'material-ui/svg-icons/navigation/chevron-right';
 import { formatCurrency } from '../lib/formaters';
 import value_equals from '../lib/value_equals';
 
-class LimitOrderPaneComponent extends Component {
+class StopOrderPaneComponent extends Component {
 	constructor(props) {
 	    super(props);
 
@@ -27,8 +27,8 @@ class LimitOrderPaneComponent extends Component {
 
 	toggleNextButton() {
 		this.setState({
-			showNextButton: !!Number(this.validLimitPrice),
-			value: this.validLimitPrice
+			showNextButton: !!Number(this.validStopPrice),
+			value: this.validStopPrice
 		});
 	}
 
@@ -41,10 +41,10 @@ class LimitOrderPaneComponent extends Component {
 	}
 
     render() {
-		const { currentOrder, stock, setOrderPrice } = this.props;
+		const { currentOrder, stock, setStopPrice, title } = this.props;
 		return (
 			<div style={{ paddingLeft: 65 }}>
-				<p>Specify the {(currentOrder.side == 'sell' ? 'minimum' : 'maximum')} amount you're<br />willing to {(currentOrder.side ? 'receive' : 'pay')} per share.</p>
+				<p>A price below the current price that<br />converts your order to a {(title.activePane == 'stop loss' ? 'market' : 'limit')} order.</p>
 				<span>$</span>
 				<TextField
 					ref="priceTextField"
@@ -55,7 +55,7 @@ class LimitOrderPaneComponent extends Component {
 						const diff = this.diffStrings(newVal, this.state.value);
 						if (diff === undefined || !isNaN(diff) || (diff === '.' && !_.includes(this.state.value, '.'))) {
 							newVal = this.toNumber(newVal);
-							this.validLimitPrice = newVal;
+							this.validStopPrice = newVal;
 							this.toggleNextButton();
 						}
 					}}
@@ -68,12 +68,13 @@ class LimitOrderPaneComponent extends Component {
 				<p>Current Price: {formatCurrency(stock.quote.last_trade_price)}</p>
 				<FloatingActionButton
 					style={{display: (this.state.showNextButton ? 'inline-block' : 'none')}}
-					onTouchTap={() => setOrderPrice('Time In Force', {hasBackButton: true, activePane: 'time in force', price: Number(this.validLimitPrice)})}
+					onTouchTap={() => (title.activePane == 'stop loss' ? setStopPrice('Time In Force', { hasBackButton: true, activePane: 'time in force', stop_price: Number(this.validStopPrice) }) : setStopPrice('Limit Price', { activePane: 'limit', orderType: 'limit', hasBackButton: true, stop_price: Number(this.validStopPrice)}))}
 				>
 					<ChevronRight />
 				</FloatingActionButton>
 			</div>
 		);
+		// A price below the current price that\nconverts your order to a {market || limit} order.
 		// Large $ field 0.00 placeholder
 		// Current Price: $1.04 <-- I think it fetches the latest quote on render.
 		// button to take user to time in force pane
@@ -90,4 +91,4 @@ class LimitOrderPaneComponent extends Component {
 //     onTodoClick: PropTypes.func.isRequired
 // }
 
-export default LimitOrderPaneComponent;
+export default StopOrderPaneComponent;

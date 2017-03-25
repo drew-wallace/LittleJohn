@@ -110,11 +110,23 @@ export function selectedOrderTypeWithPrice(fixedTitle, options={}) {
     }
 
     currentOrderOptions.price = 0;
+    currentOrderOptions.stop_price = 0;
 
     return (dispatch) => {
         dispatch(updateCurrentOrder({potential: currentOrderOptions}));
         dispatch(changeTitle(fixedTitle, options));
         return Promise.resolve();
+    };
+}
+export function setStopPrice(fixedTitle, options={}) {
+    return (dispatch) => {
+        dispatch(updateCurrentOrder({
+            potential: {
+                stop_price: options.stop_price
+            }
+        }));
+        dispatch(changeTitle(fixedTitle, options));
+        return Promise.resolve()
     };
 }
 export function setOrderPrice(fixedTitle, options={}) {
@@ -138,6 +150,9 @@ export function selectedTimeInForce(time_in_force) {
         dispatch(backToOrderPlacementPane());
         return Promise.resolve()
     };
+}
+export function confirmOrder() {
+    console.log('Confirm Order action');
 }
 export const changeDisplayedValue = (value) => {
     return {
