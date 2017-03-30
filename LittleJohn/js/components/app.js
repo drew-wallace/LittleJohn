@@ -17,6 +17,7 @@ import StockPaneContainer from '../containers/stock-pane';
 import OrderPlacementPaneContainer from '../containers/order-placement-pane';
 import LimitOrderPane from '../containers/limit-order-pane';
 import StopOrderPane from '../containers/stop-order-pane';
+import OrderPane from '../containers/order-pane';
 
 import { formatCurrency } from '../lib/formaters';
 import value_equals from '../lib/value_equals';
@@ -235,86 +236,15 @@ class AppLayout extends Component {
 					// both will take you to sell pane
 					break;
 				case 'order':
+					let selectedOrder = _.find(stocks[title.present.symbol].orders, (order) => order.id == title.present.orderId);
 					titleBar = (<div style={{ height: 118, backgroundColor: primaryColor }}></div>);
 					watchlistBar = (
 						<div style={{display: 'flex', flexDirection: 'column', zIndex: 1100, backgroundColor: primaryColor, position: 'relative', paddingLeft: 72, paddingBottom: 15}}>
-							<span>Limit Sell</span>
-							<span style={{fontSize: 24}}>Comstock Resources</span>
+							<span>{_.capitalize(selectedOrder.type)} {_.capitalize(selectedOrder.side)}</span>
+							<span style={{ fontSize: 24 }}>{stocks[title.present.symbol].instrument.name}</span>
 						</div>
 					);
-					pane = (
-						<List style={{ padding: 0 }}>
-							<ListItem
-								primaryText="Order Status"
-								secondaryText="Placed"
-								insetChildren={true}
-								disabled={true}
-							/>
-							<ListItem
-								primaryText="Time In Force"
-								secondaryText="Good Till Canceled"
-								insetChildren={true}
-								disabled={true}
-							/>
-							<ListItem
-								primaryText="Submitted"
-								secondaryText="Jun 29, 2016"
-								insetChildren={true}
-								disabled={true}
-							/>
-							<ListItem
-								primaryText="Entered Price"
-								secondaryText="$1.06"
-								insetChildren={true}
-								disabled={true}
-							/>
-							<ListItem
-								primaryText="Entered Quantity"
-								secondaryText="283"
-								insetChildren={true}
-								disabled={true}
-							/>
-							<ListItem
-								primaryText="Filled Quantity"
-								secondaryText="N/A"
-								insetChildren={true}
-								disabled={true}
-							/>
-							<ListItem
-								primaryText="Total Notional"
-								secondaryText="Placed"
-								insetChildren={true}
-								disabled={true}
-							/>
-						</List>
-					);
-					// <-
-					// 	Limit Sell
-					// 	instrument name
-					// ==============================
-
-					// 	sub: Order Status
-					// 	status
-
-					// 	sub: Time In Force
-					// 	gtc or gfd
-
-					// 	sub: Submitted
-					// 	MMM DD, YYYY
-
-					// 	sub: Estimated Price
-					// 	price (tried to buy/sell for)
-
-					// 	sub: Entered Quantity
-					// 	quantity
-
-					// 	sub: Filled Quantity
-					// 	filled quantity
-
-					// 	sub: Total Notional
-					// 	Queued, Canceled, Placed, total amount subtracted or added to my portfolio based on filled quantity * price
-
-					// 	button: Cancel Order
+					pane = (<OrderPane/>);
 					break;
 				default:
 					iconElementRight = (

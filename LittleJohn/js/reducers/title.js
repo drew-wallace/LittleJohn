@@ -13,7 +13,8 @@ let title = (state = {}, action) => {
                 stockType: action.stockType,
                 symbol: action.symbol,
                 hasBackButton: action.hasBackButton,
-                activePane: action.activePane
+                activePane: action.activePane,
+                orderId: action.orderId
             };
         default:
             return state;
@@ -36,7 +37,8 @@ title = recycleState(title, ['INIT_TITLE', 'BACK_TO_ORDER_PLACEMENT_PANE'], (sta
                     stockType: action.stockType,
                     symbol: action.symbol,
                     hasBackButton: action.hasBackButton,
-                    activePane: action.activePane
+                    activePane: action.activePane,
+                    orderId: action.orderId
                 },
                 past: [
                     ...state.past,
@@ -48,7 +50,8 @@ title = recycleState(title, ['INIT_TITLE', 'BACK_TO_ORDER_PLACEMENT_PANE'], (sta
                     stockType: action.stockType,
                     symbol: action.symbol,
                     hasBackButton: action.hasBackButton,
-                    activePane: action.activePane
+                    activePane: action.activePane,
+                    orderId: action.orderId
                 },
                 future: [
                     ...state.future

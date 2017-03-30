@@ -155,7 +155,7 @@ class PositionPaneComponent extends Component {
 									{lessOrders.map((order, index) => {
 										let status = order.state;
 										if(status == 'filled') {
-											status = formatCurrency(+order.price * +order.quantity);
+											status = formatCurrencyDiff(+order.average_price * +order.cumulative_quantity * (order.side == 'sell' ? 1 : -1));
 										} else {
 											status = _.capitalize(status);
 										}
@@ -166,7 +166,7 @@ class PositionPaneComponent extends Component {
 													innerDivStyle={{display: 'flex', flexDirection: 'row-reverse', flexWrap: 'wrap'}}
 													primaryText={(<span style={{flex: '0 1 50%'}}>{moment(order.updated_at).format('MMM DD, YYYY')}</span>)}
 													secondaryText={(<span style={{flex: '0 1 100%'}}>{`${_.capitalize(order.type)} ${_.capitalize(order.side)}`}</span>)}
-													onTouchTap={() => initTitle('', {activePane: 'order', hasBackButton: true, symbol: instrument.symbol, order_id: order.id})}
+													onTouchTap={() => initTitle('', {activePane: 'order', hasBackButton: true, symbol: instrument.symbol, orderId: order.id})}
 												>
 													<div style={{flex: '0 1 50%', display: 'flex', justifyContent: 'flex-end'}}>
 														<span style={{position: 'relative', top: '50%'}}>{status}</span>
