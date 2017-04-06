@@ -6,7 +6,7 @@ import { List, ListItem, Divider, IconButton, FloatingActionButton, TextField, S
 import InfoOutline from 'material-ui/svg-icons/action/info-outline';
 import Check from 'material-ui/svg-icons/navigation/check';
 
-import { formatNumberBig, formatCurrency, formatCurrencyDiff } from '../lib/formaters';
+import { formatNumberBig, formatCurrency, formatCurrencyDiff, formatTime } from '../lib/formaters';
 import value_equals from '../lib/value_equals';
 
 class OrderPaneComponent extends Component {
@@ -52,21 +52,21 @@ class OrderPaneComponent extends Component {
 	}
 
     render() {
-		const { stock, account, order } = this.props;
+		const { stock, account, order, robinhood, cancelOrder } = this.props;
 		let time_in_force = order.time_in_force;
 		let totalNotional = _.capitalize(order.state);
 
 		switch(time_in_force) {
 			case 'gfd':
-				time_in_force = 'Good For Day';
+				time_in_force = 'Good for day';
 				break;
 			case 'gtc':
-				time_in_force = 'Good Till Canceled';
+				time_in_force = 'Good till canceled';
 				break;
 		}
 
 		if (+order.average_price > 0) {
-			totalNotional = formatCurrencyDiff(+order.average_price * +order.cumulative_quantity * (order.side == 'sell' ? 1 : -1));
+			totalNotional = formatCurrency(+order.average_price * +order.cumulative_quantity);
 		}
 		// <-
 		// 	Limit Sell
@@ -98,6 +98,8 @@ class OrderPaneComponent extends Component {
 		// 	Queued, Canceled, Placed, total amount subtracted or added to my portfolio based on filled quantity * price
 
 		// 	button: Cancel Order
+
+		console.log(order);
 
 		return (
 			<List style={{ padding: 0 }}>
@@ -132,15 +134,21 @@ class OrderPaneComponent extends Component {
 					disabled={true}
 				/>
 				<ListItem
+					primaryText="Filled"
+					secondaryText={(order.last_transaction_at && order.state == 'filled' ? moment(order.last_transaction_at).format('MMM D, YYYY') : 'N/A')}
+					insetChildren={true}
+					disabled={true}
+				/>
+				<ListItem
 					primaryText="Filled Quantity"
-					secondaryText={+order.cumulative_quantity ? `${formatNumberBig(+order.cumulative_quantity)} shares at ${formatCurrency(+order.average_price)}` : 'N/A'}
+					secondaryText={(+order.cumulative_quantity ? `${formatNumberBig(+order.cumulative_quantity)} shares at ${formatCurrency(+order.average_price)}` : '0')}
 					insetChildren={true}
 					disabled={true}
 				/>
 				{order.state == 'filled' && (
 					<ListItem
 						primaryText="Settlement Date"
-						secondaryText={moment(order.last_transaction_at).format('MMM D YYYY')}
+						secondaryText={moment(_.last(order.executions).settlement_date).format('MMM D, YYYY')}
 						insetChildren={true}
 						disabled={true}
 					/>
@@ -151,6 +159,13 @@ class OrderPaneComponent extends Component {
 					insetChildren={true}
 					disabled={true}
 				/>
+				{order.cancel && (
+					<ListItem
+						primaryText="CANCEL ORDER"
+						insetChildren={true}
+						onTouchTap={() => {robinhood.cancelOrder(order.id).then((orderRes) => cancelOrder(order.id, stock.instrument.symbol, orderRes))}}
+					/>
+				)}
 			</List>
 		);
 	}

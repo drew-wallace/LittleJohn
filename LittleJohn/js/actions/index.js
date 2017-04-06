@@ -212,34 +212,29 @@ export const addPosition = (position) => {
         position
     };
 }
-
 export const changePrimaryColor = (color) => {
     return {
         type: 'CHANGE_PRIMARY_COLOR',
         color
     };
 }
-
 export const updateStocks = (stocks) => {
     return {
         type: 'UPDATE_STOCKS',
         stocks
     }
 }
-
 export const invalidateAccount = (account) => {
   return {
     type: 'INVALIDATE_ACCOUNT',
     account
   }
 }
-
 function requestAccount() {
     return {
         type: 'REQUEST_ACCOUNT'
     };
 }
-
 function receiveAccount(account) {
     return {
         type: 'RECEIVE_ACCOUNT',
@@ -247,7 +242,14 @@ function receiveAccount(account) {
         receivedAt: Date.now()
     };
 }
-
+export const cancelOrder = (orderId, symbol, orderRes) => {
+    return {
+        type: 'DISMISS_ORDER',
+        orderId,
+        symbol,
+        orderRes
+    };
+}
 function fetchAccount(state) {
     return dispatch => {
         dispatch(requestAccount());

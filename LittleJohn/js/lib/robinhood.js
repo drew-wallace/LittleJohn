@@ -327,13 +327,34 @@ class Robinhood{
             }.bind(this);
         }.bind(this));
     }
-    place_buy_order(options) {
+    placeBuyOrder(options) {
         options.transaction = 'buy';
         return this._place_order(options);
     }
-    place_sell_order(options) {
+    placeSellOrder(options) {
         options.transaction = 'sell';
         return this._place_order(options);
+    }
+    cancelOrder(orderId) {
+        return new Promise(function (resolve, reject) {
+            var request = new XMLHttpRequest();
+            request.open(
+                'POST',
+                this._endpoints.orders + orderId + '/cancel/',
+                true
+            );
+            this._setHeaders(request);
+            request.send();
+            request.onload = function () {
+                request.responseJSON = JSON.parse(request.response);
+                if (request.status == 200) {
+                    resolve(request);
+                } else {
+                    reject(request);
+                }
+            }.bind(this);
+            request.onerror = function () { reject(request); }.bind(this);
+        }.bind(this));
     }
     position(instrumentId) {
         return new Promise(function(resolve, reject) {

@@ -155,7 +155,7 @@ class PositionPaneComponent extends Component {
 									{lessOrders.map((order, index) => {
 										let status = order.state;
 										if(status == 'filled') {
-											status = formatCurrencyDiff(+order.average_price * +order.cumulative_quantity * (order.side == 'sell' ? 1 : -1));
+											status = formatCurrency(+order.average_price * +order.cumulative_quantity);
 										} else {
 											status = _.capitalize(status);
 										}

@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 
-// import { confirmOrder } from '../actions';
+import { cancelOrder } from '../actions';
 
 import OrderPaneComponent from '../components/order-pane';
 
@@ -18,13 +18,14 @@ const mapStateToProps = (state) => {
         account,
         stock,
         order,
-        primaryColor: state.primaryColor
+        primaryColor: state.primaryColor,
+        robinhood: state.robinhood
     }
 }
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        // confirmOrder: (fixedTitle, options) => dispatch(confirmOrder())
+        cancelOrder: (url) => dispatch(cancelOrder(url))
     }
 }
 
