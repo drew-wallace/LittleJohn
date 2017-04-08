@@ -174,6 +174,7 @@ class AppLayout extends Component {
 					break;
 				case 'buy':
 				case 'sell':
+				case 'confirm order':
 					iconElementRight = (
 						<FlatButton label="Order Types" onTouchTap={() => changeTitle('Order Types', {activePane: 'order types', hasBackButton: true})}/>
 					);
@@ -346,7 +347,7 @@ class AppLayout extends Component {
 						style={{height: 55}}
 					/>
 					{watchlistBar}
-					<div ref="scrollableView" className="scrollable-pane-content">
+					<div ref="scrollableView" className="scrollable-pane-content" style={{ backgroundColor: (title.present.activePane == 'confirm order' ? styles.positivePrimaryColor : '')}}>
 						{titleBar}
 						{pane}
 					</div>

@@ -80,7 +80,9 @@ export function selectedOrderSide(fixedTitle, options={}) {
         dispatch(resetCurrentOrder({
             side: options.side,
             symbol: options.symbol,
-            type: 'market'
+            type: 'market',
+            trigger: 'immediate',
+            time_in_force: 'gfd'
         }));
         dispatch(initTitle(fixedTitle, options));
         return Promise.resolve()
@@ -92,7 +94,9 @@ export function selectedMarketOrderType(fixedTitle, options={}) {
         dispatch(resetCurrentOrder({
             side: state.currentOrder.side,
             symbol: state.currentOrder.symbol,
-            type: 'market'
+            type: 'market',
+            trigger: 'immediate',
+            time_in_force: 'gfd'
         }));
         dispatch(backToOrderPlacementPane());
         return Promise.resolve()
@@ -126,7 +130,7 @@ export function setStopPrice(fixedTitle, options={}) {
             }
         }));
         dispatch(changeTitle(fixedTitle, options));
-        return Promise.resolve()
+        return Promise.resolve();
     };
 }
 export function setOrderPrice(fixedTitle, options={}) {
@@ -137,7 +141,7 @@ export function setOrderPrice(fixedTitle, options={}) {
             }
         }));
         dispatch(changeTitle(fixedTitle, options));
-        return Promise.resolve()
+        return Promise.resolve();
     };
 }
 export function selectedTimeInForce(time_in_force) {
@@ -148,11 +152,17 @@ export function selectedTimeInForce(time_in_force) {
             ...state.currentOrder.potential
         }));
         dispatch(backToOrderPlacementPane());
-        return Promise.resolve()
+        return Promise.resolve();
     };
 }
-export function confirmOrder() {
+export function confirmOrder(quantity) {
     console.log('Confirm Order action');
+    return (dispatch, getState) => {
+        const state = getState();
+        dispatch(updateCurrentOrder({quantity}));
+        dispatch(changeTitle(state.title.present.fixedTitle, {...state.title.present, activePane: 'confirm order'}));
+        return Promise.resolve();
+    };
 }
 export const changeDisplayedValue = (value) => {
     return {

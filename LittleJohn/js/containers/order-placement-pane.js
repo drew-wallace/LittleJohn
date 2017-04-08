@@ -19,13 +19,14 @@ const mapStateToProps = (state) => {
         stockType,
         stock,
         currentOrder,
-        primaryColor: state.primaryColor
+        primaryColor: state.primaryColor,
+        title: state.title.present
     }
 }
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        confirmOrder: (fixedTitle, options) => dispatch(confirmOrder())
+        confirmOrder: (quantity) => dispatch(confirmOrder(quantity))
     }
 }
 
