@@ -74,17 +74,24 @@ class OrderPlacementPaneComponent extends Component {
 		let element = ReactDOM.findDOMNode(elm);
 		element.style.transitionDuration = `0ms`;
 		element.style.transform = `translate(0px,${e.deltaY}px)`;
+		element.style.zIndex = '1100';
 	}
 	handleSwipeEnd(e, elm) {
 		let { url, dismissCard, robinhood } = this.props;
 		let element = ReactDOM.findDOMNode(elm);
 		const height = element.offsetHeight;
-		element.style.transitionDuration = `450ms`;
+		element.style.transitionDuration = `200ms`;
 		element.style.transform = `translate(0px,${e.deltaY}px)`;
 		if (e.deltaY < 0 && Math.abs(e.deltaY / height) >= 0.5) {
-			console.log('swiped up', e.deltaY, height, Math.abs(e.deltaY / height));
+			console.log('swiped up');
+			// won't need this after action code is placed here
 			element.style.transform = `translate(0px,0px)`;
 		} else {
+			function fixOverlay() {
+				element.style.zIndex = '0';
+				element.removeEventListener('transitionend', fixOverlay);
+			}
+			element.addEventListener('transitionend', fixOverlay, false);
 			element.style.transform = `translate(0px,0px)`;
 		}
 	}
@@ -111,9 +118,9 @@ class OrderPlacementPaneComponent extends Component {
 		//   Estimated Credit    {quantity} share(s) available <-- Becomes ${shares * Market price}
 
 		return (
-			<Hammer onPan={(e) => this.handleSwipe(e, this.refs.order)} onPanEnd={(e) => this.handleSwipeEnd(e, this.refs.order)}>
-				<div ref="order">
-					<div style={(this.state.showSwipeView ? {margin: 15, backgroundColor: '#000000'} : {})}>
+			<Hammer onPan={(e) => this.handleSwipe(e, this.refs.order)} onPanEnd={(e) => this.handleSwipeEnd(e, this.refs.order)} options={{recognizers: {pan: {enable: this.state.showSwipeView, direction: HammerJS.DIRECTION_VERTICAL}}}}>
+				<div ref="order" style={(this.state.showSwipeView ? {display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'space-between', position: 'absolute', width: '100%', marginTop: -55} : {})}>
+					<div style={(this.state.showSwipeView ? { margin: 15, backgroundColor: '#000000', position: 'relative', top: 55} : {})}>
 						<List>
 							<ListItem
 								leftIcon={!this.state.showSwipeView && (<IconButton style={{paddingTop: 0}} onTouchTap={() => this.setState({ showSharesInfo: `You can ${(currentOrder.side == 'sell' ? 'sell' : 'afford')} ${formatNumberBig(shares)} share(s) of ${currentOrder.symbol}.`})}><InfoOutline/></IconButton>)}
@@ -181,7 +188,7 @@ class OrderPlacementPaneComponent extends Component {
 							onRequestClose={this.handleRequestClose.bind(this)}
 						/>
 					</div>
-					<div style={{display: 'flex', flexDirection: 'column'}}>
+					<div style={{ display: (this.state.showSwipeView ? 'flex' : 'none'), flexDirection: 'column', paddingBottom: 30}}>
 						<KeyboardArrowUp style={{margin: '0 auto'}}/>
 						<span style={{margin: '0 auto'}}>Swipe up to trade</span>
 					</div>
