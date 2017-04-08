@@ -27,7 +27,7 @@ class OrderPaneComponent extends Component {
 	}
 
 	toNumber(value) {
-		return value.toString().match(/[0-9]*/)[0]
+		return value.toString().match(/[0-9]*/)[0];
 	};
 
 	toggleNextButton() {

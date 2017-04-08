@@ -1,4 +1,6 @@
-﻿const positions = (state = {}, action) => {
+﻿import _ from 'lodash';
+
+const positions = (state = {}, action) => {
     switch (action.type) {
         case 'INVALIDATE_POSITIONS':
             return Object.assign({}, state, {

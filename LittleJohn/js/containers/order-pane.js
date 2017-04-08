@@ -25,7 +25,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        cancelOrder: (url) => dispatch(cancelOrder(url))
+        cancelOrder: (url, symbol, orderRes) => dispatch(cancelOrder(url, symbol, orderRes))
     }
 }
 
