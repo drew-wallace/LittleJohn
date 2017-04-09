@@ -174,11 +174,13 @@ class AppLayout extends Component {
 					break;
 				case 'buy':
 				case 'sell':
-				case 'confirm order':
 					iconElementRight = (
 						<FlatButton label="Order Types" onTouchTap={() => changeTitle('Order Types', {activePane: 'order types', hasBackButton: true})}/>
 					);
 					pane = (<OrderPlacementPaneContainer/>);
+					break;
+				case 'confirm order':
+					pane = (<OrderPlacementPaneContainer />);
 					break;
 				case 'order types':
 					pane = (

@@ -58,6 +58,20 @@ export const initTitle = (fixedTitle='Portfolio', options={}) => {
         fixedTitle
     };
 }
+export function showMoreNews(fixedTitle, options={}) {
+    return (dispatch) => {
+        dispatch(changePrimaryColor(styles.positivePrimaryColor));
+        dispatch(initTitle(fixedTitle, options));
+        return Promise.resolve()
+    };
+}
+export function showPastOrder(fixedTitle, options = {}) {
+    return (dispatch) => {
+        dispatch(changePrimaryColor(styles.positivePrimaryColor));
+        dispatch(initTitle(fixedTitle, options));
+        return Promise.resolve()
+    };
+}
 export const backToOrderPlacementPane = () => {
     return {
         type: 'BACK_TO_ORDER_PLACEMENT_PANE'
@@ -77,6 +91,7 @@ export const resetCurrentOrder = (options={}) => {
 }
 export function selectedOrderSide(fixedTitle, options={}) {
     return (dispatch) => {
+        dispatch(changePrimaryColor(styles.positivePrimaryColor));
         dispatch(resetCurrentOrder({
             side: options.side,
             symbol: options.symbol,

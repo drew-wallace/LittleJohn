@@ -32,7 +32,8 @@ class PositionPaneComponent extends Component {
 	}
 
 	handleMoreNews() {
-		this.props.initTitle(`${this.props.stock.instrument.symbol} News`, {symbol: this.props.stock.instrument.symbol, activePane: 'news', hasBackButton: true});
+		// need to make custom action to do this and change primary color
+		this.props.showMoreNews(`${this.props.stock.instrument.symbol} News`, {symbol: this.props.stock.instrument.symbol, activePane: 'news', hasBackButton: true});
 	}
 
 	handleDescriptionExpanded() {
@@ -55,7 +56,7 @@ class PositionPaneComponent extends Component {
 
     render() {
 		// if(this.props.stock.lastUpdated) {
-			const { changePrimaryColor, primaryColor, stockType, initTitle } = this.props;
+			const { changePrimaryColor, primaryColor, stockType, showPastOrder } = this.props;
 			const { historicals, quote, instrument, fundamentals, orders } = this.props.stock;
 			const { buying_power } = this.props.account.accountData;
 			const news = this.props.stock.news.slice(0, Math.min(this.props.stock.news.length, 3));
@@ -166,7 +167,7 @@ class PositionPaneComponent extends Component {
 													innerDivStyle={{display: 'flex', flexDirection: 'row-reverse', flexWrap: 'wrap'}}
 													primaryText={(<span style={{flex: '0 1 50%'}}>{moment(order.updated_at).format('MMM DD, YYYY')}</span>)}
 													secondaryText={(<span style={{flex: '0 1 100%'}}>{`${_.capitalize(order.type)} ${_.capitalize(order.side)}`}</span>)}
-													onTouchTap={() => initTitle('', {activePane: 'order', hasBackButton: true, symbol: instrument.symbol, orderId: order.id})}
+													onTouchTap={() => showPastOrder('', {activePane: 'order', hasBackButton: true, symbol: instrument.symbol, orderId: order.id})}
 												>
 													<div style={{flex: '0 1 50%', display: 'flex', justifyContent: 'flex-end'}}>
 														<span style={{position: 'relative', top: '50%'}}>{status}</span>

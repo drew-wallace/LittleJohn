@@ -137,7 +137,7 @@ class OrderPlacementPaneComponent extends Component {
 											style={{height: 16, lineHeight: 16}}
 											underlineShow={false}
 											inputStyle={{textAlign: 'right'}}
-											hintStyle={{textAlign: 'right', bottom: 0, width: '100%'}}
+											hintStyle={{textAlign: 'right', bottom: 0, width: '100%', height: 16}}
 											disabled={this.state.showSwipeView}
 											onChange={(e, newVal) => {
 												const diff = this.diffStrings(newVal, this.state.value);
@@ -173,7 +173,7 @@ class OrderPlacementPaneComponent extends Component {
 							/>
 						</List>
 						<FloatingActionButton
-							style={{ display: (this.state.showPlaceOrderButton ? 'inline-block' : 'none') }}
+							style={{ display: (this.state.showPlaceOrderButton ? 'inline-block' : 'none'), float: 'right' }}
 							onTouchTap={() => confirmOrder(this.validNumberOfShares)}
 						>
 							<Check />
