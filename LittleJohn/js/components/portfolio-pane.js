@@ -39,8 +39,8 @@ class PortfolioPaneComponent extends Component {
 
     render() {
 		if(this.props.portfolio.lastUpdated) {
-			let { changePrimaryColor, primaryColor} = this.props;
-			let {equity, historicals, disclosures} = this.props.portfolio;
+			let {changePrimaryColor, primaryColor} = this.props;
+			let {equity, historicals, disclosures, adjusted_equity_previous_close} = this.props.portfolio;
 			let {day, week, month, quarter, year, all} = historicals;
 
 			return (
@@ -50,7 +50,7 @@ class PortfolioPaneComponent extends Component {
 						margin={{top: 0, right: 0, bottom: 0, left: 0}}
 						data={{day: day.equity_historicals, week: week.equity_historicals, quarter: quarter.equity_historicals, month: month.equity_historicals, year: year.equity_historicals, all: all.equity_historicals}}
 						changePrimaryColor={changePrimaryColor}
-						primaryColor={primaryColor}
+						previousClose={adjusted_equity_previous_close}
 					/>
 					<CardStackContainer/>
 					<PositionListContainer/>

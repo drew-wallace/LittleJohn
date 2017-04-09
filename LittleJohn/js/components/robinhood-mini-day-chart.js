@@ -13,7 +13,7 @@ class RobinhoodMiniDayChart extends Component {
     }
 
     render() {
-        const { historicals } = this.props.stock;
+        const { historicals, instrument, quote } = this.props.stock;
 
         const margin = {top: 0, right: 0, bottom: 0, left: 0};
         const width = 100 - margin.left - margin.right;
@@ -37,7 +37,8 @@ class RobinhoodMiniDayChart extends Component {
         return (
             <svg width={width + margin.left + margin.right} height={height + margin.top + margin.bottom}>
                 <g transform={`translate(${margin.left}, ${margin.top})`}>
-                    <path fill="none" stroke={(+_.last(data).adjusted_open_equity >= +data[0].adjusted_open_equity ? positivePrimaryColor : negativePrimaryColor)} strokeWidth="2.5px" d={lineD3(data)}></path>
+                    <path fill="none" stroke={(+_.last(data).open_price >= +quote.adjusted_previous_close ? positivePrimaryColor : negativePrimaryColor)} strokeWidth="2.5px" d={lineD3(data)}></path>
+                    <line className="dashed-line" x1='0' y1={y(quote.adjusted_previous_close)} x2={width} y2={y(quote.adjusted_previous_close)} stroke="white" strokeWidth="1px"></line>
                 </g>
             </svg>
         );

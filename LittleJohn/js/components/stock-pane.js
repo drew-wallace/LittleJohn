@@ -219,6 +219,7 @@ class PositionPaneComponent extends Component {
 						margin={{top: 0, right: 0, bottom: 0, left: 0}}
 						data={historicals}
 						changePrimaryColor={changePrimaryColor}
+						previousClose={quote.adjusted_previous_close}
 					/>
 					<div style={{display: 'flex', justifyContent: 'space-around', marginBottom: 15}}>
 						{sellButton}

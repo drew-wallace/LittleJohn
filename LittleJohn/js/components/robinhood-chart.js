@@ -23,7 +23,7 @@ class RobinhoodChart extends Component {
         this.generateSubtitle = _.memoize(this.generateSubtitle);
 
         const { subtitle, margin, width, height } = this.setupChart(this.props);
-        const newPrimaryColor = (+_.last(this.props.data.day)[this.openKey] >= +this.props.data.day[0][this.openKey] ? positivePrimaryColor : negativePrimaryColor);
+        const newPrimaryColor = (+_.last(this.props.data.day)[this.openKey] >= +this.props.previousClose ? positivePrimaryColor : negativePrimaryColor);
 
         this.state = {
             title: this.props.title,
@@ -77,7 +77,7 @@ class RobinhoodChart extends Component {
     changeTab(tab) {
         const equityKey = (tab == 'day' ? this.openKey : this.closeKey);
         const subtitle = this.generateSubtitle(tab, this.props.data[tab]);
-        const primaryColor = (+_.last(this.props.data[tab])[equityKey] >= +this.props.data[tab][0][equityKey] ? positivePrimaryColor : negativePrimaryColor)
+        const primaryColor = (+_.last(this.props.data[tab])[equityKey] >= +this.props.previousClose ? positivePrimaryColor : negativePrimaryColor)
         this.props.changePrimaryColor(primaryColor);
 		this.setState({
             tab,
@@ -145,7 +145,7 @@ class RobinhoodChart extends Component {
             }
 
             const subtitle = this.generateSubtitle('day', nextProps.data.day, nextProps.title);
-            const primaryColor = (+_.last(nextProps.data.day)[this.openKey] >= +nextProps.data.day[0][this.openKey] ? positivePrimaryColor : negativePrimaryColor);
+            const primaryColor = (+_.last(nextProps.data.day)[this.openKey] >= +this.props.previousClose ? positivePrimaryColor : negativePrimaryColor);
 
             this.setState({
                 title: nextProps.title,
@@ -247,6 +247,10 @@ class RobinhoodChart extends Component {
     }
 
     render() {
+        let previousClosePoint = this.y(this.props.previousClose);
+        if (previousClosePoint < 0) {
+            previousClosePoint = 0;
+        }
         return (
             <Card style={{marginBottom: 15}}>
                 <CardHeader
@@ -259,6 +263,8 @@ class RobinhoodChart extends Component {
                         <svg ref="chart" width={this.state.width + this.state.margin.left + this.state.margin.right} height={this.state.height + this.state.margin.top + this.state.margin.bottom}>
                             <g transform={`translate(${this.state.margin.left}, ${this.state.margin.top})`}>
                                 <path ref="mainLine" fill="none" stroke={this.state.primaryColor} strokeWidth="2.5px" d={this.lineD3(this.state.data)}></path>
+
+                                <line className="dashed-line" x1='0' y1={previousClosePoint} x2={this.state.width} y2={previousClosePoint} stroke="white" strokeWidth="1px"></line>
 
                                 <g ref="focus" height={this.state.height} transform="translate(0,0)" style={{display: 'none'}}>
                                     <line x1='0' y1='0' x2='0' y2={this.state.height} stroke="white" strokeWidth="2.5px"></line>

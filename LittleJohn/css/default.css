@@ -57,3 +57,7 @@
 .order-quantity-textbox > div {
     height: auto !important;
 }
+
+.dashed-line {
+    stroke-dasharray: 1, 2;
+}
