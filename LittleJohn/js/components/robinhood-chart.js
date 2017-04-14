@@ -145,7 +145,7 @@ class RobinhoodChart extends Component {
             }
 
             const subtitle = this.generateSubtitle('day', nextProps.data.day, nextProps.title);
-            const primaryColor = (+_.last(nextProps.data.day)[this.openKey] >= +this.props.previousClose ? positivePrimaryColor : negativePrimaryColor);
+            const primaryColor = (+_.last(nextProps.data.day)[this.openKey] >= +nextProps.previousClose ? positivePrimaryColor : negativePrimaryColor);
 
             this.setState({
                 title: nextProps.title,

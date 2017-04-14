@@ -15,6 +15,7 @@ import Search from 'material-ui/svg-icons/action/search';
 import PorfolioPaneContainer from '../containers/portfolio-pane';
 import StockPaneContainer from '../containers/stock-pane';
 import OrderPlacementPaneContainer from '../containers/order-placement-pane';
+import OrderPlacedPane from '../containers/order-placed-pane';
 import LimitOrderPane from '../containers/limit-order-pane';
 import StopOrderPane from '../containers/stop-order-pane';
 import OrderPane from '../containers/order-pane';
@@ -181,6 +182,10 @@ class AppLayout extends Component {
 					break;
 				case 'confirm order':
 					pane = (<OrderPlacementPaneContainer />);
+					break;
+				case 'placed order':
+					titleBar = (<div></div>);
+					pane = (<OrderPlacedPane/>);
 					break;
 				case 'order types':
 					pane = (
@@ -349,7 +354,7 @@ class AppLayout extends Component {
 						style={{height: 55}}
 					/>
 					{watchlistBar}
-					<div ref="scrollableView" className="scrollable-pane-content" style={{ backgroundColor: (title.present.activePane == 'confirm order' ? styles.positivePrimaryColor : '')}}>
+					<div ref="scrollableView" className="scrollable-pane-content" style={{ backgroundColor: (title.present.activePane == 'confirm order' || title.present.activePane == 'placed order' ? styles.positivePrimaryColor : '')}}>
 						{titleBar}
 						{pane}
 					</div>

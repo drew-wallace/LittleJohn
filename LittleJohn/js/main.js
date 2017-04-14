@@ -12,11 +12,11 @@ import _ from 'lodash';
 import LittleJohnApp from './reducers';
 import Robinhood from './lib/robinhood';
 import processPortfolio from './lib/process-portfolio';
+import { undoTitle } from './actions';
 
 import LoginPage from './containers/login-page';
 
 import env from "../env";
-
 import styles from './styles';
 
 let app = WinJS.Application;
@@ -91,5 +91,12 @@ app.oncheckpoint = function (args) {
     const state = store.getState();
     app.sessionState = {...state};
 };
+
+app.onbackclick = function (event) {
+    store.dispatch(undoTitle());
+
+    // Need to return true to cancel the default behavior of this event.
+    return true;
+}
 
 app.start();

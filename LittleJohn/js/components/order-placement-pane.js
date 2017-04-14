@@ -83,9 +83,9 @@ class OrderPlacementPaneComponent extends Component {
 		element.style.transitionDuration = `200ms`;
 		element.style.transform = `translate(0px,${e.deltaY}px)`;
 		if (e.deltaY < 0 && Math.abs(e.deltaY / height) >= 0.5) {
-			console.log('swiped up');
+			console.log(this.props.currentOrder);
 			// won't need this after action code is placed here
-			element.style.transform = `translate(0px,0px)`;
+			// element.style.transform = `translate(0px,0px)`;
 		} else {
 			function fixOverlay() {
 				element.style.zIndex = '0';
@@ -143,7 +143,7 @@ class OrderPlacementPaneComponent extends Component {
 												const diff = this.diffStrings(newVal, this.state.value);
 												if (diff === undefined || !isNaN(diff)) {
 													newVal = this.toNumber(newVal);
-													this.validNumberOfShares = newVal;
+													this.validNumberOfShares = +newVal;
 													this.toggleNextButton();
 												}
 											}}

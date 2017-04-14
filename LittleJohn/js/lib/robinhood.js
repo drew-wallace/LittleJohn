@@ -307,15 +307,15 @@ class Robinhood{
             this._setHeaders(request);
             request.send(this._formatParams({
                     account: this._private.account.url,
-                    instrument: options.instrument.url,
-                    price: options.bid_price,
+                    instrument: options.instrument,
+                    price: options.price,
                     stop_price: options.stop_price,
                     quantity: options.quantity,
-                    side: options.transaction,
-                    symbol: options.instrument.symbol.toUpperCase(),
-                    time_in_force: options.time || 'gfd',
-                    trigger: options.trigger || 'immediate',
-                    type: options.type || 'market'
+                    side: options.side,
+                    symbol: options.symbol,
+                    time_in_force: options.time_in_force,
+                    trigger: options.trigger,
+                    type: options.type
                 }, true));
             request.onload = function () {
                 request.responseJSON = JSON.parse(request.response);

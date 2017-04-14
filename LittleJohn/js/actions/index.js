@@ -77,6 +77,11 @@ export const backToOrderPlacementPane = () => {
         type: 'BACK_TO_ORDER_PLACEMENT_PANE'
     };
 }
+export const backToStockPane = () => {
+    return {
+        type: 'BACK_TO_STOCK_PANE'
+    };
+}
 export const updateCurrentOrder = (options={}) => {
     return {
         type: 'UPDATE_CURRENT_ORDER',
@@ -95,6 +100,7 @@ export function selectedOrderSide(fixedTitle, options={}) {
         dispatch(resetCurrentOrder({
             side: options.side,
             symbol: options.symbol,
+            instrument: options.instrumentUrl,
             type: 'market',
             trigger: 'immediate',
             time_in_force: 'gfd'
@@ -125,7 +131,9 @@ export function selectedOrderTypeWithPrice(fixedTitle, options={}) {
         currentOrderOptions.trigger = 'stop';
     } else if (currentOrderOptions.type == 'stop limit') {
         currentOrderOptions.type = 'limit';
-        currentOrderOptions.trigger = 'stop'
+        currentOrderOptions.trigger = 'stop';
+    } else {
+        currentOrderOptions.trigger = 'immediate';
     }
 
     currentOrderOptions.price = 0;
@@ -162,20 +170,37 @@ export function setOrderPrice(fixedTitle, options={}) {
 export function selectedTimeInForce(time_in_force) {
     return (dispatch, getState) => {
         const state = getState();
-        dispatch(updateCurrentOrder({
+        let cleanPotential = {...state.currentOrder.potential};
+        if(cleanPotential.price === 0) {
+            delete cleanPotential.price;
+        }
+        if(cleanPotential.stop_price === 0) {
+            delete cleanPotential.stop_price;
+        }
+        dispatch(resetCurrentOrder({
+            side: state.currentOrder.side,
+            symbol: state.currentOrder.symbol,
+            instrument: state.currentOrder.instrument,
+            type: state.currentOrder.type,
+            ...cleanPotential,
             time_in_force,
-            ...state.currentOrder.potential
         }));
         dispatch(backToOrderPlacementPane());
         return Promise.resolve();
     };
 }
 export function confirmOrder(quantity) {
-    console.log('Confirm Order action');
     return (dispatch, getState) => {
         const state = getState();
         dispatch(updateCurrentOrder({quantity}));
         dispatch(changeTitle(state.title.present.fixedTitle, {...state.title.present, activePane: 'confirm order'}));
+        return Promise.resolve();
+    };
+}
+export function placeOrder() {
+    return (dispatch, getState) => {
+        const state = getState();
+        dispatch(changeTitle(state.title.present.fixedTitle, { ...state.title.present, activePane: 'placed order' }));
         return Promise.resolve();
     };
 }

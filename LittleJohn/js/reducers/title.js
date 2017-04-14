@@ -28,6 +28,8 @@ title = undoable(title, {
 })
 
 title = recycleState(title, ['INIT_TITLE', 'BACK_TO_ORDER_PLACEMENT_PANE'], (state, action) => {
+    let past;
+
     switch (action.type) {
         case 'INIT_TITLE':
             return {
@@ -58,11 +60,20 @@ title = recycleState(title, ['INIT_TITLE', 'BACK_TO_ORDER_PLACEMENT_PANE'], (sta
                 ]
             };
         case 'BACK_TO_ORDER_PLACEMENT_PANE':
-            let past = state.past.slice(0, 3);
+            past = state.past.slice(0, 3);
 
             return {
                 _latestUnfiltered: _.last(past),
                 past: state.past.slice(0, 2),
+                present: _.last(past),
+                future: []
+            };
+        case 'BACK_TO_STOCK_PANE':
+            past = state.past.slice(0, 4);
+
+            return {
+                _latestUnfiltered: _.last(past),
+                past: state.past.slice(0, 3),
                 present: _.last(past),
                 future: []
             };
