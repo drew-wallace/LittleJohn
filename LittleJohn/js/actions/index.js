@@ -197,7 +197,7 @@ export function confirmOrder(quantity) {
         return Promise.resolve();
     };
 }
-export function placeOrder() {
+export function placedOrder() {
     return (dispatch, getState) => {
         const state = getState();
         dispatch(changeTitle(state.title.present.fixedTitle, { ...state.title.present, activePane: 'placed order' }));

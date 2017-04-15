@@ -5,13 +5,15 @@ import _ from 'lodash';
 
 import { backToStockPane } from '../actions';
 
-import OrderPlacementPaneComponent from '../components/order-placement-pane';
+import OrderPlacedPaneComponent from '../components/order-placed-pane';
 
 const mapStateToProps = (state) => {
     const currentOrder = state.currentOrder;
+    const stock = state.stocks[currentOrder.symbol];
 
     return {
         currentOrder,
+        stock,
         primaryColor: state.primaryColor,
         title: state.title.present
     }
@@ -26,6 +28,6 @@ const mapDispatchToProps = (dispatch) => {
 const OrderPlacementPaneContainer = connect(
     mapStateToProps,
     mapDispatchToProps
-)(OrderPlacementPaneComponent);
+)(OrderPlacedPaneComponent);
 
 export default OrderPlacementPaneContainer;

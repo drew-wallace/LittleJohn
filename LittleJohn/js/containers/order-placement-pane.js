@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 
-import { changeTitleFromTab, confirmOrder } from '../actions';
+import { changeTitleFromTab, confirmOrder, placedOrder } from '../actions';
 
 import OrderPlacementPaneComponent from '../components/order-placement-pane';
 
@@ -26,7 +26,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        confirmOrder: (quantity) => dispatch(confirmOrder(quantity))
+        confirmOrder: (quantity) => dispatch(confirmOrder(quantity)),
+        placedOrder: (quantity) => dispatch(placedOrder(quantity))
     }
 }
 

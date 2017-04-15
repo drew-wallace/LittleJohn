@@ -105,6 +105,7 @@ class AppLayout extends Component {
 			let watchlistBar = (<div></div>);
 			const watchlistItems = _.extend({}, watchlist.items, positions.items);
 			let { buying_power } = this.props.account.accountData;
+			let hideAppBar = false;
 
 			if(title.present.hasBackButton) {
 				iconElementLeft = (
@@ -185,6 +186,7 @@ class AppLayout extends Component {
 					break;
 				case 'placed order':
 					titleBar = (<div></div>);
+					hideAppBar = true;
 					pane = (<OrderPlacedPane/>);
 					break;
 				case 'order types':
@@ -351,7 +353,7 @@ class AppLayout extends Component {
 						onLeftIconButtonTouchTap={onLeftIconButtonTouchTap}
 						iconElementRight={iconElementRight}
 						iconStyleRight={{marginBottom: 8, alignSelf: 'center'}}
-						style={{height: 55}}
+						style={{height: 55, visibility: (hideAppBar ? 'hidden': 'visible')}}
 					/>
 					{watchlistBar}
 					<div ref="scrollableView" className="scrollable-pane-content" style={{ backgroundColor: (title.present.activePane == 'confirm order' || title.present.activePane == 'placed order' ? styles.positivePrimaryColor : '')}}>

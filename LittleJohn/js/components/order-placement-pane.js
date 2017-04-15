@@ -83,7 +83,7 @@ class OrderPlacementPaneComponent extends Component {
 		element.style.transitionDuration = `200ms`;
 		element.style.transform = `translate(0px,${e.deltaY}px)`;
 		if (e.deltaY < 0 && Math.abs(e.deltaY / height) >= 0.5) {
-			console.log(this.props.currentOrder);
+			this.props.placedOrder();
 			// won't need this after action code is placed here
 			// element.style.transform = `translate(0px,0px)`;
 		} else {
